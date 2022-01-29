@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 
@@ -58,7 +59,7 @@ public class DriveHardware {
 	public DriveHardware() {
 		gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		
-		solenoid = new Solenoid(0);
+		solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
 		leftMaster = new CANSparkMax(4, MotorType.kBrushless);
 		leftSlave1 = new CANSparkMax(5, MotorType.kBrushless);
