@@ -1,20 +1,21 @@
 package frc.robot.Mechanisms;
+/*----------------------
+CONTROLS THE ELEVATOR SPEEDS
+----------------------*/
 
 public class Elevator {
-    public static enum elevatorState {
+    public static enum runElevator {
         IDLE, RUN;
     }
 
-    private elevatorState runElevator;
-
-    /*run(STATE)
-Switch-case
-States IDLE, RUN
-CASE IDLE
-Set elevator motor speed to 0
-CASE RUN
-Set elevator motor speed to x
-*/
+    public void run(runElevator elevatorState) {
+        switch(elevatorState) {
+            case IDLE:
+                //set elevator motor speed to 0
+            case RUN:
+                //set elevator motor speed to x
+        }
+    }
 
     
 }

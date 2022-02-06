@@ -48,7 +48,6 @@ public class curveTrajectory {
     public enum Direction {
         LEFT, RIGHT;
     }
-
     private Direction direction;
 
     public run runCurve = run.IDLE;
@@ -58,7 +57,7 @@ public class curveTrajectory {
         this.torDrive = torDrive;
         this.outer_distance = outer_distance;
         this.timeout = timeout;
-        this.direction = direction;
+        this.direction = direction.LEFT;
     }
 
     public boolean isDone() {
@@ -69,7 +68,7 @@ public class curveTrajectory {
         isFinished = false;
         runCurve = run.GO;
         startDistance = torDrive.getRightEncoder();
-        //ANGLE STUFF!
+        //ANGLE STUFF
         /*
 		firstAngle = drive.getHeading();
 		currentAngle = drive.getHeading();
@@ -102,7 +101,7 @@ public class curveTrajectory {
 			break;
 		case GO:
             
-            //ANGLE CORRECTION STUFF, DON'T USE!
+            //ANGLE CORRECTION STUFF, NOT USED FOR CURVE TRAJECTORY
             /*
 			angleError = currentAngle - firstAngle;
 			//is in radians so we have to make sure that it goes from -pi to pi and does not have 
@@ -133,19 +132,22 @@ public class curveTrajectory {
 			vP = error * tkP;
 			
 			currentVelocity = derivative.estimate(torDrive.getRightEncoder());//almost always positive
-			//has to be multiplied by -1 so that if it is approaching the target to fast
-			//it does not act as a positive. Because, if it was approaching fast, the
-			//derivative would be positive
+			/*has to be multiplied by -1 so that if it is approaching the target to fast
+			 *it does not act as a positive. Because, if it was approaching fast, the
+			 *derivative would be positive
+			 */
 			vD = (currentVelocity) * tkD * (180 / Math.PI);//degrees per second
 			velocity = vP + vD + (vI * tkI * kF);
 			//velocity is good
             
+			//Cuts the velocity off at Max Speed
             if(velocity > maxSpeed) {
 				velocity = maxSpeed;
 			} else if(velocity < -maxSpeed) {
 				velocity = -maxSpeed;
 			}
 			
+			//Sets Left & Right Motor speeds to velocity. Left motor has a ratio of 0.9 to make it turn.
 			torDrive.setMotorSpeeds(velocity * 0.9, velocity );//left, right
 				if((Math.abs(error) <= positionTolerance
 						//&& Math.abs(angleError) <= headingTolerance
