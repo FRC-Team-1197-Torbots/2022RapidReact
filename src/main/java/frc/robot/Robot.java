@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Mechanisms.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,6 +22,20 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+
+  private XboxController player2;
+  private Flywheel flywheel;
+  
+  public Robot() {
+    player2 = new XboxController(1);
+    flywheel = new Flywheel(player2);
+  }
+  
+  
+  
+  
+  
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -78,7 +94,13 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    if (player2.getXButtonPressed())
+      flywheel.revUp(0);
+    else
+      flywheel.stop();
+      
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
