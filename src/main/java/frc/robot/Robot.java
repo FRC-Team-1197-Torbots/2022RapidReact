@@ -95,10 +95,10 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if (player2.getXButtonPressed())
-      flywheel.revUp(0);
+    if (player2.getAButton())
+      flywheel.run(true, true);
     else
-      flywheel.stop();
+      flywheel.run(false, false);
       
   }
 
