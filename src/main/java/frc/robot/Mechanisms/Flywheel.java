@@ -23,14 +23,17 @@ import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel {
-    private final double targetHighSpeed = -1000f;// rpm 5676 theoretical max
+    //2950 rpm is shot from 11ft. kp = 0.02 i = 0.4, d = 0
+    //2400 rpm is shot from 6 ft. kp = 0.02, i = 0.4, d = 0
+    //3500 rpm is shot from 16 ft. kp = 0.02, kI = 0.4, kD = 0
+    private final double targetHighSpeed = -2675f;// rpm 5676 theoretical max
     private final double targetLowSpeed = 200f;//rpm
     private final double highSpeedConstant = 0.0;//0.9
     private final double lowSpeedConstant = 0.0;
-    // private final double adjustingConstant = 1.0 / 3;
-    private final double kP = 0.05;//.00035
-    private final double kI = 0.9;//.000005
-    private final double kD = 0.0001; //original 0.5 0 0
+    // RPM below 2000 p = 0.045 i = 0.4 d = 0
+    private final double kP = 0.02;//.00035//0.05
+    private final double kI = 0.4;//.000005
+    private final double kD = 0.00; //original 0.5 0 0
     private double FeedForward;
     private final double MaxMotorSpeed = 5676f;
     private double currentError = 0;
@@ -119,14 +122,15 @@ public class Flywheel {
             currentSpeed = flywheelEncoder1.getVelocity() / MaxMotorSpeed;//rpm
             speedToSetMotor = pidRun(currentSpeed, FeedForward);
 
-            System.out.println("RPM: " + currentSpeed);
-            System.out.println("Feedforward " + FeedForward);
+            System.out.println("RPM: " + (int)(currentSpeed * 5676));
+            //System.out.println("Feedforward " + FeedForward);
            
             flywheelMotor1.set(speedToSetMotor);
             //otherFlywheelMotor.set(speedToSetMotor);
         }
         else {
             flywheelMotor1.set(0 * 1.0f);
+            sumSpeed = 0;
             //System.out.println("RPM: " + flywheelEncoder1.getVelocity());
             //otherFlywheelMotor.set(-0 * 1.0f);
         }
