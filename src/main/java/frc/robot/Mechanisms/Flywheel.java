@@ -23,14 +23,14 @@ import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel {
-    private final double targetHighSpeed = -2000f;// rpm 5676 theoretical max
-    private final double targetLowSpeed = 1000f;//rpm
+    private final double targetHighSpeed = -1000f;// rpm 5676 theoretical max
+    private final double targetLowSpeed = 200f;//rpm
     private final double highSpeedConstant = 0.0;//0.9
     private final double lowSpeedConstant = 0.0;
     // private final double adjustingConstant = 1.0 / 3;
-    private final double kP = 0.1;//.00035
-    private final double kI = 0.0;//.000005
-    private final double kD = 0.0; //original 0.5 0 0
+    private final double kP = 0.05;//.00035
+    private final double kI = 0.9;//.000005
+    private final double kD = 0.0001; //original 0.5 0 0
     private double FeedForward;
     private final double MaxMotorSpeed = 5676f;
     private double currentError = 0;
@@ -48,7 +48,7 @@ public class Flywheel {
     // private double currentPosition;
     private final double gearRatio = 1;// ratio from encoder to flywheel
     private CANSparkMax flywheelMotor1;
-    private CANSparkMax otherFlywheelMotor;
+    //private CANSparkMax otherFlywheelMotor;
     private CANEncoder flywheelEncoder1;
     // private CANEncoder flywheelEncoder2;
     private XboxController player2;
@@ -62,14 +62,17 @@ public class Flywheel {
     private boolean starting = true;
 
     public Flywheel(XboxController player2) {
-        // this.flywheelMotor1 = flywheelMotor1;
+       
         // this.otherFlywheelMotor = flywheelMotor2;
         // this.flywheelMotor2.follow(this.flywheelMotor1);
-        // this.flywheelEncoder1 = this.flywheelMotor1.getEncoder();
+        
         // this.flywheelEncoder2 = this.flywheelMotor2.getEncoder();
-        flywheelMotor1 = new CANSparkMax(8, MotorType.kBrushless);
-        otherFlywheelMotor = new CANSparkMax(7, MotorType.kBrushless);
-        flywheelEncoder1 = otherFlywheelMotor.getEncoder();
+        flywheelMotor1 = new CANSparkMax(7, MotorType.kBrushless);
+
+        //this.flywheelMotor1 = flywheelMotor1;
+        this.flywheelEncoder1 = flywheelMotor1.getEncoder();
+        //otherFlywheelMotor = new CANSparkMax(7, MotorType.kBrushless);
+        //flywheelEncoder1 = otherFlywheelMotor.getEncoder();
 
         this.player2 = player2;
         // findCurrentSpeed = new TorDerivative(dt);
@@ -120,12 +123,12 @@ public class Flywheel {
             System.out.println("Feedforward " + FeedForward);
            
             flywheelMotor1.set(speedToSetMotor);
-            otherFlywheelMotor.set(speedToSetMotor);
+            //otherFlywheelMotor.set(speedToSetMotor);
         }
         else {
             flywheelMotor1.set(0 * 1.0f);
             //System.out.println("RPM: " + flywheelEncoder1.getVelocity());
-            otherFlywheelMotor.set(-0 * 1.0f);
+            //otherFlywheelMotor.set(-0 * 1.0f);
         }
 
         
