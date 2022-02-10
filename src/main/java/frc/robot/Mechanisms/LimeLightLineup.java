@@ -34,7 +34,7 @@ public class LimeLightLineup {
                 right_command -= steering_adjust;
         }
     }
-    public void calculate_distance(){
+    public double calculate_distance(){
         //IF isAligned = true
             //use the function d = (h2-h1) / tan(a1+a2) to calculate
     }

@@ -96,9 +96,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (player2.getAButton())
-      flywheel.run(true, true);
+      flywheel.run(true, true, 8); //SET A CONSTANT VALUE FOR THE THIRD PARAMETER (FOR NOW).
+                                    //EVENTUALLY IT WILL BE FED THE DISTANCE VALUES RETURNED BY THE LIMELIGHT
     else
-      flywheel.run(false, false);
+      flywheel.run(false, false, 8);
       
   }
 

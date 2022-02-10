@@ -26,7 +26,7 @@ public class Flywheel {
     //2950 rpm is shot from 11ft. kp = 0.02 i = 0.4, d = 0
     //2400 rpm is shot from 6 ft. kp = 0.02, i = 0.4, d = 0
     //3500 rpm is shot from 16 ft. kp = 0.02, kI = 0.4, kD = 0
-    private final double targetHighSpeed = -2675f;// rpm 5676 theoretical max
+    private double targetHighSpeed;// rpm 5676 theoretical max
     private final double targetLowSpeed = 200f;//rpm
     private final double highSpeedConstant = 0.0;//0.9
     private final double lowSpeedConstant = 0.0;
@@ -111,9 +111,10 @@ public class Flywheel {
     }
     */
 
-    public void run(boolean run, boolean forceOn) {
+    public void run(boolean run, boolean forceOn, double distance) {
         //testing high speed
         if (run) {
+            targetHighSpeed = -((108 * distance) + 1776); //FORMULA FOR THE DISTANCE
             targetSpeed = targetHighSpeed;
             FeedForward = targetSpeed/MaxMotorSpeed;
             
