@@ -10,8 +10,12 @@ public class LimeLightLineup {
 
     }
 
-    /*
+    public boolean linedUp() {
+            return false;
+    }
+
     public void lineup(){
+        /*
         float Kp = -0.1f;
         float min_command = 0.05f;
 
@@ -33,11 +37,13 @@ public class LimeLightLineup {
                 left_command += steering_adjust;
                 right_command -= steering_adjust;
         }
+        */
     }
-    public double calculate_distance(){
+    public double calculateDistance(){
+        return 0.0;
         //IF isAligned = true
             //use the function d = (h2-h1) / tan(a1+a2) to calculate
     }
-    */
+
     
 }

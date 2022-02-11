@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
   
   public Robot() {
     player2 = new XboxController(1);
-    flywheel = new Flywheel(player2);
+    flywheel = new Flywheel();
   }
   
   
@@ -98,8 +98,18 @@ public class Robot extends TimedRobot {
     if (player2.getAButton())
       flywheel.run(true, true, 8); //SET A CONSTANT VALUE FOR THE THIRD PARAMETER (FOR NOW).
                                     //EVENTUALLY IT WILL BE FED THE DISTANCE VALUES RETURNED BY THE LIMELIGHT
-    else
-      flywheel.run(false, false, 8);
+    else {
+      //flywheel.run(false, false, 8);
+      flywheel.stop();
+    }
+      
+
+
+
+    /*
+    CODE TO RUN THE TURRET
+    turret.run();
+    */
       
   }
 
