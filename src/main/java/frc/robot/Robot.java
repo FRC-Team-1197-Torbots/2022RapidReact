@@ -106,21 +106,23 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //turret.init();
-    /*
+    turret.init();
+    /* ***************FLY WHEEL TEST CODE***********
     if (player2.getAButton())
       flywheel.run(true, true);
     else
       flywheel.run(false, false);
     */
-    if (player2.getBButton()){
+
+    
+    /*if (player2.getBButton()){
       turret.test("right");
     } else if(player2.getXButton()) {
       turret.test("left");
     }
     else{
       turret.test("stop");
-    }
+    }*/
 
     // if (player2.getXButton()){
       // turret.test("left");

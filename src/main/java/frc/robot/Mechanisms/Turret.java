@@ -30,8 +30,14 @@ CALLS METHODS FROM ELEVATOR, FLYWHEEL, AND LIMELIGHTLINEUP CLASS.
 
 public class Turret {
     public static enum runTurret{
-        IDLE, LINEUP, REVUP, SHOOT;
+        INIT, IDLE, LINEUP, REVUP, SHOOT;
     }
+
+    public enum INIT_STATES {
+        INIT,TURN, RETURN, ZERO, IDLE
+    }
+
+    private INIT_STATES m_initstate;
     
     private runTurret turretState = runTurret.IDLE;
     private final TalonSRX talon;
@@ -51,11 +57,50 @@ public class Turret {
         zeroSensor = new DigitalInput(0);
         breakBeam = new DigitalInput(1);
         talon = new TalonSRX(10);
+
+
+        m_initstate = INIT_STATES.TURN;
     }
 
     public void init(){
-        //System.out.println("go");
-        units = degrees_to_units(45f);
+        
+        switch(m_initstate) {
+            case INIT:
+                talon.setSelectedSensorPosition(0);
+                m_initstate = INIT_STATES.TURN;
+            break;
+
+            case TURN:
+                //turn 45 degress                
+                if(Math.abs(units_to_degrees(talon.getSelectedSensorPosition())) >= 45.0f ) {
+                    talon.set(ControlMode.PercentOutput, 0.0f);
+                    m_initstate = INIT_STATES.RETURN;
+                } else {
+                    talon.set(ControlMode.PercentOutput, 0.2f);
+                }
+            break;
+
+            case RETURN:
+                //return to the zero position
+                if(!zeroSensor.get()) {
+                    m_initstate = INIT_STATES.ZERO;
+                    talon.set(ControlMode.PercentOutput, 0.0f);
+                } else {
+                    talon.set(ControlMode.PercentOutput, -0.15f);
+                }
+            break;
+
+            case ZERO:
+                //set to zero
+                talon.setSelectedSensorPosition(0);
+                m_initstate = INIT_STATES.IDLE;
+            break;
+
+            case IDLE:
+
+            break;
+        }
+        /*units = degrees_to_units(45f);
         talon.set(ControlMode.PercentOutput, 0.2f);
         talon.setSelectedSensorPosition(units);
         //talon.set(ControlMode.PercentOutput, 0);
@@ -64,7 +109,7 @@ public class Turret {
             talon.set(ControlMode.PercentOutput, 0);
             talon.setSelectedSensorPosition(0);
             System.out.println("zeroed.");
-        }
+        }*/
 
     }
 
@@ -90,7 +135,7 @@ public class Turret {
             talon.setSelectedSensorPosition(0);
         }
 
-        System.out.println(breakBeam.get());
+        //System.out.println(breakBeam.get());
         //Diameter for large circle is 41.625 inches.
         //Diameter for inner circle is 1.26 inches.
         if(direction.equals("right")){
