@@ -30,7 +30,7 @@ CALLS METHODS FROM ELEVATOR, FLYWHEEL, AND LIMELIGHTLINEUP CLASS.
 
 public class Turret {
     public static enum runTurret{
-        IDLE, LINEUP, REVUP, SHOOT, DONE;
+        IDLE, LINEUP, REVUP, SHOOT;
     }
     
     private runTurret turretState = runTurret.IDLE;
@@ -114,26 +114,36 @@ public class Turret {
     }
 
     public void run() {
+    /*
+    CURRENTLY CODING BASED ON ASSUMPTION THAT ROBOT STOPS BEFORE SHOOTING. NOT CONSIDERING MOVING 
+    SHOTS JUST YET
+    
         switch(turretState) {
             case IDLE:
-                //if button pressed
-                    //runState = run.LINEUP
+                flywheel.run(false, false, 0);
+                elevator.run(runElevator.IDLE);
+
+                if (player2.getXButtonPressed()) {
+                    turretState = runTurret.LINEUP;
+                }
+            
             case LINEUP:
-                //if linedup = true
-                    //flywheel.init
-                    //runState = run.REVUP
+                limelight.lineup();
+                if (limelight.linedUp()) {
+                    flywheel.init();
+                    turretState = runTurret.REVUP;
+                }
             case REVUP:
-                //flywheel.revup(limelight.calculateDistance())
-                //if flywheel is done
-                    //elevator.init
-                    //runState = run.SHOOT
+                flywheel.run(true, true, limelight.calculateDistance());
+                if (flywheel.isFastEnough());
+                    //elevator.init();
+                    turretState = runTurret.SHOOT;
             case SHOOT:
-                //elevator.run
-            case DONE:
-                //stop elevator
-                //stop shootermotor
-            //if button is let go
-                //runState = run.DONE
+                elevator.run(runElevator.RUN);
+            
+            if (player2.getXButtonReleased()) {
+                turretState = runTurret.IDLE;
+            }
         } 
-    }
+    }*/
 }

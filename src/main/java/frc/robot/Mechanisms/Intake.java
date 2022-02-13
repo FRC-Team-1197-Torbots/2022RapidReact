@@ -1,5 +1,7 @@
 package frc.robot.Mechanisms;
 
+import com.revrobotics.CANSparkMax;
+
 /*-------------------------
 INTAKE CLASS CONTROLS EVERYTHING INTAKE RELATED. DRIVER PRESSES 1 BUTTON TO TOGGLE INTAKE
     -DROPS AND RAISES INTAKE
@@ -8,6 +10,7 @@ INTAKE CLASS CONTROLS EVERYTHING INTAKE RELATED. DRIVER PRESSES 1 BUTTON TO TOGG
 -------------------------*/
 
 public class Intake {
+    
     public static enum moveIntake{
         UP, DOWN, GOING_UP, GOING_DOWN;
     }
