@@ -164,6 +164,14 @@ public class Turret {
     SHOTS JUST YET
     
         switch(turretState) {
+            case INIT:
+                if(m_initstate != IDLE) {
+                    init();
+                } else {
+                    turretState = IDLE;
+                }
+            break;
+
             case IDLE:
                 flywheel.run(false, false, 0);
                 elevator.run(runElevator.IDLE);
