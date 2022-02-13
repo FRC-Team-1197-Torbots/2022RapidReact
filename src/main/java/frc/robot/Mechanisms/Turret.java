@@ -144,6 +144,6 @@ public class Turret {
             if (player2.getXButtonReleased()) {
                 turretState = runTurret.IDLE;
             }
-        } 
-    }*/
+        }*/ 
+    }
 }
