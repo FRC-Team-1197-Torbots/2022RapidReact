@@ -36,6 +36,7 @@ public class Turret {
     private runTurret turretState = runTurret.IDLE;
     private final TalonSRX talon;
     private DigitalInput zeroSensor;
+    private DigitalInput breakBeam;
     private XboxController player2;
 
     private double units;
@@ -48,6 +49,7 @@ public class Turret {
         this.talon = talon;
         this.player2 = player2;
         zeroSensor = new DigitalInput(0);
+        breakBeam = new DigitalInput(1);
         talon = new TalonSRX(10);
     }
 
@@ -87,6 +89,8 @@ public class Turret {
         if(!(zeroSensor.get())){
             talon.setSelectedSensorPosition(0);
         }
+
+        System.out.println(breakBeam.get());
         //Diameter for large circle is 41.625 inches.
         //Diameter for inner circle is 1.26 inches.
         if(direction.equals("right")){

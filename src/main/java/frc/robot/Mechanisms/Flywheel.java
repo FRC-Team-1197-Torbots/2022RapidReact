@@ -65,12 +65,13 @@ public class Flywheel {
     private boolean starting = true;
 
     public Flywheel(XboxController player2) {
-       
+    }
+       /*
         // this.otherFlywheelMotor = flywheelMotor2;
         // this.flywheelMotor2.follow(this.flywheelMotor1);
         
         // this.flywheelEncoder2 = this.flywheelMotor2.getEncoder();
-        flywheelMotor1 = new CANSparkMax(7, MotorType.kBrushless);
+        flywheelMotor1 = new CANSparkMax(1, MotorType.kBrushless);
 
         //this.flywheelMotor1 = flywheelMotor1;
         this.flywheelEncoder1 = flywheelMotor1.getEncoder();
@@ -110,6 +111,7 @@ public class Flywheel {
         motor2.set(0);
     }
     */
+    /*
 
     public void run(boolean run, boolean forceOn) {
         //testing high speed
@@ -176,8 +178,9 @@ public class Flywheel {
             }
             
             // SmartDashboard.putNumber("current Speed", currentSpeed);
-        }*/
+        }
     }
+    */
     
     public boolean isFastEnough() {
         return currentSpeed > 0.95 * targetHighSpeed;

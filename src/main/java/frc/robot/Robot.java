@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
+import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.can.*;
+import edu.wpi.first.wpilibj.*;
 import frc.robot.Mechanisms.*;
 
 /**
@@ -25,10 +28,16 @@ public class Robot extends TimedRobot {
 
   private XboxController player2;
   private Flywheel flywheel;
+  private Turret turret;
+  //channel port 0 is where the talon encoder is
+  private TalonSRX talon;
+
   
   public Robot() {
-    player2 = new XboxController(1);
-    flywheel = new Flywheel(player2);
+    player2 = new XboxController(0);
+    //flywheel = new Flywheel(player2);
+    talon = new TalonSRX(10);
+    turret = new Turret(talon, player2);
   }
   
   
@@ -45,6 +54,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
   }
 
   /**
@@ -90,15 +100,31 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+  }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    //turret.init();
+    /*
     if (player2.getAButton())
       flywheel.run(true, true);
     else
       flywheel.run(false, false);
+    */
+    if (player2.getBButton()){
+      turret.test("right");
+    } else if(player2.getXButton()) {
+      turret.test("left");
+    }
+    else{
+      turret.test("stop");
+    }
+
+    // if (player2.getXButton()){
+      // turret.test("left");
+    // }
       
   }
 
