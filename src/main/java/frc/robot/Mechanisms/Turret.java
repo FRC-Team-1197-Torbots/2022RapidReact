@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.PID_Tools.TorDerivative;
 //import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.DigitalInput;
 //DIO 0
@@ -18,6 +19,10 @@ CONTROLS 3 THINGS:
     3.START/STOP ELEVATOR
 
 CALLS METHODS FROM ELEVATOR, FLYWHEEL, AND LIMELIGHTLINEUP CLASS.
+
+
+NOTE margin of error for shooting from 20ft is +- 5 degrees
+    MOE from safe zone @ ~190inches is +- 7 degrees
 ------------------------------------*/
 
 //import edu.wpi.first.wpilibj.Encoder;
@@ -40,7 +45,7 @@ public class Turret {
     private INIT_STATES m_initstate;
     
     private runTurret turretState = runTurret.IDLE;
-    private final TalonSRX talon;
+    private final TalonSRX TurretMotor;
     private DigitalInput zeroSensor;
     private DigitalInput breakBeam;
     private XboxController player2;
@@ -51,8 +56,21 @@ public class Turret {
     private double big_rotations;
     private final double gearRatio = 18f/220f;//1.26 / 41.625;
 
+
+    /** PID VARs */
+    private double TargetAngle; //in degrees
+    private final double dt = 0.005f;
+    private TorDerivative TurretDerivative;
+    private double pidIntegral = 0;
+    private final double turretKP = 0.009;
+    private final double turretKI = 0.00000f;
+    private final double turretKD = 0.0000f;
+    private final double OnTargetDelta = 0.25f;
+    private double kFF = 0.06f;
+    private Boolean OnTarget;
+
     public Turret(TalonSRX talon, XboxController player2){
-        this.talon = talon;
+        this.TurretMotor = talon;
         this.player2 = player2;
         zeroSensor = new DigitalInput(0);
         breakBeam = new DigitalInput(1);
@@ -60,23 +78,35 @@ public class Turret {
 
 
         m_initstate = INIT_STATES.TURN;
+
+        //PID
+        TurretDerivative = new TorDerivative(dt);
+
+        //hard coding target for now
+        TargetAngle = 0;
+        pidIntegral = 0;
+        OnTarget = false;
     }
 
+    /**
+     * Function to initially zero the robot
+     * turret
+     */
     public void init(){
         
         switch(m_initstate) {
             case INIT:
-                talon.setSelectedSensorPosition(0);
+                TurretMotor.setSelectedSensorPosition(0);
                 m_initstate = INIT_STATES.TURN;
             break;
 
             case TURN:
                 //turn 45 degress                
-                if(Math.abs(units_to_degrees(talon.getSelectedSensorPosition())) >= 45.0f ) {
-                    talon.set(ControlMode.PercentOutput, 0.0f);
+                if(Math.abs(units_to_degrees(TurretMotor.getSelectedSensorPosition())) >= 45.0f ) {
+                    TurretMotor.set(ControlMode.PercentOutput, 0.0f);
                     m_initstate = INIT_STATES.RETURN;
                 } else {
-                    talon.set(ControlMode.PercentOutput, 0.2f);
+                    TurretMotor.set(ControlMode.PercentOutput, -0.2f);
                 }
             break;
 
@@ -84,16 +114,17 @@ public class Turret {
                 //return to the zero position
                 if(!zeroSensor.get()) {
                     m_initstate = INIT_STATES.ZERO;
-                    talon.set(ControlMode.PercentOutput, 0.0f);
+                    TurretMotor.set(ControlMode.PercentOutput, 0.0f);
                 } else {
-                    talon.set(ControlMode.PercentOutput, -0.15f);
+                    TurretMotor.set(ControlMode.PercentOutput, 0.2f);
                 }
             break;
 
             case ZERO:
                 //set to zero
-                talon.setSelectedSensorPosition(0);
+                TurretMotor.setSelectedSensorPosition(0);
                 m_initstate = INIT_STATES.IDLE;
+                //System.out.println("Zero");
             break;
 
             case IDLE:
@@ -128,31 +159,69 @@ public class Turret {
         return degrees;
     }
 
+    
+    public void PIDTuning(double stick) {
+        TargetAngle += stick * 5;
+
+        if(m_initstate != INIT_STATES.IDLE) {
+            init();
+        } else {
+            //start writing state machine to turn for tuning
+            double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
+            // System.out.println("target " + TargetAngle);
+            
+            TurretMotor.set(ControlMode.PercentOutput, pidout);            
+        }
+    }
+
+    private double TurretPID(double currentangle, double targetangle) {
+        double currenterror = currentangle - targetangle;
+
+        double pidDerivativeResult = TurretDerivative.estimate(currenterror);
+        pidIntegral += currenterror;
+
+        if(currenterror < 20) {
+            pidIntegral = 0;
+        }
+
+        if(pidIntegral * turretKI > 0.5) {
+            pidIntegral = 0.5 / turretKI;
+        } else if(pidIntegral * turretKI < -0.5) {
+            pidIntegral = -0.5 / turretKI;
+        }
+
+        // System.out.println(currenterror);
+
+        return ((currenterror * turretKP) +
+        (pidIntegral * turretKI) +
+        (pidDerivativeResult * turretKD) + (kFF * (currenterror/Math.abs(currenterror)))); //+ FeedForward;
+    }
+
 
     public void test(String direction){
         //false is when the sensor is on, and true is when the sensor is off
         if(!(zeroSensor.get())){
-            talon.setSelectedSensorPosition(0);
+            TurretMotor.setSelectedSensorPosition(0);
         }
 
         //System.out.println(breakBeam.get());
         //Diameter for large circle is 41.625 inches.
         //Diameter for inner circle is 1.26 inches.
         if(direction.equals("right")){
-            talon.set(ControlMode.PercentOutput, 0.2f);
-            units = talon.getSelectedSensorPosition();
+            TurretMotor.set(ControlMode.PercentOutput, 0.2f);
+            units = TurretMotor.getSelectedSensorPosition();
             units_to_degrees(units);
             System.out.println("Degrees " + degrees);
         }
         else if(direction.equals("left")){
-            talon.set(ControlMode.PercentOutput, -0.2f);
-            units = talon.getSelectedSensorPosition();
+            TurretMotor.set(ControlMode.PercentOutput, -0.2f);
+            units = TurretMotor.getSelectedSensorPosition();
             units_to_degrees(units);
             System.out.println("Degrees " + degrees);
         }
         else if(direction.equals("stop")){
-            talon.set(ControlMode.PercentOutput, 0);
-            units = talon.getSelectedSensorPosition();
+            TurretMotor.set(ControlMode.PercentOutput, 0);
+            units = TurretMotor.getSelectedSensorPosition();
             units_to_degrees(units);
             System.out.println("Degrees " + degrees);
         }
