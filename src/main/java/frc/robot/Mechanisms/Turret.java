@@ -62,9 +62,9 @@ public class Turret {
     private final double dt = 0.005f;
     private TorDerivative TurretDerivative;
     private double pidIntegral = 0;
-    private final double turretKP = 0.009;
+    private final double turretKP = 0.0008f;
     private final double turretKI = 0.00000f;
-    private final double turretKD = 0.0000f;
+    private final double turretKD = 0.00f;
     private final double OnTargetDelta = 0.25f;
     private double kFF = 0.06f;
     private Boolean OnTarget;
@@ -129,8 +129,11 @@ public class Turret {
 
             case IDLE:
 
-            break;
+            break;            
         }
+
+        System.out.println(m_initstate);
+
         /*units = degrees_to_units(45f);
         talon.set(ControlMode.PercentOutput, 0.2f);
         talon.setSelectedSensorPosition(units);
@@ -170,7 +173,14 @@ public class Turret {
             double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
             // System.out.println("target " + TargetAngle);
             
-            TurretMotor.set(ControlMode.PercentOutput, pidout);            
+            //maxes out at 0.25
+            if (Math.abs(pidout) > 0.25) {
+                TurretMotor.set(ControlMode.PercentOutput, 0.25);
+            }
+            else {
+                TurretMotor.set(ControlMode.PercentOutput, pidout);            
+            }
+            System.out.println("pidout: " + pidout);
         }
     }
 
@@ -195,6 +205,7 @@ public class Turret {
         return ((currenterror * turretKP) +
         (pidIntegral * turretKI) +
         (pidDerivativeResult * turretKD) + (kFF * (currenterror/Math.abs(currenterror)))); //+ FeedForward;
+                                            //if currenterror is positive, kFF is positive.  if currenterror is negative, kFF is negative
     }
 
 
