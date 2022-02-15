@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    //turret.PIDTuning(player2.getRawAxis(0));
   }
 
   /** This function is called periodically during operator control. */
