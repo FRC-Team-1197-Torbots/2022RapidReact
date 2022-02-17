@@ -114,19 +114,20 @@ public class Robot extends TimedRobot {
       flywheel.run(false, false);
     */
 
-    
-    /*if (player2.getBButton()){
+    /*
+    if (player2.getBButton()){
       turret.test("right");
     } else if(player2.getXButton()) {
       turret.test("left");
     }
     else{
       turret.test("stop");
-    }*/
+    }
 
-    // if (player2.getXButton()){
-      // turret.test("left");
-    // }
+     if (player2.getXButton()){
+       turret.test("left");
+     }
+     */
       
   }
 

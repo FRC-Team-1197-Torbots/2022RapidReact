@@ -62,18 +62,18 @@ public class Turret {
     private final double dt = 0.005f;
     private TorDerivative TurretDerivative;
     private double pidIntegral = 0;
-    private final double turretKP = 0.0008f;
-    private final double turretKI = 0.00000f;
-    private final double turretKD = 0.00f;
+    private final double turretKP = 0.009f;
+    private final double turretKI = 0.00005f;
+    private final double turretKD = 0.0005f;
     private final double OnTargetDelta = 0.25f;
-    private double kFF = 0.06f;
+    private double kFF = 0.04f;//0.06f;
     private Boolean OnTarget;
 
     public Turret(TalonSRX talon, XboxController player2){
         this.TurretMotor = talon;
         this.player2 = player2;
-        zeroSensor = new DigitalInput(0);
-        breakBeam = new DigitalInput(1);
+        zeroSensor = new DigitalInput(1);
+        //breakBeam = new DigitalInput(1);
         talon = new TalonSRX(10);
 
 
@@ -83,7 +83,7 @@ public class Turret {
         TurretDerivative = new TorDerivative(dt);
 
         //hard coding target for now
-        TargetAngle = 0;
+        TargetAngle = 90;
         pidIntegral = 0;
         OnTarget = false;
     }
@@ -112,6 +112,7 @@ public class Turret {
 
             case RETURN:
                 //return to the zero position
+                System.out.println(zeroSensor.get());
                 if(!zeroSensor.get()) {
                     m_initstate = INIT_STATES.ZERO;
                     TurretMotor.set(ControlMode.PercentOutput, 0.0f);
@@ -132,7 +133,7 @@ public class Turret {
             break;            
         }
 
-        System.out.println(m_initstate);
+        //System.out.println(m_initstate);
 
         /*units = degrees_to_units(45f);
         talon.set(ControlMode.PercentOutput, 0.2f);
@@ -164,7 +165,11 @@ public class Turret {
 
     
     public void PIDTuning(double stick) {
-        TargetAngle += stick * 5;
+        //System.out.println("Axis: "+ stick);
+        //the axis can possibly be nonzero at rest, this is to account for that.
+        if (Math.abs(stick) > 0.05) {
+            //TargetAngle += stick * 5;
+        }
 
         if(m_initstate != INIT_STATES.IDLE) {
             init();
@@ -175,12 +180,21 @@ public class Turret {
             
             //maxes out at 0.25
             if (Math.abs(pidout) > 0.25) {
-                TurretMotor.set(ControlMode.PercentOutput, 0.25);
+                if(pidout < 0){
+                    TurretMotor.set(ControlMode.PercentOutput, -0.25);
+                }
+                else{
+                    TurretMotor.set(ControlMode.PercentOutput, 0.25);
+                }
             }
             else {
-                TurretMotor.set(ControlMode.PercentOutput, pidout);            
+                TurretMotor.set(ControlMode.PercentOutput, -pidout);            
             }
-            System.out.println("pidout: " + pidout);
+            //System.out.println("pidout: " + pidout);
+            System.out.println("Target Angle: " + TargetAngle);
+            System.out.println("Current Angle: " + units_to_degrees(TurretMotor.getSelectedSensorPosition()));
+            System.out.println("\n");
+            //System.out.println(zeroSensor.get());
         }
     }
 
