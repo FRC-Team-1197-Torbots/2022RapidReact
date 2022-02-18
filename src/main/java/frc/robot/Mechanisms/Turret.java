@@ -63,10 +63,10 @@ public class Turret {
     private TorDerivative TurretDerivative;
     private double pidIntegral = 0;
     private final double turretKP = 0.009f;
-    private final double turretKI = 0.00005f;
-    private final double turretKD = 0.0005f;
+    private final double turretKI = 0.00000f;
+    private final double turretKD = 0.0000f;
     private final double OnTargetDelta = 0.25f;
-    private double kFF = 0.04f;//0.06f;
+    private double kFF = 0.06f;//0.06f;
     private Boolean OnTarget;
 
     public Turret(TalonSRX talon, XboxController player2){
@@ -83,7 +83,7 @@ public class Turret {
         TurretDerivative = new TorDerivative(dt);
 
         //hard coding target for now
-        TargetAngle = 90;
+        TargetAngle = -45;
         pidIntegral = 0;
         OnTarget = false;
     }
@@ -188,12 +188,12 @@ public class Turret {
                 }
             }
             else {
-                TurretMotor.set(ControlMode.PercentOutput, -pidout);            
+                TurretMotor.set(ControlMode.PercentOutput, pidout);            
             }
             //System.out.println("pidout: " + pidout);
-            System.out.println("Target Angle: " + TargetAngle);
-            System.out.println("Current Angle: " + units_to_degrees(TurretMotor.getSelectedSensorPosition()));
-            System.out.println("\n");
+            System.out.printf("%25s%25f%25s%25f\n", "Current Angle: ", + units_to_degrees(TurretMotor.getSelectedSensorPosition()), "pidout: ", pidout);
+            //System.out.println("Current Angle: " + units_to_degrees(TurretMotor.getSelectedSensorPosition()));
+            //System.out.println("pidout: " + pidout);
             //System.out.println(zeroSensor.get());
         }
     }

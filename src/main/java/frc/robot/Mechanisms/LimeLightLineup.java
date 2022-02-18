@@ -11,23 +11,69 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 
 public class LimeLightLineup {
-        //private NetworkTableInstance networkTableInstance;
-        //private final NetworkTable table;// for limelight
-       // private final NetworkTableEntry tx;
-       // private final NetworkTableEntry ty;
-        //private final NetworkTableEntry ta;
+        private NetworkTableInstance networkTableInstance;
+        private NetworkTable table;// for limelight
+        private NetworkTableEntry tx;
+        private NetworkTableEntry ty;
+        private NetworkTableEntry ta;
+        private NetworkTableEntry tv;
+        private NetworkTableEntry ts;
         private double x;
         private double y;
-/*
+        private double area;
+        private double v;
+        private double s;
+        
+
         public LimeLightLineup(){
-                table = NetworkTableInstance.getDefault().getTable("limelight").getEntry("<variablename>").getDouble(0);
+                table = NetworkTableInstance.getDefault().getTable("limelight");
+                tx = table.getEntry("tx");
+                ty = table.getEntry("ty");
+                ta = table.getEntry("ta");
+                tv = table.getEntry("tv");
+                ts = table.getEntry("ts");
+
+                
+
+
+                
         }
         
         public void init(){
 
         }
+
+        public void test(){
+                
+                NetworkTableInstance.getDefault().getTable("limelight");
+
+
+                tx = table.getEntry("tx");
+                ty = table.getEntry("ty");
+                ta = table.getEntry("ta");
+                tv = table.getEntry("tv");
+                ts = table.getEntry("ts");
+
+                // x = tx.getNumber(defaultValue)
+                y = ty.getDouble(0.0);
+                area = ta.getDouble(0.0);
+                v = tv.getDouble(0.5);
+
+
+               // System.out.println("X: " + x);
+                //System.out.println("Y: " + y);
+                //System.out.println("Area: " + area);
+                
+                SmartDashboard.putNumber("LimelightX", tx.getDouble(0.0));
+                SmartDashboard.putNumber("LimelightY", ty.getDouble(0.0));
+                SmartDashboard.putNumber("LimelightArea", ta.getDouble(0.0));
+                SmartDashboard.putNumber("V_Number", tv.getDouble(0.0));
+                SmartDashboard.putNumber("S_number", ts.getDouble(0.0));
+                
+        }
     /*
         public void lineup(){
+                
                 float Kp = -0.1f;
                 float min_command = 0.05f;
 

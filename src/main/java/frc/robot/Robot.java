@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
   private Turret turret;
   //channel port 0 is where the talon encoder is
   private TalonSRX talon;
+  private LimeLightLineup limeLight;
 
   
   public Robot() {
@@ -38,6 +39,7 @@ public class Robot extends TimedRobot {
     //flywheel = new Flywheel(player2);
     talon = new TalonSRX(10);
     turret = new Turret(talon, player2);
+    limeLight = new LimeLightLineup();
   }
   
   
@@ -106,7 +108,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    turret.PIDTuning(player2.getRawAxis(0));
+    //turret.PIDTuning(player2.getRawAxis(0));
+    limeLight.test();
     /* ***************FLY WHEEL TEST CODE***********
     if (player2.getAButton())
       flywheel.run(true, true);
