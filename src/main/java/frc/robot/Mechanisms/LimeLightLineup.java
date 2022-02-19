@@ -71,15 +71,16 @@ public class LimeLightLineup {
                 SmartDashboard.putNumber("S_number", ts.getDouble(0.0));
                 
         }
-    /*
+    
         public void lineup(){
                 
                 float Kp = -0.1f;
                 float min_command = 0.05f;
 
-                std::shared_ptr<NetworkTable> table = NetworkTable::GetTable("limelight");
-                float tx = table->GetNumber("tx");
+                x = tx.getDouble(0.0);
+                y = ty.getDouble(0.0);
 
+                /*
                 if (joystick->GetRawButton(9))
                 {
                         float heading_error = -tx;
@@ -94,12 +95,18 @@ public class LimeLightLineup {
                         }
                         left_command += steering_adjust;
                         right_command -= steering_adjust;
+                
                 }
+                */
         }
-        public void calculate_distance(){
+
+        public double getAngle() {
+                x = tx.getDouble(0.0);
+                return x;
+        }
+        public void calculate_distance() {
                 //IF isAligned = true
                 //use the function d = (h2-h1) / tan(a1+a2) to calculate
         }
-    */
     
 }

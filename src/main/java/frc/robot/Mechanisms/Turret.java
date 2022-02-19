@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.PID_Tools.TorDerivative;
 //import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -49,12 +50,16 @@ public class Turret {
     private DigitalInput zeroSensor;
     private DigitalInput breakBeam;
     private XboxController player2;
+    private LimeLightLineup limelight;
 
     private double units;
     private double small_rotations;
     private double degrees;
     private double big_rotations;
     private final double gearRatio = 18f/220f;//1.26 / 41.625;
+
+    //test for now
+    private double horizAngleOffset;
 
 
     /** PID VARs */
@@ -75,6 +80,7 @@ public class Turret {
         zeroSensor = new DigitalInput(1);
         //breakBeam = new DigitalInput(1);
         talon = new TalonSRX(10);
+        limelight = new LimeLightLineup();
 
 
         m_initstate = INIT_STATES.TURN;
@@ -125,6 +131,7 @@ public class Turret {
                 //set to zero
                 TurretMotor.setSelectedSensorPosition(0);
                 m_initstate = INIT_STATES.IDLE;
+                horizAngleOffset = limelight.getAngle();
                 //System.out.println("Zero");
             break;
 
@@ -165,6 +172,9 @@ public class Turret {
 
     
     public void PIDTuning(double stick) {
+        //test for now, set to a angle offset that's measured right after it zeroes.
+        TargetAngle = horizAngleOffset;
+
         //System.out.println("Axis: "+ stick);
         //the axis can possibly be nonzero at rest, this is to account for that.
         if (Math.abs(stick) > 0.05) {
@@ -191,6 +201,7 @@ public class Turret {
                 TurretMotor.set(ControlMode.PercentOutput, pidout);            
             }
             //System.out.println("pidout: " + pidout);
+            SmartDashboard.putNumber("horizAngleOffset", horizAngleOffset);
             System.out.printf("%25s%25f%25s%25f\n", "Current Angle: ", + units_to_degrees(TurretMotor.getSelectedSensorPosition()), "pidout: ", pidout);
             //System.out.println("Current Angle: " + units_to_degrees(TurretMotor.getSelectedSensorPosition()));
             //System.out.println("pidout: " + pidout);

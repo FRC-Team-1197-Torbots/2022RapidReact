@@ -33,6 +33,8 @@ public class Robot extends TimedRobot {
   private TalonSRX talon;
   private LimeLightLineup limeLight;
 
+  private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
+
   
   public Robot() {
     player2 = new XboxController(0);
@@ -108,8 +110,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //turret.PIDTuning(player2.getRawAxis(0));
+    turret.PIDTuning(horizAngleOffset);
     limeLight.test();
+    SmartDashboard.putNumber("horizAngleOffset", horizAngleOffset);
     /* ***************FLY WHEEL TEST CODE***********
     if (player2.getAButton())
       flywheel.run(true, true);
