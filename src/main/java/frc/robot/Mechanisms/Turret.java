@@ -1,5 +1,7 @@
 package frc.robot.Mechanisms;
 
+import java.lang.annotation.Target;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -52,6 +54,7 @@ public class Turret {
     private XboxController player2;
     private LimeLightLineup limelight;
 
+    private double currenterror;
     private double units;
     private double small_rotations;
     private double degrees;
@@ -72,7 +75,7 @@ public class Turret {
     private final double turretKD = 0.0000f;
     private final double OnTargetDelta = 0.25f;
     private double kFF = 0.06f;//0.06f;
-    private Boolean OnTarget;
+    private boolean OnTarget;
 
     public Turret(TalonSRX talon, XboxController player2){
         this.TurretMotor = talon;
@@ -83,13 +86,13 @@ public class Turret {
         limelight = new LimeLightLineup();
 
 
-        m_initstate = INIT_STATES.TURN;
+        m_initstate = INIT_STATES.INIT;
 
         //PID
         TurretDerivative = new TorDerivative(dt);
 
         //hard coding target for now
-        TargetAngle = -45;
+        TargetAngle = 0;
         pidIntegral = 0;
         OnTarget = false;
     }
@@ -118,7 +121,7 @@ public class Turret {
 
             case RETURN:
                 //return to the zero position
-                System.out.println(zeroSensor.get());
+                // System.out.println(zeroSensor.get());
                 if(!zeroSensor.get()) {
                     m_initstate = INIT_STATES.ZERO;
                     TurretMotor.set(ControlMode.PercentOutput, 0.0f);
@@ -128,11 +131,10 @@ public class Turret {
             break;
 
             case ZERO:
+                
                 //set to zero
                 TurretMotor.setSelectedSensorPosition(0);
                 m_initstate = INIT_STATES.IDLE;
-                horizAngleOffset = limelight.getAngle();
-                //System.out.println("Zero");
             break;
 
             case IDLE:
@@ -171,14 +173,25 @@ public class Turret {
     }
 
     
-    public void PIDTuning(double stick) {
-        //test for now, set to a angle offset that's measured right after it zeroes.
-        TargetAngle = horizAngleOffset;
-
-        //System.out.println("Axis: "+ stick);
+    public void PIDTuning(double tx) {
+       
+        //test if the target angle can react to angles above 90
+        //TargetAngle = tx;
+        //System.out.println("Target Angle: " + TargetAngle);
+        
+        if (TargetAngle > 90 || TargetAngle <-90)
+        {
+            TargetAngle = 0;
+        }
+        else 
+        {
+            TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
+        }
+        // SmartDashboard.putNumber("TargetAngle", TargetAngle);
+        //System.out.println("Axis: "+ tx);
         //the axis can possibly be nonzero at rest, this is to account for that.
-        if (Math.abs(stick) > 0.05) {
-            //TargetAngle += stick * 5;
+        if (Math.abs(tx) > 0.05) {
+            //TargetAngle += tx * 5;
         }
 
         if(m_initstate != INIT_STATES.IDLE) {
@@ -201,19 +214,21 @@ public class Turret {
                 TurretMotor.set(ControlMode.PercentOutput, pidout);            
             }
             //System.out.println("pidout: " + pidout);
-            SmartDashboard.putNumber("horizAngleOffset", horizAngleOffset);
-            System.out.printf("%25s%25f%25s%25f\n", "Current Angle: ", + units_to_degrees(TurretMotor.getSelectedSensorPosition()), "pidout: ", pidout);
+            // SmartDashboard.putNumber("horizAngleOffset", horizAngleOffset);
+            //System.out.printf("%25s%25f%25s%25f\n", "Current Angle: ", + units_to_degrees(TurretMotor.getSelectedSensorPosition()), "pidout: ", pidout);
             //System.out.println("Current Angle: " + units_to_degrees(TurretMotor.getSelectedSensorPosition()));
             //System.out.println("pidout: " + pidout);
             //System.out.println(zeroSensor.get());
+        
         }
     }
 
     private double TurretPID(double currentangle, double targetangle) {
-        double currenterror = currentangle - targetangle;
+        currenterror = currentangle - targetangle;
 
         double pidDerivativeResult = TurretDerivative.estimate(currenterror);
         pidIntegral += currenterror;
+
 
         if(currenterror < 20) {
             pidIntegral = 0;
@@ -229,8 +244,17 @@ public class Turret {
 
         return ((currenterror * turretKP) +
         (pidIntegral * turretKI) +
-        (pidDerivativeResult * turretKD) + (kFF * (currenterror/Math.abs(currenterror)))); //+ FeedForward;
+        (pidDerivativeResult * turretKD) + (kFF * Integer.signum((int)currenterror))); //+ FeedForward;
                                             //if currenterror is positive, kFF is positive.  if currenterror is negative, kFF is negative
+    }
+
+    public boolean isDone(){
+        if(Math.abs(currenterror) <= 1.0f){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 

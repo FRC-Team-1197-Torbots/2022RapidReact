@@ -104,9 +104,21 @@ public class LimeLightLineup {
                 x = tx.getDouble(0.0);
                 return x;
         }
-        public void calculate_distance() {
+
+        private double degrees_to_radians(double degrees){
+                double radians = (degrees * Math.PI) / 180f;
+                return radians;
+        }
+
+        public double calculate_distance() {
+                y = ty.getDouble(0.0);
+                double distance = (102.619 - 47.125) / (Math.tan(degrees_to_radians(25) + degrees_to_radians(y)));
+                return distance;
                 //IF isAligned = true
                 //use the function d = (h2-h1) / tan(a1+a2) to calculate
+                //h1 = 47.125 inches
+                //h2 = 102.619 inches
+
         }
     
 }
