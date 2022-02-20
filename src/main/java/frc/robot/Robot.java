@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
   private TalonSRX talon;
   private LimeLightLineup limeLight;
 
+  private boolean isAligned;
   private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
 
   
@@ -110,9 +111,21 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    turret.PIDTuning(horizAngleOffset);
+
+    //turret.PIDTuning(limeLight.getAngle());
+    
     limeLight.test();
-    SmartDashboard.putNumber("horizAngleOffset", horizAngleOffset);
+    //SmartDashboard.putNumber("horizAngleOffset", horizAngleOffset);
+
+    //Hard turn the robot 70 degrees, then force the "error" to be another 50 degrees.
+    //System.out.println("Error: " + limeLight.getAngle());
+    turret.PIDTuning(limeLight.getAngle());
+    
+    if(turret.isDone()){
+      SmartDashboard.putNumber("Distance: ", limeLight.calculate_distance());
+    }
+    
+
     /* ***************FLY WHEEL TEST CODE***********
     if (player2.getAButton())
       flywheel.run(true, true);
