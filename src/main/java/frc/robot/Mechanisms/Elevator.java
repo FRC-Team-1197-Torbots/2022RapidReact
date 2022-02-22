@@ -12,6 +12,8 @@ public class Elevator {
     private DigitalInput breakbeam;
     private CANSparkMax elMotor;
 
+    private boolean ballInElevator = false;
+
     public Elevator() {
         breakbeam = new DigitalInput(0);
         elMotor = new CANSparkMax(7, MotorType.kBrushless);
@@ -29,14 +31,17 @@ public class Elevator {
                 //set elevator motor speed to 0
             case STORE:
                 //if break beam (digital input) is broken, set motor speed to 0, else set elevator motor speed to x
-                if (breakbeam.get()) //or !breakbeam.get()
+                if (breakbeam.get()){ //or !breakbeam.get()
+                    ballInElevator = true;
                     elMotor.set(0);
+                }
                 else
                     elMotor.set(0.5);
     
             case SHOOT:
                 //set elevator motor speed to x
                 elMotor.set(0.5);
+                ballInElevator = false;
         }
     }
 
@@ -44,4 +49,7 @@ public class Elevator {
         System.out.println("Breakbeam: " + breakbeam.get());
     }
     
+    public boolean isBallInElevator() {
+        return ballInElevator;
+    }
 }

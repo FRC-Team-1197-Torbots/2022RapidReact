@@ -1,5 +1,7 @@
 package frc.robot.Mechanisms;
 
+import javax.lang.model.util.ElementScanner6;
+
 import com.revrobotics.CANSparkMax;
 
 /*-------------------------
@@ -17,24 +19,25 @@ public class Intake {
 
     private moveIntake intakeState = moveIntake.UP;
 
-    public void run() {
+    public void run(moveIntake intakeState) {
         switch(intakeState) {
             case UP:
-                //set motor speed to 0
-                //if button pressed
-                    //intakeState = moveIntake.GOING_DOWN
-            case GOING_DOWN:
-                //move motor speed x amount
-                //if going down is done
-                    //intakeState = moveIntake.DOWN
+            /*
+                set roller speeds to 0
+                if (motor position != 0)
+                    set motor speed to -x amount;
+                else
+                    set motor speed to 0;
+            */
             case DOWN:
-                //set roller speed to x amount
-                //if button pressed
-                    //intakeState = moveIntake.GOING_UP
-            case GOING_UP:
-                //set motor speed x amount
-                //if going up is done
-                    //intakeState = moveIntake.UP
+            /*
+                if (!magsensor.get) {
+                    set motor speed to x amount;
+                }
+                else 
+                    set roller speed to x amount;
+                    set motor speed to 0;
+            */
         }
 
     }

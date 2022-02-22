@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     player2 = new XboxController(0);
     //flywheel = new Flywheel(player2);
     talon = new TalonSRX(10);
-    turret = new Turret(talon, player2);
+    turret = new Turret();
     limeLight = new LimeLightLineup();
     elevator = new Elevator();
   }
