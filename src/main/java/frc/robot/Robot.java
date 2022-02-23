@@ -8,10 +8,14 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
+
+import javax.lang.model.util.ElementScanner6;
+
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.*;
 import frc.robot.Mechanisms.*;
+import frc.robot.Mechanisms.Elevator.runElevator;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,13 +35,20 @@ public class Robot extends TimedRobot {
   private Turret turret;
   //channel port 0 is where the talon encoder is
   private TalonSRX talon;
+  private LimeLightLineup limeLight;
+  private Elevator elevator;
+
+  private boolean isAligned;
+  private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
 
   
   public Robot() {
     player2 = new XboxController(0);
     //flywheel = new Flywheel(player2);
     talon = new TalonSRX(10);
-    turret = new Turret(talon, player2);
+    turret = new Turret();
+    limeLight = new LimeLightLineup();
+    elevator = new Elevator();
   }
   
   
@@ -107,7 +118,41 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    turret.PIDTuning(player2.getRawAxis(0));
+
+
+
+
+    /* **************** TURRET TEST CODE ****************************
+    //turret.PIDTuning(limeLight.getAngle());
+    
+    limeLight.test();
+    //SmartDashboard.putNumber("horizAngleOffset", horizAngleOffset);
+
+    //Hard turn the robot 70 degrees, then force the "error" to be another 50 degrees.
+    //System.out.println("Error: " + limeLight.getAngle());
+    turret.PIDTuning(limeLight.getAngle());
+    
+    if(turret.isDone()){
+      SmartDashboard.putNumber("Distance: ", limeLight.calculate_distance());
+    }
+    */
+
+    // ****************** ELEVATOR TEST CODE *****************
+    
+    //see when the breakbeam returns true or false
+    elevator.testBreakbeam();
+
+    //test the STORE & SHOOT state
+    /*
+    if (player2.getXButtonPressed())
+      elevator.run(runElevator.STORE);
+    else if (player2.getBButtonPressed())
+      elevator.run(runElevator.SHOOT);
+    else
+      elevator.run(runElevator.IDLE);
+    */
+    
+
     /* ***************FLY WHEEL TEST CODE***********
     if (player2.getAButton())
       flywheel.run(true, true);
@@ -115,19 +160,20 @@ public class Robot extends TimedRobot {
       flywheel.run(false, false);
     */
 
-    
-    /*if (player2.getBButton()){
+    /*
+    if (player2.getBButton()){
       turret.test("right");
     } else if(player2.getXButton()) {
       turret.test("left");
     }
     else{
       turret.test("stop");
-    }*/
+    }
 
-    // if (player2.getXButton()){
-      // turret.test("left");
-    // }
+     if (player2.getXButton()){
+       turret.test("left");
+     }
+     */
       
   }
 

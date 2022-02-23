@@ -27,9 +27,9 @@ public class Flywheel {
     //2400 rpm is shot from 6 ft. kp = 0.02, i = 0.4, d = 0
     //3500 rpm is shot from 16 ft. kp = 0.02, kI = 0.4, kD = 0
     private double targetHighSpeed;// rpm 5676 theoretical max
-    private final double targetLowSpeed = 200f;//rpm
-    private final double highSpeedConstant = 0.0;//0.9
-    private final double lowSpeedConstant = 0.0;
+    //private final double targetLowSpeed = 200f;//rpm
+    //private final double highSpeedConstant = 0.0;//0.9
+    //private final double lowSpeedConstant = 0.0;
     // RPM below 2000 p = 0.045 i = 0.4 d = 0
     private final double kP = 0.02;//.00035//0.05
     private final double kI = 0.4;//.000005
@@ -52,34 +52,26 @@ public class Flywheel {
     private final double gearRatio = 1;// ratio from encoder to flywheel
     private CANSparkMax flyMotor;
     //private CANSparkMax upperMotor;
-    private CANEncoder flyEncoder1;
+    private CANEncoder flyEncoder;
     // private CANEncoder flyEncoder2;
 
     // time stuff to make sure only goes in correct intervals
-    private long currentTime;
-    private long startTime = (long) (Timer.getFPGATimestamp() * 1000);
+    //private long currentTime;
+    //private long startTime = (long) (Timer.getFPGATimestamp() * 1000);
     private double timeInterval = 0.005;
     private double dt = timeInterval;
-    private long lastCountedTime;
-    private boolean starting = true;
+    //private long lastCountedTime;
+    //private boolean starting = true;
 
-    public Flywheel(XboxController player2) {
+    public static enum runFlywheel {
+        RUN, IDLE;
     }
-       /*
-        // this.otherFlywheelMotor = flywheelMotor2;
-        // this.flywheelMotor2.follow(this.flywheelMotor1);
-        
-        // this.flywheelEncoder2 = this.flywheelMotor2.getEncoder();
-        flywheelMotor1 = new CANSparkMax(1, MotorType.kBrushless);
 
-        //this.flywheelMotor1 = flywheelMotor1;
-        this.flywheelEncoder1 = flywheelMotor1.getEncoder();
-        //otherFlywheelMotor = new CANSparkMax(7, MotorType.kBrushless);
-        //flywheelEncoder1 = otherFlywheelMotor.getEncoder();
+    public Flywheel() {
 
-        this.player2 = player2;
-        // findCurrentSpeed = new TorDerivative(dt);
-        // findCurrentSpeed.resetValue(0);
+        flyMotor = new CANSparkMax(1, MotorType.kBrushless);
+        flyEncoder = flyMotor.getEncoder();
+       
         pidDerivative = new TorDerivative(dt);
         pidDerivative.resetValue(0);
         
@@ -88,96 +80,25 @@ public class Flywheel {
     public void init(){
 
     }
+    
 
-
-
-    /*
-    COMMENTED OUT FOR NOW
-    public void revUp(double distance){
-        //Calculate targetSpeed through distance ranges
-        //use PID to constantly increase the speed to a target value (probably reuse Brennan's code)
-
-        motor1.set(0.5);
-        motor2.set(0.5);
-
-    }
-
-    public void stop(){
-        //set motor speed to 0
-        motor1.set(0);
-        motor2.set(0);
-    }
-    */
-    /*
-
-    public void run(boolean run, boolean forceOn) {
-        //testing high speed
-        if (run) {
-            targetHighSpeed = -((108 * distance) + 1776); //FORMULA FOR THE DISTANCE
-            targetSpeed = targetHighSpeed;
-            FeedForward = targetSpeed/MaxMotorSpeed;
-            
-            // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
-            // currentPosition = (adjustingConstant * 1) / (gearRatio);
-            currentSpeed = flyEncoder1.getVelocity() / MaxMotorSpeed;//rpm
-            speedToSetMotor = pidRun(currentSpeed, FeedForward);
-
-            System.out.println("RPM: " + (int)(currentSpeed * 5676));
-            //System.out.println("Feedforward " + FeedForward);
-           
-            flyMotor.set(speedToSetMotor);
-        }
-        else {
-            flyMotor.set(0 * 1.0f);
-            sumSpeed = 0;
-            //System.out.println("RPM: " + flyEncoder1.getVelocity());
-            //upperMotor.set(-0 * 1.0f);
-        }
-
-        
-        //OLD CODE
-        /*currentTime = (long) (Timer.getFPGATimestamp() * 1000);
-        if (((currentTime - startTime) - ((currentTime - startTime) % (dt * 1000))) > // has current time minus start time to see the relative time the trajectory has been going
-            ((lastCountedTime - startTime) - ((lastCountedTime - startTime) % (dt * 1000))) // subtracts that mod dt times 1000 so that it is floored to
-            // the nearest multiple of dt times 1000 then checks if that is greater than the last one to see if it is time to move on to the next tick
-            || starting) {
-            starting = false;
-            lastCountedTime = currentTime;
-            if(player2.getRawButton(6) || forceOn) {
+    public void run(runFlywheel flyState, double distance) {
+        switch(flyState) {
+            case RUN:
+                targetHighSpeed = -((108 * distance) + 1776); //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 targetSpeed = targetHighSpeed;
+                FeedForward = targetSpeed/MaxMotorSpeed;
+                
                 // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
                 // currentPosition = (adjustingConstant * 1) / (gearRatio);
-                currentSpeed = -flyEncoder1.getVelocity() / gearRatio;//rpm
-                speedToSetMotor = pidRun(currentSpeed, targetSpeed) + highSpeedConstant;
-            } else {   
-                targetSpeed = targetLowSpeed;
-                // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
-                // currentPosition = (adjustingConstant * 1) / (gearRatio);
-                currentSpeed = -flyEncoder1.getVelocity() / gearRatio;//rpm
-                speedToSetMotor = pidRun(currentSpeed, targetSpeed) + lowSpeedConstant;
-                speedToSetMotor = lowSpeedConstant;
-            }
-            if(run) {
-
-                if(player2.getRawButton(6) || forceOn) {
-                    flyMotor.set(speedToSetMotor * 1.0f);
-                    upperMotor.set(-speedToSetMotor * 1.0f);
-                    // flyMotor.set(0.8f);
-                    // upperMotor.set(-0.8f);
-                    // flyMotor.set(0.0f);
-                    // flywheelMotor2.set(0.0f);
-                } else {
-                    // flyMotor.set(-0.5f);
-                    // flywheelMotor2.set(0.5f);
-                    flyMotor.set(lowSpeedConstant * 1.0f);
-                    upperMotor.set(lowSpeedConstant * -1.0f);
-                }
-            }
-            
-            // SmartDashboard.putNumber("current Speed", currentSpeed);
+                currentSpeed = flyEncoder.getVelocity() / MaxMotorSpeed;//rpm
+                speedToSetMotor = pidRun(currentSpeed, FeedForward);
+                flyMotor.set(speedToSetMotor);
+            case IDLE:
+                flyMotor.set(0 * 1.0f);
         }
     }
-    */
+
     
     public boolean isFastEnough() {
         return currentSpeed > 0.95 * targetHighSpeed;

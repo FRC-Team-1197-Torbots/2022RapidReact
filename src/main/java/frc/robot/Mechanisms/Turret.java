@@ -1,9 +1,12 @@
 package frc.robot.Mechanisms;
 
+import java.lang.annotation.Target;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.PID_Tools.TorDerivative;
 //import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -45,39 +48,37 @@ public class Turret {
     private INIT_STATES m_initstate;
     
     private runTurret turretState = runTurret.IDLE;
-    private final TalonSRX TurretMotor;
+    private TalonSRX TurretMotor;
     private DigitalInput zeroSensor;
-    private DigitalInput breakBeam;
-    private XboxController player2;
+    //private XboxController player2;
+    private LimeLightLineup limelight;
 
+    private double currenterror;
     private double units;
     private double small_rotations;
     private double degrees;
     private double big_rotations;
+    private double horizAngleOffset;
     private final double gearRatio = 18f/220f;//1.26 / 41.625;
-
 
     /** PID VARs */
     private double TargetAngle; //in degrees
     private final double dt = 0.005f;
     private TorDerivative TurretDerivative;
     private double pidIntegral = 0;
-    private final double turretKP = 0.0008f;
+    private final double turretKP = 0.009f;
     private final double turretKI = 0.00000f;
-    private final double turretKD = 0.00f;
+    private final double turretKD = 0.0000f;
     private final double OnTargetDelta = 0.25f;
-    private double kFF = 0.06f;
-    private Boolean OnTarget;
+    private double kFF = 0.06f;//0.06f;
+    private boolean OnTarget;
 
-    public Turret(TalonSRX talon, XboxController player2){
-        this.TurretMotor = talon;
-        this.player2 = player2;
-        zeroSensor = new DigitalInput(0);
-        breakBeam = new DigitalInput(1);
-        talon = new TalonSRX(10);
+    public Turret(){
+        TurretMotor = new TalonSRX(10);
+        zeroSensor = new DigitalInput(1);
+        limelight = new LimeLightLineup();
 
-
-        m_initstate = INIT_STATES.TURN;
+        m_initstate = INIT_STATES.INIT;
 
         //PID
         TurretDerivative = new TorDerivative(dt);
@@ -112,6 +113,7 @@ public class Turret {
 
             case RETURN:
                 //return to the zero position
+                // System.out.println(zeroSensor.get());
                 if(!zeroSensor.get()) {
                     m_initstate = INIT_STATES.ZERO;
                     TurretMotor.set(ControlMode.PercentOutput, 0.0f);
@@ -121,29 +123,16 @@ public class Turret {
             break;
 
             case ZERO:
+                
                 //set to zero
                 TurretMotor.setSelectedSensorPosition(0);
                 m_initstate = INIT_STATES.IDLE;
-                //System.out.println("Zero");
             break;
 
             case IDLE:
 
             break;            
         }
-
-        System.out.println(m_initstate);
-
-        /*units = degrees_to_units(45f);
-        talon.set(ControlMode.PercentOutput, 0.2f);
-        talon.setSelectedSensorPosition(units);
-        //talon.set(ControlMode.PercentOutput, 0);
-        talon.set(ControlMode.PercentOutput, -0.2f);
-        if(!(zeroSensor.get())){
-            talon.set(ControlMode.PercentOutput, 0);
-            talon.setSelectedSensorPosition(0);
-            System.out.println("zeroed.");
-        }*/
 
     }
 
@@ -163,8 +152,13 @@ public class Turret {
     }
 
     
-    public void PIDTuning(double stick) {
-        TargetAngle += stick * 5;
+    public void PIDTuning(double tx) {        
+        if (TargetAngle > 90 || TargetAngle <-90){
+            TargetAngle = 0;
+        }
+        else {
+            TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
+        }
 
         if(m_initstate != INIT_STATES.IDLE) {
             init();
@@ -175,20 +169,26 @@ public class Turret {
             
             //maxes out at 0.25
             if (Math.abs(pidout) > 0.25) {
-                TurretMotor.set(ControlMode.PercentOutput, 0.25);
+                if(pidout < 0){
+                    TurretMotor.set(ControlMode.PercentOutput, -0.25);
+                }
+                else{
+                    TurretMotor.set(ControlMode.PercentOutput, 0.25);
+                }
             }
             else {
                 TurretMotor.set(ControlMode.PercentOutput, pidout);            
             }
-            System.out.println("pidout: " + pidout);
+        
         }
     }
 
     private double TurretPID(double currentangle, double targetangle) {
-        double currenterror = currentangle - targetangle;
+        currenterror = currentangle - targetangle;
 
         double pidDerivativeResult = TurretDerivative.estimate(currenterror);
         pidIntegral += currenterror;
+
 
         if(currenterror < 20) {
             pidIntegral = 0;
@@ -204,12 +204,21 @@ public class Turret {
 
         return ((currenterror * turretKP) +
         (pidIntegral * turretKI) +
-        (pidDerivativeResult * turretKD) + (kFF * (currenterror/Math.abs(currenterror)))); //+ FeedForward;
+        (pidDerivativeResult * turretKD) + (kFF * Integer.signum((int)currenterror))); //+ FeedForward;
                                             //if currenterror is positive, kFF is positive.  if currenterror is negative, kFF is negative
     }
 
+    public boolean isDone(){
+        if(Math.abs(currenterror) <= 1.0f){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
-    public void test(String direction){
+
+    public void manualControl(String direction){
         //false is when the sensor is on, and true is when the sensor is off
         if(!(zeroSensor.get())){
             TurretMotor.setSelectedSensorPosition(0);
@@ -238,45 +247,4 @@ public class Turret {
         }
     }
 
-    public void run() {
-    /*
-    CURRENTLY CODING BASED ON ASSUMPTION THAT ROBOT STOPS BEFORE SHOOTING. NOT CONSIDERING MOVING 
-    SHOTS JUST YET
-    
-        switch(turretState) {
-            case INIT:
-                if(m_initstate != IDLE) {
-                    init();
-                } else {
-                    turretState = IDLE;
-                }
-            break;
-
-            case IDLE:
-                flywheel.run(false, false, 0);
-                elevator.run(runElevator.IDLE);
-
-                if (player2.getXButtonPressed()) {
-                    turretState = runTurret.LINEUP;
-                }
-            
-            case LINEUP:
-                limelight.lineup();
-                if (limelight.linedUp()) {
-                    flywheel.init();
-                    turretState = runTurret.REVUP;
-                }
-            case REVUP:
-                flywheel.run(true, true, limelight.calculateDistance());
-                if (flywheel.isFastEnough());
-                    //elevator.init();
-                    turretState = runTurret.SHOOT;
-            case SHOOT:
-                elevator.run(runElevator.RUN);
-            
-            if (player2.getXButtonReleased()) {
-                turretState = runTurret.IDLE;
-            }
-        }*/ 
-    }
 }
