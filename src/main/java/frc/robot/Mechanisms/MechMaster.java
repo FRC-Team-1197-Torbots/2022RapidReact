@@ -31,7 +31,7 @@ public class MechMaster {
     public MechMaster() {
         elevator = new Elevator();
         flywheel = new Flywheel();
-        intake = new Intake();
+        //intake = new Intake();
         limelight = new LimeLightLineup();
         turret = new Turret();
         player2 = new XboxController(1);

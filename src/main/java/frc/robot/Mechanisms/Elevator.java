@@ -16,7 +16,7 @@ public class Elevator {
 
     public Elevator() {
         breakbeam = new DigitalInput(0);
-        elMotor = new CANSparkMax(7, MotorType.kBrushless);
+        //elMotor = new CANSparkMax(7, MotorType.kBrushless);
     }
 
 

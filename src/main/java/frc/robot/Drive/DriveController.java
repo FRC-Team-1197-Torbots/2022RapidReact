@@ -1,11 +1,12 @@
 package frc.robot.Drive;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 
 //this only runs in auto and is in auto periodic
 public abstract class DriveController {
 	
-	public DriveController(DriveHardware hardware, Joystick player1) {
+	public DriveController(DriveHardware hardware, XboxController player1) {
 	}
 	
 	public abstract double getLeftOutput();

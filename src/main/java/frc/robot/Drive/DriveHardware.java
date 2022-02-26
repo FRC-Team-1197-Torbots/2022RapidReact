@@ -14,12 +14,14 @@ public class DriveHardware {
 	
 	private ADXRS450_Gyro gyro;
 	
-	private final CANSparkMax rightMaster;
-	private final CANSparkMax rightSlave1;
-	private final CANSparkMax rightSlave2;
-	private final CANSparkMax leftMaster;
-	private final CANSparkMax leftSlave1;
-	private final CANSparkMax leftSlave2;
+	private final CANSparkMax Right1;	
+	private final CANSparkMax Right2;
+	private final CANSparkMax RightFlipped;
+	
+	private final CANSparkMax Left1;
+	private final CANSparkMax Left2;
+	private final CANSparkMax LeftFlipped;
+	
 	private Encoder leftEncoder;
 	private Encoder rightEncoder;
 	
@@ -28,7 +30,7 @@ public class DriveHardware {
 	
 	private double currentVoltage;
 	
-	private final Solenoid solenoid;
+	//private final Solenoid solenoid;
 	
 	/***************************/
 	
@@ -59,30 +61,31 @@ public class DriveHardware {
 	public DriveHardware() {
 		gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		
-		solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+		//solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
-		leftMaster = new CANSparkMax(4, MotorType.kBrushless);
-		leftSlave1 = new CANSparkMax(5, MotorType.kBrushless);
-		leftSlave2 = new CANSparkMax(6, MotorType.kBrushless);  
-		rightMaster = new CANSparkMax(1, MotorType.kBrushless);
-		rightSlave1 = new CANSparkMax(2, MotorType.kBrushless);
-		rightSlave2 = new CANSparkMax(3, MotorType.kBrushless);
+		Left1 = new CANSparkMax(1, MotorType.kBrushless);
+		Left2 = new CANSparkMax(2, MotorType.kBrushless);
+		LeftFlipped = new CANSparkMax(3, MotorType.kBrushless); 
+
+		RightFlipped = new CANSparkMax(13, MotorType.kBrushless); 
+		Right1 = new CANSparkMax(14, MotorType.kBrushless);		
+		Right2 = new CANSparkMax(15, MotorType.kBrushless);
 
 		leftEncoder = new Encoder(10, 11, false, Encoder.EncodingType.k4X);
 		rightEncoder = new Encoder(12, 13, false, Encoder.EncodingType.k4X);
 		
-		leftMaster.setInverted(false); // Left master must be attached to the farthest CIM from the output shaft
-		leftSlave1.setInverted(false); 
-		leftSlave2.setInverted(false);
+		//leftMaster.setInverted(false); // Left master must be attached to the farthest CIM from the output shaft
+		//leftSlave1.setInverted(false); 
+		//leftSlave2.setInverted(true);
 		
-		rightMaster.setInverted(true); // Right master must be attached to the farthest CIM from the output shaft
-		rightSlave1.setInverted(true);
-		rightSlave2.setInverted(true); 
+		// Right1.setInverted(false); // Right master must be attached to the farthest CIM from the output shaft
+		// RightFlipped.setInverted(false);
+		// Right2.setInverted(false); 
 
-		leftSlave1.follow(leftMaster);
-		leftSlave2.follow(leftMaster);
-		rightSlave1.follow(rightMaster);
-		rightSlave2.follow(rightMaster);
+		//leftSlave1.follow(leftMaster);
+		//leftSlave2.follow(leftMaster);
+		//rightSlave1.follow(rightMaster);
+		// rightSlave2.follow(rightMaster);
 		resetEncoder();
 		resetGyro();
 	}
@@ -96,24 +99,16 @@ public class DriveHardware {
 
 	// Setting the left master Talon's speed to the given parameter
 	public void SetLeft(double speed) {
-		// SmartDashboard.putNumber("set left:", speed);
-		leftMaster.set(speed);
-		// leftSlave1.set(speed);
-		// leftSlave2.set(speed);
-		// leftMaster.set(0.25);
-		// leftSlave1.set(0.25);
-		// leftSlave2.set(0.25);
+		Left1.set(-speed);
+		Left2.set(-speed);
+		LeftFlipped.set(speed);
 	}
 
 	// Setting the right master Talon's speed to the given parameter
 	public void SetRight(double speed) {
-		// SmartDashboard.putNumber("set right:", speed);
-		rightMaster.set(speed);
-		// rightSlave1.set(speed);
-		// rightSlave2.set(speed);
-		// rightMaster.set(0.25);
-		// rightSlave1.set(0.25);
-		// rightSlave2.set(0.25);
+		Right1.set(speed); //in correct setting, but "software fix"		
+		Right2.set(speed);
+		RightFlipped.set(-speed);
 	}
 
 	// Getting raw position value from the right encoder
@@ -147,10 +142,10 @@ public class DriveHardware {
 		leftSpeed = percentV - percentOmega;
 		rightSpeed = percentV + percentOmega;
 		
-		rightMaster.set(rightSpeed);
-		rightSlave1.set(rightSpeed);
-		leftMaster.set(leftSpeed);
-		leftSlave1.set(leftSpeed);
+		Right1.set(rightSpeed);
+		RightFlipped.set(-rightSpeed);
+		//leftMaster.set(leftSpeed);
+		//leftSlave1.set(leftSpeed);
 	}
 
 	// Method to reset the encoder values
@@ -166,12 +161,12 @@ public class DriveHardware {
 	
 	// Method to shift the drive to low gear
 	public void shiftToLowGear() {
-		solenoid.set(true);
+		//solenoid.set(true);
 	}
 	
 	// Method to shift the drive to high gear
 	public void shiftToHighGear() {
-		solenoid.set(false);
+		//solenoid.set(false);
 	}
 	
 	// Method to initialize 

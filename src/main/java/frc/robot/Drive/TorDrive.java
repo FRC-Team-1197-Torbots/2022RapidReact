@@ -1,5 +1,6 @@
 package frc.robot.Drive;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 
 public class TorDrive {//this is the upper layer of the drive
 	private DriveController ActiveController;
@@ -7,7 +8,7 @@ public class TorDrive {//this is the upper layer of the drive
 	private DriveController ADC;//Arcade Drive Controller
 	private DriveController TDC;//Test Drive Controller
 	private DriveHardware hardware;
-	private Joystick player1;
+	private XboxController player1;
 	private double leftOutput;
 	private double rightOutput;
 	
@@ -19,34 +20,26 @@ public class TorDrive {//this is the upper layer of the drive
 	}
 	private driveStateRunner drive = driveStateRunner.TestDrive;
 	
-	public TorDrive(DriveHardware hardware, Joystick player1) {
+	public TorDrive(DriveHardware hardware, XboxController player1) {
 		this.player1 = player1;
 		this.hardware = hardware;
 		ActiveController = new TestDriveController(hardware, player1);//starts out as nothing
 		// MPDC = new MotionProfileDriveController(hardware, player1);
 		ADC = new ArcadeDriveController(hardware, player1);
-		TDC = new TestDriveController(hardware, player1);
+		//TDC = new TestDriveController(hardware, player1);
+	}
+
+	public void Run() {
+		ADC.run();
 	}
 	
 	public void Run(boolean testing, boolean isTeleop) { //boolean topLimeLight
 		//ADC.limeLightTop(topLimeLight);
 		//TDC.limeLightTop(topLimeLight);
-		if(testing) {
+		//if(testing) {
 			drive = driveStateRunner.TestDrive;
-		} else {
-			if(isTeleop) {
-				drive = driveStateRunner.ArcadeDrive;
-				//handles the shifting
-				if(player1.getRawButton(5)) {
-					hardware.shiftToLowGear();
-				} else {
-					hardware.shiftToHighGear();
-				}
-			} else {
-				hardware.shiftToLowGear();//we should first do MP in low gear
-				// drive = driveStateRunner.MotionProfile;
-			}
-		}
+		// } else {
+		
 		//runs all of them to update their values
 		// MPDC.run();
 		ADC.run();
@@ -57,16 +50,16 @@ public class TorDrive {//this is the upper layer of the drive
 		// case MotionProfile:
 		// 	ActiveController = MPDC;
 		// 	break;
-		case ArcadeDrive:
-			ActiveController = ADC;
-			break;
-		case TestDrive:
-			ActiveController = TDC;
-			break;
+			case ArcadeDrive:
+				ActiveController = ADC;
+				break;
+			case TestDrive:
+				ActiveController = TDC;
+				break;
 		}
 		//gets the values from the active controller and sets them to the hardware
 		leftOutput = ActiveController.getLeftOutput();
-		rightOutput = ActiveController.getRightOutput();
+		rightOutput = player1.getRawAxis(1);
 		hardware.setMotorSpeeds(rightOutput, leftOutput);
 	}
 

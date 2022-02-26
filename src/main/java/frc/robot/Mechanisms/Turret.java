@@ -74,7 +74,7 @@ public class Turret {
     private boolean OnTarget;
 
     public Turret(){
-        TurretMotor = new TalonSRX(10);
+        //TurretMotor = new TalonSRX(10);
         zeroSensor = new DigitalInput(1);
         limelight = new LimeLightLineup();
 

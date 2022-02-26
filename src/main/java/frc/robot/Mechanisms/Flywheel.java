@@ -69,7 +69,7 @@ public class Flywheel {
 
     public Flywheel() {
 
-        flyMotor = new CANSparkMax(1, MotorType.kBrushless);
+        //flyMotor = new CANSparkMax(1, MotorType.kBrushless);
         flyEncoder = flyMotor.getEncoder();
        
         pidDerivative = new TorDerivative(dt);

@@ -14,6 +14,8 @@ import javax.lang.model.util.ElementScanner6;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.*;
+import frc.robot.Drive.DriveHardware;
+import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.*;
 import frc.robot.Mechanisms.Elevator.runElevator;
 
@@ -24,31 +26,43 @@ import frc.robot.Mechanisms.Elevator.runElevator;
  * project.
  */
 public class Robot extends TimedRobot {
+  public static final double TIME_INTERVAL = 0.005f;
+
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-
+  private XboxController player1;
   private XboxController player2;
+
+  //mechanisms
+  private Intake intake;
   private Flywheel flywheel;
   private Turret turret;
   //channel port 0 is where the talon encoder is
   private TalonSRX talon;
   private LimeLightLineup limeLight;
   private Elevator elevator;
+  private DriveHardware hardware;
+  private TorDrive drive;
 
   private boolean isAligned;
   private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
 
   
   public Robot() {
-    player2 = new XboxController(0);
+    player1 = new XboxController(0);
+    player2 = new XboxController(1);
     //flywheel = new Flywheel(player2);
-    talon = new TalonSRX(10);
+    //talon = new TalonSRX(10);
+
+    intake = new Intake(player1);
     turret = new Turret();
     limeLight = new LimeLightLineup();
     elevator = new Elevator();
+    hardware = new DriveHardware();
+    drive = new TorDrive(hardware, player1);
   }
   
   
@@ -119,7 +133,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-
+    // drive.Run();
+    
+    /* **************** INTAKE TEST CODE **************************** */
+    intake.run();
 
 
     /* **************** TURRET TEST CODE ****************************
@@ -140,7 +157,8 @@ public class Robot extends TimedRobot {
     // ****************** ELEVATOR TEST CODE *****************
     
     //see when the breakbeam returns true or false
-    elevator.testBreakbeam();
+    //elevator.testBreakbeam();
+    //drive.Run(true, true);
 
     //test the STORE & SHOOT state
     /*

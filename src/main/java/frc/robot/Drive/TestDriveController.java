@@ -1,11 +1,12 @@
 package frc.robot.Drive;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 
 public class TestDriveController extends DriveController {
 	private double leftOutput;
 	private double rightOutput;
-	public TestDriveController(DriveHardware hardware, Joystick player1) {
+	public TestDriveController(DriveHardware hardware, XboxController player1) {
 		super(hardware, player1);
 	}
 	

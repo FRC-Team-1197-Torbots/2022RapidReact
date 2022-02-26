@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.XboxController;
 
 public class ArcadeDriveController extends DriveController {
 
@@ -18,15 +19,8 @@ public class ArcadeDriveController extends DriveController {
    private double rightOutput;
    private double rightMotorSpeed;
    private double leftMotorSpeed;
-   private Joystick player1;
-
-   // for the limelight
-   private NetworkTable table;
-   private NetworkTableEntry tx;
-   private NetworkTableEntry ta;
-   private double x;
-   private double speedChange;
-   private double area;
+   private XboxController player1;
+   private DriveHardware hardware;
 
    private double distance;
    private BantorPID limeLightPID;
@@ -85,135 +79,58 @@ public class ArcadeDriveController extends DriveController {
     * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     */
 
-   public ArcadeDriveController(DriveHardware hardware, Joystick player1) {
+   public ArcadeDriveController(DriveHardware hardware, XboxController player1) {
        super(hardware, player1);
+       
        this.player1 = player1;
-    //    colorWheelDIO = new DigitalInput(0);
-
-       // this is the PID
-       limeLightPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP, velocitykI, velocitykD, dt,
-               positionTolerance, velocityTolerance);
-       limeLightPID.reset();
-       findCurrentVelocity = new TorDerivative(dt);
-       findCurrentVelocity.resetValue(0);
-       table = NetworkTableInstance.getDefault().getTable("limelight");//bottom
-       tx = table.getEntry("tx");
-       ta = table.getEntry("ta");
+       this.hardware = hardware;
    }
 
    @Override
    public void init() {
-       table = NetworkTableInstance.getDefault().getTable("limelight");//bottom
-       tx = table.getEntry("tx");
-       ta = table.getEntry("ta");
+
    }
 
    @Override
    public void run() {
-       if(currentInit) {
-           for(double lambda:throttleArray)
-               lambda = 0;
-           for(double lambda:arcadeArray)
-               lambda = 0;
-           currentInit = false;
+       double throttle = player1.getRawAxis(1);
+       double steer = player1.getRawAxis(0);
+
+       double sign = 0;
+
+       if(steer > 0) {
+        sign = 1;
+       } else if(steer < 0) {
+        sign = -1;
        }
-       currentTime = (long) (Timer.getFPGATimestamp() * 1000);
-       // this handles it so that it will only tick in the time interval so that the derivatives and the integrals are correct
-       if (((currentTime - startTime) - ((currentTime - startTime) % (dt * 1000))) > // has current time minus start time to see the relative time the trajectory has been going
-       ((lastCountedTime - startTime) - ((lastCountedTime - startTime) % (dt * 1000))) // subtracts that mod dt times 1000 so that it is floored to
-       // the nearest multiple of dt times 1000 then checks if that is greater than the last one to see if it is time to move on to the next tick
-       || starting) {
-           starting = false;
-           lastCountedTime = currentTime;
-          
-           throttleAxis = -player1.getRawAxis(1);
-           arcadeSteerAxis = player1.getRawAxis(0);
-           if (Math.abs(arcadeSteerAxis) <= 0.15) {
-               arcadeSteerAxis = 0.0;
-           }
-           if (Math.abs(throttleAxis) <= 0.15) {
-               throttleAxis = 0.0;
-           }
-           arcadeSteerAxis = Math.pow(arcadeSteerAxis, 3);
-           throttleAxis = Math.pow(throttleAxis, 3);
 
-           if(player1.getRawButton(2)) {
-               throttleAxis *= 0.25;
-               arcadeSteerAxis *= 0.25;
-           } else if(player1.getRawButton(3)) {
-            throttleAxis *= 0.125;
-            arcadeSteerAxis *= 0.125;
-           }
-           // get all the values from the limelight
-        //    SmartDashboard.putNumber("tx:", tx.getDouble(0.0) - 1.5);
-           x = tx.getDouble(0.0) - 1.5;
-        //    area = ta.getDouble(0.0);
-
-           // convert tShe angles into radians
-           x *= ((Math.PI) / 180.0);
-        //    SmartDashboard.putNumber("x:", x);
-        //    distance = areaAt1Meter / area;
-
-        //    SmartDashboard.putNumber("distance limelight", distance);
-           if(player1.getRawButton(1)) {
-                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);//light up
-                currentVelocity = findCurrentVelocity.estimate(x);
-
-                limeLightPID.updateTargets(0 * (Math.PI / 180.0), targetVelocity, targetAcceleration);
-                limeLightPID.updateCurrentValues(x, currentVelocity);
-                speedChange = limeLightPID.update();
-                // SmartDashboard.putNumber("speedChanged right now:", speedChange);
-                arcadeSteerAxis += speedChange;
-           } else {
-               NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
-           }
-
-           throttleAxis *= weight;
-           for(double lambda:throttleArray) {
-               throttleAxis += weight * lambda;
-           }
-           for(int i = ((int)matrixLength - 1); i >= 1; i--) {
-               throttleArray[i] = throttleArray[i - 1];
-           }
-           throttleArray[0] = throttleAxis;
-
-           arcadeSteerAxis *= Aweight;
-           for(double lambda:arcadeArray) {
-               arcadeSteerAxis += Aweight * lambda;
-           }
-           for(int c = ((int)AmatrixLength - 1); c >= 1; c--) {
-               arcadeArray[c] = arcadeArray[c - 1];
-           }
-           arcadeArray[0] = arcadeSteerAxis;
-           arcadeSteerAxis *= 0.5;//we have to slow down
-
-           if (throttleAxis > 0.0D) {
-               if (arcadeSteerAxis > 0.0D) {
-                   leftMotorSpeed = throttleAxis - arcadeSteerAxis;
-                   rightMotorSpeed = Math.max(throttleAxis, arcadeSteerAxis);
-               } else {
-                   leftMotorSpeed = Math.max(throttleAxis, -arcadeSteerAxis);
-                   rightMotorSpeed = throttleAxis + arcadeSteerAxis;
-               }
-           } else {
-               if (arcadeSteerAxis > 0.0D) {
-                   leftMotorSpeed = -Math.max(-throttleAxis, arcadeSteerAxis);
-                   rightMotorSpeed = throttleAxis + arcadeSteerAxis;
-               } else {
-                   leftMotorSpeed = throttleAxis - arcadeSteerAxis;
-                   rightMotorSpeed = -Math.max(-throttleAxis, -arcadeSteerAxis);
-               }
-           }           
-
-           //for color wheel DIO
-        //    if(!player1.getRawButton(3)) {
-        //        rightMotorSpeed = 0;
-        //        leftMotorSpeed = 0;
-        //    }
-           
-           setRightOutput(rightMotorSpeed);
-           setLeftOutput(leftMotorSpeed);
+       if(Math.abs(steer) < 0.25f) {
+           steer = 0;
+       } else {
+           steer = Math.pow(steer, 2) * sign;
        }
+       
+       double rightspeed = 0, leftSpeed = 0;
+
+       if(throttle > 0) {
+           if(steer > 0) {
+               leftSpeed = throttle - steer;
+               rightspeed = Math.max(throttle, steer);
+           } else {
+               leftSpeed = Math.max(throttle, -steer);
+               rightspeed = throttle + steer;
+           }
+       } else {
+           if(steer > 0) {
+               leftSpeed = -Math.max(-throttle, steer);
+               rightspeed = throttle + steer;
+           } else {
+               leftSpeed = throttle - steer;
+               rightspeed = -Math.max(-throttle, -steer);
+           }
+       }
+
+       hardware.setMotorSpeeds(leftSpeed, rightspeed);
    }
 
    @Override
