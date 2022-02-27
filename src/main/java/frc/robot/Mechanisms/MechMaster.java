@@ -1,6 +1,9 @@
 package frc.robot.Mechanisms;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Mechanisms.Elevator.runElevator;
+import frc.robot.Mechanisms.Flywheel.runFlywheel;
+import frc.robot.Mechanisms.Intake.moveIntake;
 
 /************************************* 
 MECHMASTER WILL CONTROL ALL THE MECHANISMS FROM A CENTRAL PLACE
@@ -25,45 +28,65 @@ public class MechMaster {
     private Intake intake;
     private LimeLightLineup limelight;
     private Turret turret;
-    private XboxController player2;
+
+    private XboxController p1;
+    private XboxController p2;
+
+    private Intake.moveIntake changeIntake;
 
 
     public MechMaster() {
         elevator = new Elevator();
         flywheel = new Flywheel();
-        //intake = new Intake();
+        //intake = new Intake(p1);
         limelight = new LimeLightLineup();
         turret = new Turret();
-        player2 = new XboxController(1);
+        p1 = new XboxController(0);
+        p2 = new XboxController(1);
+
+        intake = new Intake(p1);
 
     }
 
     public void teleRun() {
-        
+
         /*
-        if (p1.getabutton() && p2.gettriggerbutton()) {
-            intake.run(DOWN);
-            elevator.run(SHOOT);
-            flywheel.run(runFlywheel.RUN, limelight.calculateDistance())
+        if(player1.getXButtonPressed() && (changeIntake == moveIntake.UP)){
+            changeIntake = moveIntake.GOING_DOWN;
+            intake.run(moveIntake.GOING_DOWN);
+        }
+        else if(player1.getXButtonPressed() && (changeIntake == moveIntake.DOWN)){
+            intake.run(moveIntake.GOING_UP);
+        }
+        else
+        */
+        
+        //AFTER INTAKE IS TUNED, RUN IT WITH THE ELEVATOR LOGIC (COMMENT OUT THE FLYWHEEL CLASS)
+        /*
+
+        if (p1.getAButton() && p2.getRightTriggerAxis() == 1) {
+            intake.run(moveIntake.DOWN);
+            elevator.run(runElevator.SHOOT);
+            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
 
         else if (p1.getAButton()) {
-            intake.run(DOWN);
-            if (!elevator.isballinelevator)
-                elevator.run(STORE);
+            intake.run(moveIntake.DOWN);
+            if (!elevator.isBallInElevator())
+                elevator.run(runElevator.STORE);
             else
-                elevator.run(IDLE);
-            flywheel.run(runFlywheel.IDLE)
+                elevator.run(runElevator.IDLE);
+            flywheel.run(runFlywheel.IDLE, 0);
         }
 
-        else if (p2.gettriggerbutton()) {
-            elevator.run(SHOOT);
-            flywheel.run(runFlywheel.RUN, limelight.calculateDistance())
+        else if (p2.getRightTriggerAxis() == 1) {
+            elevator.run(runElevator.SHOOT);
+            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
         else {
-            intake.run(UP);
-            elevator.run(IDLE);
-            flywhell.run(runFlywheel.IDLE);
+            intake.run(moveIntake.UP);
+            elevator.run(runElevator.IDLE);
+            flywheel.run(runFlywheel.IDLE, 0);
         }
 
         

@@ -25,9 +25,8 @@ INTAKE CLASS CONTROLS EVERYTHING INTAKE RELATED. DRIVER PRESSES 1 BUTTON TO TOGG
 
 public class Intake {
     private CANSparkMax intake, roller;
-    private RelativeEncoder intakeencoder;
-
-    private TorDerivative derivative;
+    private RelativeEncoder intakeEncoder;
+    
     private XboxController controller;
 
     private double rollerin = -0.5f, rollerout = 0.5f;
@@ -36,20 +35,21 @@ public class Intake {
     //PID Variables
     private double pidDerivativeResult = 0;
     private double pidIntegral = 0;
-    private final double kP = 0.4;
+    private final double kP = 0.05;
     private final double kI = 0;
     private final double kD = 0;
     private boolean ONTARGET;
+    private TorDerivative derivative;
 
     private double target;
-    private final double UP_TARGET = 0, DOWN_TARGET = 1.785;
+    private final double UP_TARGET = 0, DOWN_TARGET = 9.1;
 
     public Intake(XboxController drivercontroller) {
         intake = new CANSparkMax(4, MotorType.kBrushless);
         roller = new CANSparkMax(11, MotorType.kBrushless);
 
-        intakeencoder = intake.getEncoder(Type.kHallSensor, 42);
-        intakeencoder.setPosition(0);
+        intakeEncoder = intake.getEncoder(Type.kHallSensor, 42);
+        intakeEncoder.setPosition(0);
 
         derivative = new TorDerivative(Robot.TIME_INTERVAL);
         derivative.resetValue(0);      
@@ -59,7 +59,7 @@ public class Intake {
         ONTARGET = false;
     }
     
-    public static enum moveIntake{
+    public enum moveIntake{
         UP, DOWN, GOING_UP, GOING_DOWN;
     }
 
@@ -67,51 +67,47 @@ public class Intake {
 
     public void run() {
         double speed = PID();
-        // intake.set(speed);
-
-        if(controller.getXButton()) {
-            target = UP_TARGET;
-        } else if(controller.getAButton()) {
-            target = DOWN_TARGET;
-        }
-
-        if(controller.getBButton()) {
-            roller.set(rollerin);
-        } else if(controller.getYButton()) {
-            roller.set(rollerout);
-        } else {
-            roller.set(0);
-        }
-
+        if (ONTARGET)
+            intake.set(0);
+        else
+            intake.set(speed);
+        
         switch(intakeState) {
             case UP:
-            /*
-                set roller speeds to 0
-                if (motor position != 0)
-                    set motor speed to -x amount;
-                else
-                    set motor speed to 0;
-            */
-            case DOWN:
-            /*
-                if (!magsensor.get) {
-                    set motor speed to x amount;
+                roller.set(0);
+                //no longer on target, set new target, change state
+                if(controller.getXButtonPressed()) {
+                    ONTARGET = false;
+                    target = DOWN_TARGET;
+                    intakeState =  moveIntake.DOWN;
                 }
-                else 
-                    set roller speed to x amount;
-                    set motor speed to 0;
-            */
+            break;
+
+            case DOWN:
+                if (ONTARGET)
+                    roller.set(rollerin);
+                if(controller.getXButtonPressed()) {
+                    ONTARGET = false;
+                    intakeState =  moveIntake.UP;
+                    target = UP_TARGET;
+                }
+            break;
         }
 
     }
     
     public double PID() {
         double speed = 0;
-        double error = target - intakeencoder.getPosition();
-        System.out.println("Error " + error);
+        double error = target - intakeEncoder.getPosition();
+        System.out.println("position " + intakeEncoder.getPosition());
 
         pidDerivativeResult = derivative.estimate(error);
         pidIntegral += error;
+
+        if (error <= 0.1)
+        {
+            ONTARGET = true;
+        }
         
         if(error < 20) { //magic number we need to calculate
             pidIntegral = 0;
@@ -126,4 +122,6 @@ public class Intake {
         speed = (error * kP) + (pidIntegral * kI) + (pidDerivativeResult * kD);
         return speed;
     }
+
+    
 }

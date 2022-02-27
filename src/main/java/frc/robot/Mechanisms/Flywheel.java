@@ -13,6 +13,7 @@ import frc.robot.PID_Tools.*;
 // import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 // import com.revrobotics.EncoderType;
 // import com.revrobotics.EncoderType;
 // import com.revrobotics.SparkMax;
@@ -52,7 +53,7 @@ public class Flywheel {
     private final double gearRatio = 1;// ratio from encoder to flywheel
     private CANSparkMax flyMotor;
     //private CANSparkMax upperMotor;
-    private CANEncoder flyEncoder;
+    private RelativeEncoder flyEncoder;
     // private CANEncoder flyEncoder2;
 
     // time stuff to make sure only goes in correct intervals

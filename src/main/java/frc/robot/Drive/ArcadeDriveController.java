@@ -130,6 +130,8 @@ public class ArcadeDriveController extends DriveController {
            }
        }
 
+
+
        hardware.setMotorSpeeds(leftSpeed, rightspeed);
    }
 
@@ -160,6 +162,43 @@ public class ArcadeDriveController extends DriveController {
 
    public void setTargets(double velocity, double omega) {
        //sets leftMotorSpeed and rightMotorSpeed
+
+   }
+
+   public double powerToRPM(double power) {
+       return power * 5500; //replace 5500 w/ the actual maximum speed (run a test)
+   }
+
+   public double RPMtoPower(double rpm) {
+       return rpm / 5500; //same thing here
+   }
+
+   public double PID(double currentSpeed, double targetSpeed) {
+        /*
+        error = targetSpeed - currentSpeed;
+
+        // SmartDashboard.putNumber("currentError:", currentError);
+        pidDerivativeResult = pidDerivative.estimate(currentError);
+        pidIntegral += currentError;
+
+        if(currentError < 20) {
+        pidIntegral = 0;
+        }
+
+        if(pidIntegral * kI > 0.5) {
+        pidIntegral = 0.5 / kI;
+        } else if(pidIntegral * kI < -0.5) {
+        pidIntegral = -0.5 / kI;
+        }
+
+        sumSpeed += ((currentError * kP) +
+        (pidIntegral * kI) +
+        (pidDerivativeResult * kD)); //+ FeedForward;
+
+        return sumSpeed;
+        */
+
+        return 0.0;
 
    }
 

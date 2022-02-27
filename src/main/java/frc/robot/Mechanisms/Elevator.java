@@ -5,7 +5,6 @@ CONTROLS THE ELEVATOR SPEEDS
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class Elevator {
 
