@@ -28,8 +28,9 @@ import frc.robot.Mechanisms.Elevator.runElevator;
 public class Robot extends TimedRobot {
   public static final double TIME_INTERVAL = 0.005f;
 
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private static final String Auto_2Ball = "2Ball";
+  private static final String Auto_4Ball = "4Ball";
+  private static final String Auto_1Ball = "1Ball";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -46,6 +47,7 @@ public class Robot extends TimedRobot {
   private Elevator elevator;
   private DriveHardware hardware;
   private TorDrive drive;
+  private MechMaster mechMaster;
 
   private boolean isAligned;
   private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
@@ -57,12 +59,13 @@ public class Robot extends TimedRobot {
     //flywheel = new Flywheel(player2);
     //talon = new TalonSRX(10);
 
-    intake = new Intake(player1);
-    turret = new Turret();
-    limeLight = new LimeLightLineup();
-    elevator = new Elevator();
-    hardware = new DriveHardware();
+    // intake = new Intake(player1);
+    // turret = new Turret();
+    // limeLight = new LimeLightLineup();
+    // elevator = new Elevator();
+    // hardware = new DriveHardware();
     drive = new TorDrive(hardware, player1);
+    mechMaster = new MechMaster();
   }
   
   
@@ -76,8 +79,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    m_chooser.setDefaultOption("4 ball", Auto_4Ball);
+    m_chooser.addOption("2 ball", Auto_2Ball);
+    m_chooser.addOption("1 ball", Auto_1Ball);
     SmartDashboard.putData("Auto choices", m_chooser);
 
   }
@@ -113,12 +117,12 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case kCustomAuto:
+      case Auto_4Ball:
         // Put custom auto code here
         break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
+      case Auto_2Ball:
+        break;
+      case Auto_1Ball:
         break;
     }
   }
@@ -134,9 +138,10 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
 
     // drive.Run();
-    
+
     /* **************** INTAKE TEST CODE **************************** */
-    intake.run();
+    //intake.run();
+    mechMaster.teleRun();
 
 
     /* **************** TURRET TEST CODE ****************************

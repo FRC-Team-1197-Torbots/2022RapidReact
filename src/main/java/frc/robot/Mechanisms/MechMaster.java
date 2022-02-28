@@ -36,30 +36,24 @@ public class MechMaster {
 
 
     public MechMaster() {
-        elevator = new Elevator();
-        flywheel = new Flywheel();
+        //elevator = new Elevator();
+        // flywheel = new Flywheel();
         //intake = new Intake(p1);
-        limelight = new LimeLightLineup();
-        turret = new Turret();
+        // limelight = new LimeLightLineup();
+        // turret = new Turret();
         p1 = new XboxController(0);
         p2 = new XboxController(1);
-
         intake = new Intake(p1);
-
+        changeIntake = moveIntake.UP;
     }
 
     public void teleRun() {
-
-        /*
-        if(player1.getXButtonPressed() && (changeIntake == moveIntake.UP)){
-            changeIntake = moveIntake.GOING_DOWN;
-            intake.run(moveIntake.GOING_DOWN);
+        if(p1.getXButtonPressed() && intake.ONTARGET){
+            // changeIntake = moveIntake.DOWN;
+            intake.run(true);        
+        } else {
+            intake.run(false);
         }
-        else if(player1.getXButtonPressed() && (changeIntake == moveIntake.DOWN)){
-            intake.run(moveIntake.GOING_UP);
-        }
-        else
-        */
         
         //AFTER INTAKE IS TUNED, RUN IT WITH THE ELEVATOR LOGIC (COMMENT OUT THE FLYWHEEL CLASS)
         /*

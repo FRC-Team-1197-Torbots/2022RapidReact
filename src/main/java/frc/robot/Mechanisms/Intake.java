@@ -1,19 +1,13 @@
 package frc.robot.Mechanisms;
 
-import javax.lang.model.util.ElementScanner6;
-
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxAlternateEncoder;
-import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.Robot;
-import frc.robot.Drive.DriveController;
 import frc.robot.PID_Tools.TorDerivative;
 
 /*-------------------------
@@ -25,7 +19,8 @@ INTAKE CLASS CONTROLS EVERYTHING INTAKE RELATED. DRIVER PRESSES 1 BUTTON TO TOGG
 
 public class Intake {
     private CANSparkMax intake, roller;
-    private RelativeEncoder intakeEncoder;
+    // private RelativeEncoder intakeEncoder;
+    private Encoder intakeEncoder;
     
     private XboxController controller;
 
@@ -35,21 +30,28 @@ public class Intake {
     //PID Variables
     private double pidDerivativeResult = 0;
     private double pidIntegral = 0;
-    private final double kP = 0.05;
+    private final double kP = 0.00075;
     private final double kI = 0;
-    private final double kD = 0;
-    private boolean ONTARGET;
+    private final double kD = 0.0000062;
+    public boolean ONTARGET;
     private TorDerivative derivative;
 
     private double target;
-    private final double UP_TARGET = 0, DOWN_TARGET = 9.1;
+    private final double UP_TARGET = 0, DOWN_TARGET = 433;
+
+    public enum moveIntake{
+        UP, DOWN;
+    }
+
+    public moveIntake intakeState = moveIntake.UP;
 
     public Intake(XboxController drivercontroller) {
         intake = new CANSparkMax(4, MotorType.kBrushless);
         roller = new CANSparkMax(11, MotorType.kBrushless);
 
-        intakeEncoder = intake.getEncoder(Type.kHallSensor, 42);
-        intakeEncoder.setPosition(0);
+        // intakeEncoder = intake.getEncoder(Type.kHallSensor, 42);
+        intakeEncoder = new Encoder(14,15, false, Encoder.EncodingType.k4X);
+        intakeEncoder.reset();
 
         derivative = new TorDerivative(Robot.TIME_INTERVAL);
         derivative.resetValue(0);      
@@ -57,27 +59,20 @@ public class Intake {
         target = UP_TARGET;
         this.controller = drivercontroller;
         ONTARGET = false;
-    }
+    }   
     
-    public enum moveIntake{
-        UP, DOWN, GOING_UP, GOING_DOWN;
-    }
 
-    private moveIntake intakeState = moveIntake.UP;
-
-    public void run() {
+    public void run(boolean buttonPressed) {
         double speed = PID();
-        if (ONTARGET)
-            intake.set(0);
-        else
-            intake.set(speed);
+        intake.set(speed);
         
         switch(intakeState) {
             case UP:
                 roller.set(0);
                 //no longer on target, set new target, change state
-                if(controller.getXButtonPressed()) {
+                if(buttonPressed) {
                     ONTARGET = false;
+                    buttonPressed = false;
                     target = DOWN_TARGET;
                     intakeState =  moveIntake.DOWN;
                 }
@@ -86,8 +81,10 @@ public class Intake {
             case DOWN:
                 if (ONTARGET)
                     roller.set(rollerin);
-                if(controller.getXButtonPressed()) {
+
+                if(buttonPressed) {
                     ONTARGET = false;
+                    buttonPressed = false;
                     intakeState =  moveIntake.UP;
                     target = UP_TARGET;
                 }
@@ -98,13 +95,12 @@ public class Intake {
     
     public double PID() {
         double speed = 0;
-        double error = target - intakeEncoder.getPosition();
-        System.out.println("position " + intakeEncoder.getPosition());
+        double error = target - intakeEncoder.get();
 
         pidDerivativeResult = derivative.estimate(error);
         pidIntegral += error;
 
-        if (error <= 0.1)
+        if (Math.abs(error) <= 20)
         {
             ONTARGET = true;
         }
