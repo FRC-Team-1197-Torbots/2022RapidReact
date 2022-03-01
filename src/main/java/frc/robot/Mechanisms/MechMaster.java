@@ -49,7 +49,6 @@ public class MechMaster {
 
     public void teleRun() {
         if(p1.getXButtonPressed() && intake.ONTARGET){
-            // changeIntake = moveIntake.DOWN;
             intake.run(true);        
         } else {
             intake.run(false);

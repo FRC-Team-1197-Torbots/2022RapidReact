@@ -13,6 +13,9 @@ import javax.lang.model.util.ElementScanner6;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.*;
 import frc.robot.Drive.DriveHardware;
 import frc.robot.Drive.TorDrive;
@@ -26,6 +29,8 @@ import frc.robot.Mechanisms.Elevator.runElevator;
  * project.
  */
 public class Robot extends TimedRobot {
+  private HttpCamera limelight;
+
   public static final double TIME_INTERVAL = 0.005f;
 
   private static final String Auto_2Ball = "2Ball";
@@ -84,6 +89,8 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("1 ball", Auto_1Ball);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    // limelight = new HttpCamera("limelight", "http://limelight.local:5801");
+    // CameraServer.startAutomaticCapture(limelight);
   }
 
   /**
