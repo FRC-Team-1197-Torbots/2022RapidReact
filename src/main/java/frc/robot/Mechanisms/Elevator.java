@@ -5,6 +5,7 @@ CONTROLS THE ELEVATOR SPEEDS
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class Elevator {
 
@@ -15,7 +16,7 @@ public class Elevator {
 
     public Elevator() {
         breakbeam = new DigitalInput(0);
-        //elMotor = new CANSparkMax(7, MotorType.kBrushless);
+        elMotor = new CANSparkMax(10, MotorType.kBrushless);
     }
 
 
@@ -26,21 +27,27 @@ public class Elevator {
     public void run(runElevator elevatorState) {
         switch(elevatorState) {
             case IDLE:
+                System.out.println("IDLE");
                 elMotor.set(0);
                 //set elevator motor speed to 0
+            break;
             case STORE:
+                System.out.println("STORE");
+
                 //if break beam (digital input) is broken, set motor speed to 0, else set elevator motor speed to x
-                if (breakbeam.get()){ //or !breakbeam.get()
+                if (!breakbeam.get()){ //or !breakbeam.get()
                     ballInElevator = true;
                     elMotor.set(0);
                 }
                 else
                     elMotor.set(0.5);
-    
+            break;
             case SHOOT:
+                System.out.println("SHOOT");
                 //set elevator motor speed to x
                 elMotor.set(0.5);
                 ballInElevator = false;
+            break;
         }
     }
 

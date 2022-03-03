@@ -20,6 +20,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -32,7 +33,7 @@ public class Flywheel {
     //private final double highSpeedConstant = 0.0;//0.9
     //private final double lowSpeedConstant = 0.0;
     // RPM below 2000 p = 0.045 i = 0.4 d = 0
-    private final double kP = 0.02;//.00035//0.05
+    private final double kP = 0.04;//.00035//0.05
     private final double kI = 0.4;//.000005
     private final double kD = 0.00; //original 0.5 0 0
     private double FeedForward;
@@ -70,7 +71,7 @@ public class Flywheel {
 
     public Flywheel() {
 
-        //flyMotor = new CANSparkMax(1, MotorType.kBrushless);
+        flyMotor = new CANSparkMax(12, MotorType.kBrushless);
         flyEncoder = flyMotor.getEncoder();
        
         pidDerivative = new TorDerivative(dt);
@@ -106,7 +107,7 @@ public class Flywheel {
     }
 
     public double pidRun(double currentSpeed, double targetSpeed) {
-        
+
         currentError = targetSpeed - currentSpeed;
         
         // SmartDashboard.putNumber("currentError:", currentError);
@@ -132,6 +133,28 @@ public class Flywheel {
 
     public void stop() {
         flyMotor.set(0);
+    }
+
+    //TESTING TO TUNE PID, INPUTS HARD TARGET
+    public void testRun(double rpm) {
+        targetHighSpeed = rpm; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
+        targetSpeed = targetHighSpeed;
+        FeedForward = targetSpeed/MaxMotorSpeed;
+        
+        // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
+        // currentPosition = (adjustingConstant * 1) / (gearRatio);
+        currentSpeed = flyEncoder.getVelocity() / MaxMotorSpeed;//rpm
+        speedToSetMotor = pidRun(currentSpeed, FeedForward);
+        flyMotor.set(speedToSetMotor);
+
+        SmartDashboard.putNumber("Current speed", flyEncoder.getVelocity());
+        SmartDashboard.putNumber("Sum speed", sumSpeed);
+    }
+
+    public void onDisable(){
+        pidIntegral = 0;
+        sumSpeed = 0;
+        flyEncoder.setPosition(0);
     }
     
 }
