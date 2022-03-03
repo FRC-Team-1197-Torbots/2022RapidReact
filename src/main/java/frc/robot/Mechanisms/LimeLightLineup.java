@@ -73,7 +73,7 @@ public class LimeLightLineup {
         }
 
         public double getAngle() {
-                x = tx.getDouble(0.0);
+                x = -tx.getDouble(0.0);
                 return x;
         }
 

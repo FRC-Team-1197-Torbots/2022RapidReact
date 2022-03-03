@@ -66,7 +66,7 @@ public class Turret {
     private final double dt = 0.005f;
     private TorDerivative TurretDerivative;
     private double pidIntegral = 0;
-    private final double turretKP = 0.009f;
+    private final double turretKP = 0.025f;
     private final double turretKI = 0.00000f;
     private final double turretKD = 0.0000f;
     private final double OnTargetDelta = 0.25f;
@@ -74,7 +74,7 @@ public class Turret {
     private boolean OnTarget;
 
     public Turret(){
-        //TurretMotor = new TalonSRX(10);
+        TurretMotor = new TalonSRX(8);
         zeroSensor = new DigitalInput(1);
         limelight = new LimeLightLineup();
 
@@ -157,7 +157,7 @@ public class Turret {
             TargetAngle = 0;
         }
         else {
-            TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
+            TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;            
         }
 
         if(m_initstate != INIT_STATES.IDLE) {
@@ -167,19 +167,7 @@ public class Turret {
             double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
             // System.out.println("target " + TargetAngle);
             
-            //maxes out at 0.25
-            if (Math.abs(pidout) > 0.25) {
-                if(pidout < 0){
-                    TurretMotor.set(ControlMode.PercentOutput, -0.25);
-                }
-                else{
-                    TurretMotor.set(ControlMode.PercentOutput, 0.25);
-                }
-            }
-            else {
-                TurretMotor.set(ControlMode.PercentOutput, pidout);            
-            }
-        
+            TurretMotor.set(ControlMode.PercentOutput, pidout);        
         }
     }
 

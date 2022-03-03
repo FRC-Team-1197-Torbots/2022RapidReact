@@ -41,7 +41,7 @@ public class MechMaster {
         flywheel = new Flywheel();
         //intake = new Intake(p1);
         limelight = new LimeLightLineup();
-        // turret = new Turret();
+        turret = new Turret();
         p1 = new XboxController(0);
         p2 = new XboxController(1);
         intake = new Intake(p1);
@@ -107,9 +107,10 @@ public class MechMaster {
         
         //elevator.run(runElevator.SHOOT);
         //flywheel.testRun(-2200f);
-        limelight.test();
-        SmartDashboard.putNumber("Limelight distance", limelight.calculate_distance());
-        System.out.println("Distance: " + limelight.calculate_distance());
+        // limelight.test();
+        // SmartDashboard.putNumber("Limelight distance", limelight.calculate_distance());
+        // System.out.println("Distance: " + limelight.calculate_distance());
+        turret.PIDTuning(limelight.getAngle());
         
         /*
         //TUNING THE PID FOR FLYWHEEL
