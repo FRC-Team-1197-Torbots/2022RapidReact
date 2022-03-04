@@ -27,25 +27,21 @@ public class Elevator {
     public void run(runElevator elevatorState) {
         switch(elevatorState) {
             case IDLE:
-                System.out.println("IDLE");
                 elMotor.set(0);
                 //set elevator motor speed to 0
             break;
             case STORE:
-                System.out.println("STORE");
-
                 //if break beam (digital input) is broken, set motor speed to 0, else set elevator motor speed to x
                 if (!breakbeam.get()){ //or !breakbeam.get()
                     ballInElevator = true;
                     elMotor.set(0);
                 }
                 else
-                    elMotor.set(0.5);
+                    elMotor.set(0.6);
             break;
             case SHOOT:
-                System.out.println("SHOOT");
                 //set elevator motor speed to x
-                elMotor.set(0.5);
+                elMotor.set(0.6);
                 ballInElevator = false;
             break;
         }

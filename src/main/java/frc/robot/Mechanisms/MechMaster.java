@@ -73,44 +73,52 @@ public class MechMaster {
         */
         
         //AFTER INTAKE IS TUNED, RUN IT WITH THE ELEVATOR LOGIC (COMMENT OUT THE FLYWHEEL CLASS)
-        /*
+        
+        
         SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
         if (p1.getAButton() && p2.getRightTriggerAxis() == 1) {
             intake.run(moveIntake.DOWN);
             elevator.run(runElevator.SHOOT);
+            //flywheel.testRun(-2300);
             //flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
 
         else if (p1.getAButton()) {
             intake.run(moveIntake.DOWN);
-            if (!elevator.isBallInElevator())
-                elevator.run(runElevator.STORE);
-            else
-                elevator.run(runElevator.IDLE);
+           // if (!elevator.isBallInElevator())
+             //   elevator.run(runElevator.STORE);
+            //else
+            elevator.run(runElevator.STORE);
             //flywheel.run(runFlywheel.IDLE, 0);
         }
 
         else if (p2.getRightTriggerAxis() == 1) {
-            elevator.run(runElevator.SHOOT);
-            //flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+            if(flywheel.OnTarget) {
+                elevator.run(runElevator.SHOOT);
+            } else {
+                elevator.run(runElevator.IDLE);
+            }
+
+            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
         else {
             intake.run(moveIntake.UP);
             elevator.run(runElevator.IDLE);
-            //flywheel.run(runFlywheel.IDLE, 0);
+            flywheel.run(runFlywheel.IDLE, 0);
         }
-        */
+        
+        
         
         //TESTING DIFFERENT DISTANCES FOR FLYWHEEL
         //(10 feet, 2200 rpm)
         //
-        
-        //elevator.run(runElevator.SHOOT);
-        //flywheel.testRun(-2200f);
-        // limelight.test();
-        // SmartDashboard.putNumber("Limelight distance", limelight.calculate_distance());
-        // System.out.println("Distance: " + limelight.calculate_distance());
-        turret.PIDTuning(limelight.getAngle());
+        /*
+        elevator.run(runElevator.SHOOT);
+        flywheel.testRun(-1800f);
+        limelight.test();
+        SmartDashboard.putNumber("Limelight distance", limelight.calculate_distance());
+        //System.out.println("Distance: " + limelight.calculate_distance());
+        //turret.PIDTuning(limelight.getAngle());
         
         /*
         //TUNING THE PID FOR FLYWHEEL

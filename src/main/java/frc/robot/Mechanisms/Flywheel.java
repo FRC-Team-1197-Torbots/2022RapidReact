@@ -33,11 +33,11 @@ public class Flywheel {
     //private final double highSpeedConstant = 0.0;//0.9
     //private final double lowSpeedConstant = 0.0;
     // RPM below 2000 p = 0.045 i = 0.4 d = 0
-    private final double kP = 0.04;//.00035//0.05
-    private final double kI = 0.4;//.000005
+    private final double kP = 0.000006;//.00035//0.05
+    private final double kI = 0.00000006;//.000005
     private final double kD = 0.00; //original 0.5 0 0
     private double FeedForward;
-    private final double MaxMotorSpeed = 5676f;
+    private final double MaxMotorSpeed = 4500;
     private double currentError = 0;
 
     private TorDerivative pidDerivative;
@@ -62,8 +62,7 @@ public class Flywheel {
     //private long startTime = (long) (Timer.getFPGATimestamp() * 1000);
     private double timeInterval = 0.005;
     private double dt = timeInterval;
-    //private long lastCountedTime;
-    //private boolean starting = true;
+    public boolean OnTarget = false;
 
     public static enum runFlywheel {
         RUN, IDLE;
@@ -82,22 +81,30 @@ public class Flywheel {
     public void init(){
 
     }
-    
+    //-2250 - 154in
+    //-1950 - 90in //min distance
+    //-2450 - 198in //safe zone
+    //-2800 - 220in
 
     public void run(runFlywheel flyState, double distance) {
         switch(flyState) {
             case RUN:
-                targetHighSpeed = -((108 * distance) + 1776); //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
-                targetSpeed = targetHighSpeed;
-                FeedForward = targetSpeed/MaxMotorSpeed;
-                
-                // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
-                // currentPosition = (adjustingConstant * 1) / (gearRatio);
-                currentSpeed = flyEncoder.getVelocity() / MaxMotorSpeed;//rpm
-                speedToSetMotor = pidRun(currentSpeed, FeedForward);
+                // targetSpeed = -((108 * distance) + 1776); //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
+                targetSpeed = -2800;
+                SmartDashboard.putNumber("distance", distance);
+                currentSpeed = flyEncoder.getVelocity();//rpm
+                SmartDashboard.putNumber("Shooter Velocity", currentSpeed);
+                speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(speedToSetMotor);
+                break;
+
             case IDLE:
-                flyMotor.set(0 * 1.0f);
+                flyMotor.set(0);
+                OnTarget = false;
+
+                pidIntegral = 0;
+                sumSpeed = 0;
+                break;
         }
     }
 
@@ -113,6 +120,9 @@ public class Flywheel {
         // SmartDashboard.putNumber("currentError:", currentError);
         pidDerivativeResult = pidDerivative.estimate(currentError);
         pidIntegral += currentError;
+
+        if(Math.abs(currentError) < 20)
+            OnTarget = true;
 
         if(currentError < 20) {
             pidIntegral = 0;
