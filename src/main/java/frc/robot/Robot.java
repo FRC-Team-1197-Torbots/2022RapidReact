@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
     // turret = new Turret();
     // limeLight = new LimeLightLineup();
     // elevator = new Elevator();
-    // hardware = new DriveHardware();
+    hardware = new DriveHardware();
     drive = new TorDrive(hardware, player1);
     mechMaster = new MechMaster();
   }
@@ -144,7 +144,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    // drive.Run();
+    drive.Run();
 
     /* **************** INTAKE TEST CODE **************************** */
     //intake.run();

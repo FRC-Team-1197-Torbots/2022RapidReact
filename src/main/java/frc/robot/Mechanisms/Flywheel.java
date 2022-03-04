@@ -89,11 +89,9 @@ public class Flywheel {
     public void run(runFlywheel flyState, double distance) {
         switch(flyState) {
             case RUN:
-                // targetSpeed = -((108 * distance) + 1776); //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
-                targetSpeed = -2800;
-                SmartDashboard.putNumber("distance", distance);
+                targetSpeed = (-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 currentSpeed = flyEncoder.getVelocity();//rpm
-                SmartDashboard.putNumber("Shooter Velocity", currentSpeed);
+                SmartDashboard.putNumber("Target Speed", targetSpeed);
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(speedToSetMotor);
                 break;
