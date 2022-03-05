@@ -10,15 +10,15 @@ public class linearTrajectory {
 	private double currentDistance;
 	private boolean isFinished = false;
 	
-	private final double maxSpeed = 0.7;
+	private final double maxSpeed = 0.3;
     
     //PID for translation
-	private final double tkP = 0.2;//0.5
-	private final double tkD = 0.00002;//.001
-    private final double tkI = 0.05;//.0003
+	private final double tkP = 0.1;//0.5
+	private final double tkD = 0.0;//0.00002;//.001
+    private final double tkI = 0.0;//0.05;//.0003
     
     //PID For rotation
-	private final double rkP = -0.3;//0.5
+	private final double rkP = 0.3;//0.5
 	private final double rkD = 0.0;//0.0
 	private final double rkI = 0.001;//0.01
 	private final double kF = 0.005;
@@ -97,6 +97,11 @@ public class linearTrajectory {
 		
 	
 	public void run() {
+
+		System.out.println("Velocity: " + velocity);
+		System.out.println("Omega: " + omega);
+
+
 		currentAngle = drive.getHeading();
 		//we can't fix current angle right now so that it can't be 359 degrees since we need it in this raw value first for the angleError
 		//since it is never used other than for finding angleError, there is no need to make sure that it reads -1 degrees rather than 359 degrees

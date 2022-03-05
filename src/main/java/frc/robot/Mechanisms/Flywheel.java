@@ -104,6 +104,11 @@ public class Flywheel {
                 sumSpeed = 0;
                 break;
         }
+
+        //System.out.println("Current speed: " + currentSpeed);
+        //System.out.println("Target speed: " + targetSpeed);
+        System.out.println("Percentage: " + (currentSpeed/targetSpeed));
+        //System.out.println("Time: " + Timer.getFPGATimestamp());
     }
 
     

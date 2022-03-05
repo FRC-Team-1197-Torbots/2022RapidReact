@@ -14,6 +14,8 @@ import javax.lang.model.util.ElementScanner6;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
 
+import org.ejml.simple.AutomaticSimpleMatrixConvert;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.*;
@@ -21,6 +23,7 @@ import frc.robot.Drive.DriveHardware;
 import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.*;
 import frc.robot.Mechanisms.Elevator.runElevator;
+import frc.robot.Autonomous.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -53,6 +56,7 @@ public class Robot extends TimedRobot {
   private DriveHardware hardware;
   private TorDrive drive;
   private MechMaster mechMaster;
+  private AutoMaster autoMaster;
 
   private boolean isAligned;
   private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
@@ -71,6 +75,7 @@ public class Robot extends TimedRobot {
     hardware = new DriveHardware();
     drive = new TorDrive(hardware, player1);
     mechMaster = new MechMaster();
+    autoMaster = new AutoMaster(drive); 
   }
   
   
@@ -84,10 +89,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("4 ball", Auto_4Ball);
-    m_chooser.addOption("2 ball", Auto_2Ball);
-    m_chooser.addOption("1 ball", Auto_1Ball);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    autoMaster.robotInit();
 
     // limelight = new HttpCamera("limelight", "http://limelight.local:5801");
     // CameraServer.startAutomaticCapture(limelight);
@@ -115,23 +117,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    autoMaster.init();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case Auto_4Ball:
-        // Put custom auto code here
-        break;
-      case Auto_2Ball:
-        break;
-      case Auto_1Ball:
-        break;
-    }
+    autoMaster.run();
   }
 
   /** This function is called once when teleop is enabled. */

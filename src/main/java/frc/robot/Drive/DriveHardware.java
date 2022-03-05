@@ -93,8 +93,8 @@ public class DriveHardware {
 	public void setMotorSpeeds(double leftSpeed, double rightSpeed) {
 		// SmartDashboard.putNumber("left raw", getLeftEncoder());
 		// SmartDashboard.putNumber("right raw", getRightEncoder());
-		SetLeft(leftSpeed);
-		SetRight(rightSpeed);
+		SetLeft(-leftSpeed); //- for auto
+		SetRight(-rightSpeed); //+ for teleop
 	}
 
 	// Setting the left master Talon's speed to the given parameter
