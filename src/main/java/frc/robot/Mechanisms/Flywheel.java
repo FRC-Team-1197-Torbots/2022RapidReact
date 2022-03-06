@@ -91,7 +91,6 @@ public class Flywheel {
             case RUN:
                 targetSpeed = (-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 currentSpeed = flyEncoder.getVelocity();//rpm
-                SmartDashboard.putNumber("Target Speed", targetSpeed);
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(speedToSetMotor);
                 break;
@@ -107,7 +106,10 @@ public class Flywheel {
 
         //System.out.println("Current speed: " + currentSpeed);
         //System.out.println("Target speed: " + targetSpeed);
-        System.out.println("Percentage: " + (currentSpeed/targetSpeed));
+        SmartDashboard.putNumber("Target Speed", -targetSpeed);
+        SmartDashboard.putNumber("Current Speed", -currentSpeed);
+        SmartDashboard.putNumber("Error: ", currentError);
+        //System.out.println("Percentage: " + (currentSpeed/targetSpeed));
         //System.out.println("Time: " + Timer.getFPGATimestamp());
     }
 

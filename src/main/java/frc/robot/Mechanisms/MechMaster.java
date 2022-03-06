@@ -2,6 +2,8 @@ package frc.robot.Mechanisms;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Mechanisms.Climber.climbState;
+import frc.robot.Mechanisms.Climber.nikitaState;
 import frc.robot.Mechanisms.Elevator.runElevator;
 import frc.robot.Mechanisms.Flywheel.runFlywheel;
 import frc.robot.Mechanisms.Intake.moveIntake;
@@ -29,14 +31,21 @@ public class MechMaster {
     private Intake intake;
     private LimeLightLineup limelight;
     private Turret turret;
+    private Climber climber;
 
     private XboxController p1;
     private XboxController p2;
 
     private Intake.moveIntake changeIntake;
+    private climbState moveClimber;
+
+    public enum autoMech {
+        STORE, SHOOT, IDLE;
+    }
 
 
     public MechMaster() {
+        //climber = new Climber();
         elevator = new Elevator();
         flywheel = new Flywheel();
         //intake = new Intake(p1);
@@ -106,6 +115,23 @@ public class MechMaster {
             elevator.run(runElevator.IDLE);
             flywheel.run(runFlywheel.IDLE, 0);
         }
+
+        //CLIMBER
+
+        if(p2.getPOV(0) == 0){
+            climber.climb(climbState.UP);  
+        }
+        else if(p2.getPOV(180) == 180){
+            climber.climb(climbState.DOWN);
+        }
+
+        if (p2.getPOV(90) == 90) {
+            climber.nikita(nikitaState.UP);
+        }
+
+        if (p2.getPOV(270) == 270) {
+            climber.nikita(nikitaState.DOWN);
+        }
         
         
         
@@ -143,7 +169,27 @@ public class MechMaster {
     
     }
 
-    public void autoRun() {
+    public void autoRun(autoMech mechState) {
+        switch(mechState) {
+            case STORE:
+                intake.run(moveIntake.DOWN);
+                elevator.run(runElevator.STORE);
+            break;
+            case SHOOT:
+                if(flywheel.OnTarget) {
+                    elevator.run(runElevator.SHOOT);
+                } else {
+                    elevator.run(runElevator.IDLE);
+                }
+                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+            break;
+            
+            case IDLE:
+                intake.run(moveIntake.UP);
+                elevator.run(runElevator.IDLE);
+                flywheel.run(runFlywheel.IDLE, 0);
+            break;
+        }
 
     }
 

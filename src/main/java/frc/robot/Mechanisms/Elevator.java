@@ -41,11 +41,11 @@ public class Elevator {
                     elMotor.set(0);
                 }
                 else
-                    elMotor.set(0.45);
+                    elMotor.set(0.6);
             break;
             case SHOOT:
                 //set elevator motor speed to x
-                elMotor.set(0.45);
+                elMotor.set(0.6);
                 ballInElevator = false;
             break;
         }

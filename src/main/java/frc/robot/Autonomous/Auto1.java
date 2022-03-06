@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Autonomous.curveTrajectory.Direction;
 import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.*;
+import frc.robot.Mechanisms.MechMaster.autoMech;
 
 public class Auto1 {
     public static enum autoRun{
@@ -40,12 +41,12 @@ public class Auto1 {
         switch(AutoState1){
             case INIT:
                 linear1.init();
-                //keep the mechanics idle
+                mechMaster.autoRun(autoMech.IDLE);
                 AutoState1 = autoRun.Linear1;
                 break;
             case Linear1:
                 linear1.run();
-                //run the intake
+                mechMaster.autoRun(autoMech.STORE);
                 if(linear1.isDone()){
                     curve1.init();
                     AutoState1 = autoRun.Curve1;
@@ -53,7 +54,7 @@ public class Auto1 {
                 break;
             case Curve1:
                 curve1.run();
-                //shoot the ball
+                mechMaster.autoRun(autoMech.SHOOT);
                 if(curve1.isDone()){
                     linear2.init();
                     AutoState1 = autoRun.Linear2;
