@@ -19,8 +19,9 @@ public class AutoMaster {
     private MechMaster mechMaster;
     private TorDrive drive;
 
-    public AutoMaster (TorDrive drive) {
+    public AutoMaster (TorDrive drive, MechMaster mechMaster) {
         this.drive = drive;
+        this.mechMaster = mechMaster;
         auto1 = new Auto1(mechMaster, drive);
         auto2 = new Auto2(mechMaster, drive);
 

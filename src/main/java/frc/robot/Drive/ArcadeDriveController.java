@@ -42,24 +42,24 @@ public class ArcadeDriveController extends DriveController {
     */
    private final double areaAt1Meter = 1.27;//in percent//maybe later?
 
-   // limelight PID
+   // PID
    // Stuff------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-   private final double positionkP = -2; //-1.4
-   private final double positionkI = 0; //-0.002
-   private final double positionkD = -0.035; //-0.035
-   private final double positionTolerance = 3 * Math.PI / 180.0;// for thePID
-   private final double velocitykP = 0.0;// velocity stuff probably not needed at all and should keep 0
+   private final double velocitykP = 0.0001;// velocity stuff probably not needed at all and should keep 0
    private final double velocitykI = 0.0;
    private final double velocitykD = 0.0;
-   private final double kV = 0.0;// this should definitely stay at 0
-   private final double kA = 0.0;// this should definitely stay at 0
-   private final double velocityTolerance = 0.0;
-   private final double targetVelocity = 0.0;// probably won't need
-   private final double targetAcceleration = 0.0;// probably won't need
 
    // ------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+
+   private double currentError = 0;
+   private TorDerivative pidDerivative;
+   private double pidDerivativeResult;
+   private double pidIntegral = 0;
+   private double LeftPIDSum = 0, RightPIDSum = 0;
+
+   private double throttle = 0;
+   private double steer = 0;
    //this is for the curve drive
 
    //tunable
@@ -73,6 +73,8 @@ public class ArcadeDriveController extends DriveController {
    private double[] arcadeArray = new double[(int)AmatrixLength];
    private boolean currentInit = true;
 
+   private enum SIDE {LEFT, RIGHT};
+
    /*
     * no more tuneable
     * things-------------------------------------------------------->>>>>>>>>>>>>>>
@@ -84,6 +86,7 @@ public class ArcadeDriveController extends DriveController {
        
        this.player1 = player1;
        this.hardware = hardware;
+       pidDerivative = new TorDerivative(dt);
    }
 
    @Override
@@ -93,8 +96,8 @@ public class ArcadeDriveController extends DriveController {
 
    @Override
    public void run() {
-       double throttle = player1.getRawAxis(1);
-       double steer = player1.getRawAxis(0);
+       throttle = player1.getRawAxis(1) / 2;
+       steer = player1.getRawAxis(0) / 1.5;
 
        double sign = 0;
 
@@ -130,9 +133,46 @@ public class ArcadeDriveController extends DriveController {
            }
        }
 
+       hardware.setMotorSpeeds(-leftSpeed, -rightspeed); 
+
+       //convert to requested speed in encoder ticks per second
+       //convertedspeed = max speed * leftSpeed
+
+       //leftOutput = PID(hardware.getLeftVelocity(), leftSpeed, SIDE.LEFT);
+       //rightOutput = PID(hardware.getRightVelocity(), rightspeed, SIDE.RIGHT);
 
 
-       hardware.setMotorSpeeds(leftSpeed, rightspeed);
+       //hardware.setMotorSpeeds(-leftOutput, -rightOutput);
+
+       //System.out.println("Left output: " +  leftOutput);
+       //System.out.println("Right output: " + rightOutput);
+       //System.out.println("Current error: " +currentError);
+   }
+
+   public void testRun(XboxController player1){
+       double leftSpeed, rightSpeed = 0;
+       if(player1.getYButton()){
+           leftSpeed = 0.4;
+           rightSpeed = 0.4;
+        //    leftOutput = PID(hardware.getLeftEncoder(), leftSpeed);
+        //    rightOutput = PID(hardware.getRightEncoder(), rightSpeed);
+           hardware.setMotorSpeeds(-leftOutput, -rightOutput);
+       }
+       else if(player1.getAButton()){
+            leftSpeed = -0.4;
+            rightSpeed = -0.4;
+            // leftOutput = PID(hardware.getLeftEncoder(), leftSpeed);
+            // rightOutput = PID(hardware.getRightEncoder(), rightSpeed);
+            hardware.setMotorSpeeds(-leftOutput, -rightOutput);
+       }
+       else{
+            leftSpeed = 0;
+            rightSpeed = 0;
+            // leftOutput = PID(hardware.getLeftEncoder(), leftSpeed);
+            // rightOutput = PID(hardware.getRightEncoder(), rightSpeed);
+            hardware.setMotorSpeeds(-leftOutput, -rightOutput);
+       }
+
    }
 
    @Override
@@ -173,9 +213,9 @@ public class ArcadeDriveController extends DriveController {
        return rpm / 5500; //same thing here
    }
 
-   public double PID(double currentSpeed, double targetSpeed) {
-        /*
-        error = targetSpeed - currentSpeed;
+   public double PID(double currentSpeed, double targetSpeed, SIDE side) {
+        
+        currentError = targetSpeed - currentSpeed;
 
         // SmartDashboard.putNumber("currentError:", currentError);
         pidDerivativeResult = pidDerivative.estimate(currentError);
@@ -185,20 +225,28 @@ public class ArcadeDriveController extends DriveController {
         pidIntegral = 0;
         }
 
-        if(pidIntegral * kI > 0.5) {
-        pidIntegral = 0.5 / kI;
-        } else if(pidIntegral * kI < -0.5) {
-        pidIntegral = -0.5 / kI;
+        if(pidIntegral * velocitykI > 0.5) {
+        pidIntegral = 0.5 / velocitykI;
+        } else if(pidIntegral * velocitykI < -0.5) {
+        pidIntegral = -0.5 / velocitykI;
         }
 
-        sumSpeed += ((currentError * kP) +
-        (pidIntegral * kI) +
-        (pidDerivativeResult * kD)); //+ FeedForward;
+        if(side == SIDE.LEFT) {
+            LeftPIDSum += ((currentError * velocitykP) +
+            (pidIntegral * velocitykI) +
+            (pidDerivativeResult * velocitykD)); //+ FeedForward;
+    
+            return LeftPIDSum;
+        } else if(side == SIDE.RIGHT) {
+            RightPIDSum += ((currentError * velocitykP) +
+            (pidIntegral * velocitykI) +
+            (pidDerivativeResult * velocitykD)); //+ FeedForward;
+    
+            return RightPIDSum;
+        } else {
+            return 0;            
+        }
 
-        return sumSpeed;
-        */
-
-        return 0.0;
 
    }
 
@@ -208,5 +256,9 @@ public class ArcadeDriveController extends DriveController {
        } else {
            return -(0.5) * (1 - Math.cos(Math.PI * (Math.pow(Math.abs(x), 1.75))));
        }
+   }
+
+   public void disable() {
+
    }
 }

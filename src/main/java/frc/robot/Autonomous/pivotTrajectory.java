@@ -78,6 +78,10 @@ public class pivotTrajectory {
 	}
 	
 	public void run() {
+
+		//System.out.println("Heading: " + drive.getHeading());
+		//System.out.println("Angle Error: " + angleError);
+
 		currentAngle = drive.getHeading();
 		currentTime = Timer.getFPGATimestamp();
 		switch(runIt) {

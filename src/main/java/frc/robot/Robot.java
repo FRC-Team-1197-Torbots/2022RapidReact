@@ -68,14 +68,14 @@ public class Robot extends TimedRobot {
     //flywheel = new Flywheel(player2);
     //talon = new TalonSRX(10);
 
-    // intake = new Intake(player1);
+    //intake = new Intake(player1);
     // turret = new Turret();
     // limeLight = new LimeLightLineup();
     // elevator = new Elevator();
     hardware = new DriveHardware();
     drive = new TorDrive(hardware, player1);
     mechMaster = new MechMaster();
-    autoMaster = new AutoMaster(drive); 
+    autoMaster = new AutoMaster(drive, mechMaster); 
   }
   
   
@@ -136,11 +136,13 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    drive.Run();
+    SmartDashboard.putNumber("Right encoder", drive.getRightEncoder());
+    SmartDashboard.putNumber("Left encoder", drive.getLeftEncoder());
+    //drive.Run();
 
     /* **************** INTAKE TEST CODE **************************** */
     //intake.run();
-    mechMaster.teleRun();
+    //mechMaster.teleRun();
 
 
     /* **************** TURRET TEST CODE ****************************

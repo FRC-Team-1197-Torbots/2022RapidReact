@@ -1,5 +1,7 @@
 package frc.robot.Mechanisms;
 
+import javax.lang.model.util.ElementScanner6;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.Climber.climbState;
@@ -45,20 +47,21 @@ public class MechMaster {
 
 
     public MechMaster() {
-        //climber = new Climber();
+        climber = new Climber();
         elevator = new Elevator();
         flywheel = new Flywheel();
-        //intake = new Intake(p1);
+        intake = new Intake(p1);
         limelight = new LimeLightLineup();
         turret = new Turret();
         p1 = new XboxController(0);
         p2 = new XboxController(1);
-        intake = new Intake(p1);
-        //changeIntake = moveIntake.UP;
+        // intake = new Intake(p1);
+        // changeIntake = moveIntake.UP;
     }
 
     public void teleRun() {
         turret.PIDTuning(limelight.getAngle());
+        
         /*
         if(p1.getXButtonPressed() && intake.ONTARGET){
             intake.run(true);        
@@ -118,20 +121,28 @@ public class MechMaster {
 
         //CLIMBER
 
-        if(p2.getPOV(0) == 0){
-            climber.climb(climbState.UP);  
+        if(p2.getPOV() == 0){
+             climber.climb(climbState.UP);  
         }
-        else if(p2.getPOV(180) == 180){
+        else if(p2.getPOV() == 180){
             climber.climb(climbState.DOWN);
         }
+        else
+            climber.climb(climbState.IDLE);
 
-        if (p2.getPOV(90) == 90) {
+        //NIKITA
+        if (p2.getPOV() == 90) {
             climber.nikita(nikitaState.UP);
         }
-
-        if (p2.getPOV(270) == 270) {
+        else if (p2.getPOV() == 270) {
             climber.nikita(nikitaState.DOWN);
         }
+        else
+            climber.nikita(nikitaState.IDLE);
+
+        //TEST NIKITA
+        //System.out.println("Nikita power: " + climber.testNikita());
+        
         
         
         
@@ -174,7 +185,7 @@ public class MechMaster {
             case STORE:
                 intake.run(moveIntake.DOWN);
                 elevator.run(runElevator.STORE);
-            break;
+                break;
             case SHOOT:
                 if(flywheel.OnTarget) {
                     elevator.run(runElevator.SHOOT);
@@ -182,13 +193,13 @@ public class MechMaster {
                     elevator.run(runElevator.IDLE);
                 }
                 flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
-            break;
+                break;
             
             case IDLE:
                 intake.run(moveIntake.UP);
                 elevator.run(runElevator.IDLE);
                 flywheel.run(runFlywheel.IDLE, 0);
-            break;
+                break;
         }
 
     }

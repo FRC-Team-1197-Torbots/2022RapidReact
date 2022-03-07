@@ -98,8 +98,11 @@ public class linearTrajectory {
 	
 	public void run() {
 
-		System.out.println("Velocity: " + velocity);
-		System.out.println("Omega: " + omega);
+		//System.out.println("Velocity: " + velocity);
+		//System.out.println("Omega: " + omega);
+		System.out.println("Current distance: " + drive.getPosition());
+		System.out.println("Error: " + error);
+		
 
 
 		currentAngle = drive.getHeading();

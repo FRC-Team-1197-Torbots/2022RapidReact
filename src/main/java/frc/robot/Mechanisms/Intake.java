@@ -67,7 +67,7 @@ public class Intake {
         this.intakeState = intakeState;
         double speed = PID();
         intake.set(speed);
-        //SmartDashboard.putNumber("Intake position", intakeEncoder.get());
+        SmartDashboard.putNumber("Intake position", intakeEncoder.get());
         //System.out.println(intakeState);
         //SmartDashboard.putNumber("Target value", target);
         //SmartDashboard.putNumber("Speed", speed);
