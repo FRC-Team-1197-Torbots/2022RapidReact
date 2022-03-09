@@ -90,9 +90,12 @@ public class MechMaster {
         SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
         if (p1.getAButton() && p2.getRightTriggerAxis() == 1) {
             intake.run(moveIntake.DOWN);
-            elevator.run(runElevator.SHOOT);
-            //flywheel.testRun(-2300);
-            //flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+            if(flywheel.OnTarget) {
+                elevator.run(runElevator.SHOOT);
+            } else {
+                elevator.run(runElevator.IDLE);
+            }
+            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
 
         else if (p1.getAButton()) {
