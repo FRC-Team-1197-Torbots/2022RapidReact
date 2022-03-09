@@ -47,7 +47,7 @@ public class MechMaster {
 
 
     public MechMaster() {
-        climber = new Climber();
+        // climber = new Climber();
         elevator = new Elevator();
         flywheel = new Flywheel();
         intake = new Intake(p1);
@@ -60,7 +60,7 @@ public class MechMaster {
     }
 
     public void teleRun() {
-        turret.PIDTuning(limelight.getAngle());
+        // turret.PIDTuning(limelight.getAngle());
         
         /*
         if(p1.getXButtonPressed() && intake.ONTARGET){
@@ -96,12 +96,15 @@ public class MechMaster {
         }
 
         else if (p1.getAButton()) {
-            intake.run(moveIntake.DOWN);
+            if(elevator.ballcount < 2)
+                intake.run(moveIntake.DOWN);
            // if (!elevator.isBallInElevator())
              //   elevator.run(runElevator.STORE);
             //else
             elevator.run(runElevator.STORE);
             //flywheel.run(runFlywheel.IDLE, 0);
+        } else if(p1.getBButton()) {
+            elevator.run(runElevator.DOWN);
         }
 
         else if (p2.getRightTriggerAxis() == 1) {
@@ -121,24 +124,24 @@ public class MechMaster {
 
         //CLIMBER
 
-        if(p2.getPOV() == 0){
-             climber.climb(climbState.UP);  
-        }
-        else if(p2.getPOV() == 180){
-            climber.climb(climbState.DOWN);
-        }
-        else
-            climber.climb(climbState.IDLE);
+        // if(p2.getPOV() == 0){
+        //      climber.climb(climbState.UP);  
+        // }
+        // else if(p2.getPOV() == 180){
+        //     climber.climb(climbState.DOWN);
+        // }
+        // else
+        //     climber.climb(climbState.IDLE);
 
-        //NIKITA
-        if (p2.getPOV() == 90) {
-            climber.nikita(nikitaState.UP);
-        }
-        else if (p2.getPOV() == 270) {
-            climber.nikita(nikitaState.DOWN);
-        }
-        else
-            climber.nikita(nikitaState.IDLE);
+        // //NIKITA
+        // if (p2.getPOV() == 90) {
+        //     climber.nikita(nikitaState.UP);
+        // }
+        // else if (p2.getPOV() == 270) {
+        //     climber.nikita(nikitaState.DOWN);
+        // }
+        // else
+        //     climber.nikita(nikitaState.IDLE);
 
         //TEST NIKITA
         //System.out.println("Nikita power: " + climber.testNikita());
@@ -173,11 +176,7 @@ public class MechMaster {
         else{
             //turret.PIDTuning(tx);
         }
-        */
-
-
-
-    
+        */    
     }
 
     public void autoRun(autoMech mechState) {

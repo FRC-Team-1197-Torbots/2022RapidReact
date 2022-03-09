@@ -5,13 +5,6 @@ CONTROLS THE FLYWHEEL SPEEDS
 
 import frc.robot.PID_Tools.*;
 
-// import com.revrobotics.AlternateEncoderType;
-// import com.ctre.phoenix.motorcontrol.ControlMode;
-// import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-// import com.ctre.phoenix.motorcontrol.IMotorController;
-// import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-// import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 // import com.revrobotics.EncoderType;
@@ -53,6 +46,7 @@ public class Flywheel {
     // private double currentPosition;
     private final double gearRatio = 1;// ratio from encoder to flywheel
     private CANSparkMax flyMotor;
+    private CANSparkMax flyMotor2;
     //private CANSparkMax upperMotor;
     private RelativeEncoder flyEncoder;
     // private CANEncoder flyEncoder2;
@@ -71,6 +65,7 @@ public class Flywheel {
     public Flywheel() {
 
         flyMotor = new CANSparkMax(12, MotorType.kBrushless);
+        flyMotor2 = new CANSparkMax(16, MotorType.kBrushless);
         flyEncoder = flyMotor.getEncoder();
        
         pidDerivative = new TorDerivative(dt);
@@ -93,10 +88,12 @@ public class Flywheel {
                 currentSpeed = flyEncoder.getVelocity();//rpm
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(speedToSetMotor);
+                flyMotor2.set(-speedToSetMotor);
                 break;
 
             case IDLE:
                 flyMotor.set(0);
+                flyMotor2.set(0);
                 OnTarget = false;
 
                 pidIntegral = 0;
@@ -126,8 +123,12 @@ public class Flywheel {
         pidDerivativeResult = pidDerivative.estimate(currentError);
         pidIntegral += currentError;
 
-        if(Math.abs(currentError) < 20)
+        if(Math.abs(currentError) < 80) {
             OnTarget = true;
+        } else {
+            OnTarget = false;
+        }
+            
 
         if(currentError < 20) {
             pidIntegral = 0;

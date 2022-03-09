@@ -43,7 +43,7 @@ public class TorDrive {//this is the upper layer of the drive
 		//runs all of them to update their values
 		// MPDC.run();
 		ADC.run();
-		TDC.run();
+		// TDC.run();
 		
 		//sets the activeController to one of them so the active controller will get all the values
 		switch(drive) {

@@ -8,16 +8,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
-
 import javax.lang.model.util.ElementScanner6;
-
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
-
 import org.ejml.simple.AutomaticSimpleMatrixConvert;
-
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.*;
 import frc.robot.Drive.DriveHardware;
 import frc.robot.Drive.TorDrive;
@@ -32,7 +27,6 @@ import frc.robot.Autonomous.*;
  * project.
  */
 public class Robot extends TimedRobot {
-  private HttpCamera limelight;
 
   public static final double TIME_INTERVAL = 0.005f;
 
@@ -60,7 +54,6 @@ public class Robot extends TimedRobot {
 
   private boolean isAligned;
   private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
-
   
   public Robot() {
     player1 = new XboxController(0);
@@ -76,6 +69,8 @@ public class Robot extends TimedRobot {
     drive = new TorDrive(hardware, player1);
     mechMaster = new MechMaster();
     autoMaster = new AutoMaster(drive, mechMaster); 
+
+    CameraServer.startAutomaticCapture();
   }
   
   
@@ -138,11 +133,11 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Right encoder", drive.getRightEncoder());
     SmartDashboard.putNumber("Left encoder", drive.getLeftEncoder());
-    //drive.Run();
+    // drive.Run();
 
     /* **************** INTAKE TEST CODE **************************** */
     //intake.run();
-    //mechMaster.teleRun();
+    mechMaster.teleRun();
 
 
     /* **************** TURRET TEST CODE ****************************
