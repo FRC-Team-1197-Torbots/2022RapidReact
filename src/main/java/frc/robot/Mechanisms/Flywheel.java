@@ -27,7 +27,7 @@ public class Flywheel {
     //private final double lowSpeedConstant = 0.0;
     // RPM below 2000 p = 0.045 i = 0.4 d = 0
     private final double kP = 0.000006;//.00035//0.05
-    private final double kI = 0.00000006;//.000005
+    private final double kI = 0.00000015;//0.00000006;//.000005
     private final double kD = 0.00; //original 0.5 0 0
     private double FeedForward;
     private final double MaxMotorSpeed = 4500;
@@ -92,6 +92,8 @@ public class Flywheel {
                 break;
 
             case IDLE:
+                // targetSpeed = 0;
+                // speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(0);
                 flyMotor2.set(0);
                 OnTarget = false;
@@ -106,6 +108,7 @@ public class Flywheel {
         SmartDashboard.putNumber("Target Speed", -targetSpeed);
         SmartDashboard.putNumber("Current Speed", -currentSpeed);
         SmartDashboard.putNumber("Error: ", currentError);
+        SmartDashboard.putBoolean("OnTarget", OnTarget);
         //System.out.println("Percentage: " + (currentSpeed/targetSpeed));
         //System.out.println("Time: " + Timer.getFPGATimestamp());
     }

@@ -12,25 +12,29 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Elevator {
 
     private DigitalInput breakbeam;
+    private DigitalInput ShooterBeam;
     private CANSparkMax elMotor;
     private Timer timer;
 
     private boolean ballInElevator = false;
     public int ballcount;
-    private boolean prev;
+    private boolean prev, shooterprev;
 
     public Elevator() {
         breakbeam = new DigitalInput(0);
+        ShooterBeam = new DigitalInput(2);
         elMotor = new CANSparkMax(10, MotorType.kBrushless);
         timer = new Timer();
         timer.reset();
 
-        prev = false;
+        prev = breakbeam.get();
+        shooterprev = ShooterBeam.get();
+        ballcount = 0;
     }
 
 
     public static enum runElevator {
-        IDLE, STORE, SHOOT, DOWN;
+        IDLE, STORE, SHOOT;
     }
 
     public void run(runElevator elevatorState) {
@@ -38,40 +42,47 @@ public class Elevator {
 
         switch(elevatorState) {
             case IDLE:
-                elMotor.set(0);
-                //set elevator motor speed to 0
+                if(ballcount > 0) {
+                    if(breakbeam.get()) {
+                        elMotor.set(-0.6);
+                    } else {
+                        elMotor.set(0);
+                    }
+                } else {
+                    elMotor.set(0);
+                }
+                
+                
             break;
             case STORE:
                 if(ballcount < 2) {
                     //if break beam (digital input) is broken, set motor speed to 0, else set elevator motor speed to x
-                    if (!breakbeam.get() && !prev){ 
+                    if (breakbeam.get() && !prev){ 
                         ballcount++;                        
                     }
 
-                    prev = !breakbeam.get();
+                    prev = breakbeam.get();
                     
                 } 
 
                 elMotor.set(0.4);                
             break;
             case SHOOT:
-                //set elevator motor speed to x
                 elMotor.set(0.6);
-                ballInElevator = false;
-            break;
-            case DOWN:
-                if(breakbeam.get()) {
-                    elMotor.set(-0.6);
-                } else {
-                    elMotor.set(0);
+                
+                if(ShooterBeam.get() && !shooterprev) {
+                    ballcount--;
                 }
                 
+                shooterprev = ShooterBeam.get();
             break;
+            
         }
     }
 
     public void testBreakbeam() {
         SmartDashboard.putBoolean("Breakbeam", breakbeam.get()); 
+        SmartDashboard.putBoolean("Shooter Beam", ShooterBeam.get());
         SmartDashboard.putNumber("Balls in robot", ballcount);       
     }
     

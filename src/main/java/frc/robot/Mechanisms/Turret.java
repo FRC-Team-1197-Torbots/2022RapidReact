@@ -66,7 +66,7 @@ public class Turret {
     private final double dt = 0.005f;
     private TorDerivative TurretDerivative;
     private double pidIntegral = 0;
-    private final double turretKP = 0.020f;
+    private final double turretKP = 0.015f;
     private final double turretKI = 0.00000f;
     private final double turretKD = 0.0000f;
     private final double OnTargetDelta = 0.25f;

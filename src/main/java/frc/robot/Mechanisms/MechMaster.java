@@ -60,7 +60,7 @@ public class MechMaster {
     }
 
     public void teleRun() {
-        // turret.PIDTuning(limelight.getAngle());
+        turret.PIDTuning(limelight.getAngle());
         
         /*
         if(p1.getXButtonPressed() && intake.ONTARGET){
@@ -99,15 +99,21 @@ public class MechMaster {
         }
 
         else if (p1.getAButton()) {
-            if(elevator.ballcount < 2)
+            if(elevator.ballcount < 2) {
                 intake.run(moveIntake.DOWN);
+                elevator.run(runElevator.STORE);
+            } else {
+                intake.run(moveIntake.UP);
+                elevator.run(runElevator.IDLE);
+            }
+                
            // if (!elevator.isBallInElevator())
              //   elevator.run(runElevator.STORE);
             //else
-            elevator.run(runElevator.STORE);
+            
             //flywheel.run(runFlywheel.IDLE, 0);
         } else if(p1.getBButton()) {
-            elevator.run(runElevator.DOWN);
+            elevator.run(runElevator.IDLE);
         }
 
         else if (p2.getRightTriggerAxis() == 1) {
