@@ -16,7 +16,7 @@ public class Climber {
     private CANSparkMax leftClMotor;
     private CANSparkMax nikitaClMotor;
 
-    private double speed = 0.2;
+    private double speed = 0.8;
     private double nikitaSpeed = 0.3;
 
     public enum climbState{

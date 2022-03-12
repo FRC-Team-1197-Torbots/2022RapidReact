@@ -47,7 +47,7 @@ public class MechMaster {
 
 
     public MechMaster() {
-        // climber = new Climber();
+        climber = new Climber();
         elevator = new Elevator();
         flywheel = new Flywheel();
         intake = new Intake(p1);
@@ -130,27 +130,31 @@ public class MechMaster {
             elevator.run(runElevator.IDLE);
             flywheel.run(runFlywheel.IDLE, 0);
         }
+        
 
         //CLIMBER
+        /*
 
-        // if(p2.getPOV() == 0){
-        //      climber.climb(climbState.UP);  
-        // }
-        // else if(p2.getPOV() == 180){
-        //     climber.climb(climbState.DOWN);
-        // }
-        // else
-        //     climber.climb(climbState.IDLE);
+        if(p2.getPOV() == 0){
+            climber.climb(climbState.UP);  
+        }
+        else if(p2.getPOV() == 180){
+            climber.climb(climbState.DOWN);
+        }
+        else
+            climber.climb(climbState.IDLE);
 
-        // //NIKITA
-        // if (p2.getPOV() == 90) {
-        //     climber.nikita(nikitaState.UP);
-        // }
-        // else if (p2.getPOV() == 270) {
-        //     climber.nikita(nikitaState.DOWN);
-        // }
-        // else
-        //     climber.nikita(nikitaState.IDLE);
+        //NIKITA
+        if (p2.getPOV() == 90) {
+            climber.nikita(nikitaState.UP);
+        }
+        else if (p2.getPOV() == 270) {
+            climber.nikita(nikitaState.DOWN);
+        }
+        else
+            climber.nikita(nikitaState.IDLE);
+        
+        */
 
         //TEST NIKITA
         //System.out.println("Nikita power: " + climber.testNikita());

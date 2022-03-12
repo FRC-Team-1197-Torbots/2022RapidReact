@@ -26,9 +26,9 @@ public class Flywheel {
     //private final double highSpeedConstant = 0.0;//0.9
     //private final double lowSpeedConstant = 0.0;
     // RPM below 2000 p = 0.045 i = 0.4 d = 0
-    private final double kP = 0.000006;//.00035//0.05
-    private final double kI = 0.00000015;//0.00000006;//.000005
-    private final double kD = 0.00; //original 0.5 0 0
+    private final double kP = 0.000008;//.00035//0.05
+    private final double kI = 0.0001;//0.00000006;//.000005
+    private final double kD = 0.000000; //original 0.5 0 0
     private double FeedForward;
     private final double MaxMotorSpeed = 4500;
     private double currentError = 0;
@@ -36,7 +36,7 @@ public class Flywheel {
     private TorDerivative pidDerivative;
     private double pidDerivativeResult;
 
-    private double pidIntegral = 0;
+    public static double pidIntegral = 0;
 
     private double targetSpeed;
     private double currentSpeed;
@@ -107,6 +107,7 @@ public class Flywheel {
         //System.out.println("Target speed: " + targetSpeed);
         SmartDashboard.putNumber("Target Speed", -targetSpeed);
         SmartDashboard.putNumber("Current Speed", -currentSpeed);
+        //System.out.println("Current Speed: " + -currentSpeed);
         SmartDashboard.putNumber("Error: ", currentError);
         SmartDashboard.putBoolean("OnTarget", OnTarget);
         //System.out.println("Percentage: " + (currentSpeed/targetSpeed));

@@ -72,6 +72,7 @@ public class Elevator {
                 
                 if(ShooterBeam.get() && !shooterprev) {
                     ballcount--;
+                    Flywheel.pidIntegral = 0;
                 }
                 
                 shooterprev = ShooterBeam.get();
