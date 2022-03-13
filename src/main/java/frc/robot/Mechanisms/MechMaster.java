@@ -41,6 +41,8 @@ public class MechMaster {
     private Intake.moveIntake changeIntake;
     private climbState moveClimber;
 
+    private boolean turretIsAuto = true;
+
     public enum autoMech {
         STORE, SHOOT, IDLE;
     }
@@ -48,8 +50,8 @@ public class MechMaster {
 
     public MechMaster() {
         climber = new Climber();
-        elevator = new Elevator();
         flywheel = new Flywheel();
+        elevator = new Elevator(flywheel);
         intake = new Intake(p1);
         limelight = new LimeLightLineup();
         turret = new Turret();
@@ -59,8 +61,13 @@ public class MechMaster {
         // changeIntake = moveIntake.UP;
     }
 
+    public void TeleInit() {
+        elevator.init();
+        flywheel.init();
+    }
+
     public void teleRun() {
-        turret.PIDTuning(limelight.getAngle());
+        
         
         /*
         if(p1.getXButtonPressed() && intake.ONTARGET){
@@ -85,6 +92,26 @@ public class MechMaster {
         */
         
         //AFTER INTAKE IS TUNED, RUN IT WITH THE ELEVATOR LOGIC (COMMENT OUT THE FLYWHEEL CLASS)
+        SmartDashboard.putBoolean("turretIsAuto?", turretIsAuto);
+        
+        if (p2.getYButtonPressed()) {
+            turretIsAuto = !turretIsAuto;
+        }
+        
+        if (turretIsAuto) {
+            turret.PIDTuning(limelight.getAngle());
+        }
+        else {
+            if (p2.getBButton())
+                turret.manualControl(-0.2f);
+            else if (p2.getXButton())
+                turret.manualControl(0.2f);
+            else if (p2.getAButton())
+                turret.manualZero();
+            else
+                turret.manualControl(0f);
+        }
+        
         
         
         SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
@@ -112,11 +139,10 @@ public class MechMaster {
             //else
             
             //flywheel.run(runFlywheel.IDLE, 0);
-        } else if(p1.getBButton()) {
-            elevator.run(runElevator.IDLE);
         }
 
         else if (p2.getRightTriggerAxis() == 1) {
+            
             if(flywheel.OnTarget) {
                 elevator.run(runElevator.SHOOT);
             } else {
@@ -130,6 +156,11 @@ public class MechMaster {
             elevator.run(runElevator.IDLE);
             flywheel.run(runFlywheel.IDLE, 0);
         }
+
+        if (p2.getLeftBumperPressed()) {
+            elevator.resetBallCount();
+            flywheel.setPIDValues(1);
+        } 
         
 
         //CLIMBER

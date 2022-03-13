@@ -72,7 +72,7 @@ public class DriveHardware {
 		Right2 = new CANSparkMax(15, MotorType.kBrushless);
 
 		leftEncoder = new Encoder(10, 11, false, Encoder.EncodingType.k4X);
-		rightEncoder = new Encoder(12, 13, false, Encoder.EncodingType.k4X);
+		rightEncoder = new Encoder(16, 17, false, Encoder.EncodingType.k4X);
 		
 		//leftMaster.setInverted(false); // Left master must be attached to the farthest CIM from the output shaft
 		//leftSlave1.setInverted(false); 
@@ -121,7 +121,7 @@ public class DriveHardware {
 	}
 
 	public double getLeftVelocity() {
-		return leftEncoder.getRate();
+		return -leftEncoder.getRate();
 	}
 
 	// Getting raw position value from the left encoder

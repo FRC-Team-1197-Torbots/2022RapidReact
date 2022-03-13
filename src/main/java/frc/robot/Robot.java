@@ -124,7 +124,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    //turret.PIDTuning(player2.getRawAxis(0));
+    mechMaster.TeleInit();
   }
 
   /** This function is called periodically during operator control. */
@@ -133,7 +133,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Right encoder", drive.getRightEncoder());
     SmartDashboard.putNumber("Left encoder", drive.getLeftEncoder());
-    // drive.Run();
+    drive.Run();
 
     /* **************** INTAKE TEST CODE **************************** */
     //intake.run();

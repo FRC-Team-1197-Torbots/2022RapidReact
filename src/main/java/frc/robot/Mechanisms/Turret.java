@@ -60,6 +60,7 @@ public class Turret {
     private double big_rotations;
     private double horizAngleOffset;
     private final double gearRatio = 18f/220f;//1.26 / 41.625;
+    private int offTargetCount = 0;
 
     /** PID VARs */
     private double TargetAngle; //in degrees
@@ -151,18 +152,35 @@ public class Turret {
         return degrees;
     }
 
+    private boolean offTargetForALongTime(double tx) {
+        if (tx == 0) {
+            offTargetCount++;
+        }
+        else
+            offTargetCount = 0;
+        if (offTargetCount > 10) {
+            return true;
+        }
+        else
+            return false;
+    }
+
     
-    public void PIDTuning(double tx) {        
-        if (TargetAngle > 90 || TargetAngle <-90){
-            TargetAngle = 0;
-        }
-        else {
-            TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;            
-        }
+    public void PIDTuning(double tx) {      
 
         if(m_initstate != INIT_STATES.IDLE) {
             init();
         } else {
+            if (offTargetForALongTime(tx))
+                TargetAngle = 0;
+            else
+                TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
+
+            if (TargetAngle > 120)
+                TargetAngle = 120;
+            else if (TargetAngle <-120)
+                TargetAngle = -120;
+
             //start writing state machine to turn for tuning
             double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
             // System.out.println("target " + TargetAngle);
@@ -205,7 +223,7 @@ public class Turret {
         }
     }
 
-
+    /*
     public void manualControl(String direction){
         //false is when the sensor is on, and true is when the sensor is off
         if(!(zeroSensor.get())){
@@ -234,5 +252,31 @@ public class Turret {
             System.out.println("Degrees " + degrees);
         }
     }
+    */
+    public void manualControl(double speed) {
+        if (Math.abs(units_to_degrees(TurretMotor.getSelectedSensorPosition())) > 120)
+            TurretMotor.set(ControlMode.PercentOutput, 0);
+        else  
+            TurretMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    public void manualZero() {
+        if (!zeroSensor.get()) {
+            TurretMotor.set(ControlMode.PercentOutput, 0);
+            TurretMotor.setSelectedSensorPosition(0);
+        }
+        else {
+            if (units_to_degrees(TurretMotor.getSelectedSensorPosition()) > 0) {
+                TurretMotor.set(ControlMode.PercentOutput, 0.2f);
+            }
+            else {
+                TurretMotor.set(ControlMode.PercentOutput, -0.2f);
+            }
+        }
+
+        
+    }
 
 }
+
+

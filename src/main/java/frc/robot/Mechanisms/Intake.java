@@ -31,9 +31,9 @@ public class Intake {
     //PID Variables
     private double pidDerivativeResult = 0;
     private double pidIntegral = 0;
-    private final double kP = 0.00075;
+    private final double kP = 0.001;//0.00075;
     private final double kI = 0;
-    private final double kD = 0.0000062;
+    private final double kD = 0;//0.0000062;
     public boolean ONTARGET;
     private TorDerivative derivative;
 

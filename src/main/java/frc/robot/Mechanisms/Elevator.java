@@ -14,22 +14,26 @@ public class Elevator {
     private DigitalInput breakbeam;
     private DigitalInput ShooterBeam;
     private CANSparkMax elMotor;
-    private Timer timer;
 
     private boolean ballInElevator = false;
     public int ballcount;
     private boolean prev, shooterprev;
+    private double PrevTime;
 
-    public Elevator() {
+    private Flywheel flywheel;
+
+    public Elevator(Flywheel flywheel) {
+        this.flywheel = flywheel;
         breakbeam = new DigitalInput(0);
         ShooterBeam = new DigitalInput(2);
         elMotor = new CANSparkMax(10, MotorType.kBrushless);
-        timer = new Timer();
-        timer.reset();
-
         prev = breakbeam.get();
         shooterprev = ShooterBeam.get();
         ballcount = 0;
+    }
+
+    public void init() {
+        PrevTime = Timer.getFPGATimestamp() + 0.2f;
     }
 
 
@@ -42,17 +46,11 @@ public class Elevator {
 
         switch(elevatorState) {
             case IDLE:
-                if(ballcount > 0) {
-                    if(breakbeam.get()) {
-                        elMotor.set(-0.6);
-                    } else {
-                        elMotor.set(0);
-                    }
+                if(Timer.getFPGATimestamp() < PrevTime + 0.1f) {                    
+                    elMotor.set(-0.6);                    
                 } else {
                     elMotor.set(0);
-                }
-                
-                
+                }                              
             break;
             case STORE:
                 if(ballcount < 2) {
@@ -61,20 +59,29 @@ public class Elevator {
                         ballcount++;                        
                     }
 
-                    prev = breakbeam.get();
-                    
+                    prev = breakbeam.get();                    
                 } 
 
-                elMotor.set(0.4);                
+                elMotor.set(0.4);
+                PrevTime = Timer.getFPGATimestamp();                
             break;
             case SHOOT:
                 elMotor.set(0.6);
                 
                 if(ShooterBeam.get() && !shooterprev) {
                     ballcount--;
-                    Flywheel.pidIntegral = 0;
+
+                    // SWITCHES PID VALUES
+                    if (ballcount == 1) {
+                        flywheel.setPIDValues(2);
+                    }
+                    else if(ballcount == 0) {
+                        flywheel.pidIntegral = 0;
+                        flywheel.setPIDValues(1);
+                    }
                 }
                 
+                PrevTime = Timer.getFPGATimestamp();
                 shooterprev = ShooterBeam.get();
             break;
             
@@ -89,5 +96,9 @@ public class Elevator {
     
     public boolean isBallInElevator() {
         return ballInElevator;
+    }
+
+    public void resetBallCount() {
+        ballcount = 0;
     }
 }

@@ -7,15 +7,8 @@ import frc.robot.PID_Tools.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-// import com.revrobotics.EncoderType;
-// import com.revrobotics.EncoderType;
-// import com.revrobotics.SparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Timer;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel {
     //2950 rpm is shot from 11ft. kp = 0.02 i = 0.4, d = 0
@@ -26,9 +19,18 @@ public class Flywheel {
     //private final double highSpeedConstant = 0.0;//0.9
     //private final double lowSpeedConstant = 0.0;
     // RPM below 2000 p = 0.045 i = 0.4 d = 0
-    private final double kP = 0.000008;//.00035//0.05
-    private final double kI = 0.0001;//0.00000006;//.000005
-    private final double kD = 0.000000; //original 0.5 0 0
+    private final double kP1 = 0.000006;//.00035//0.05
+    private final double kI1 = 0.000000;//0.00000006;//.000005
+    private final double kD1 = 0.00000004; //original 0.5 0 0
+
+    private final double kP2 = 0.0000008;//.00035//0.05
+    private final double kI2 = 0.000000;//0.00000006;//.000005
+    private final double kD2 = 0.00000001; //original 0.5 0 0
+
+    private double kP;
+    private double kI;
+    private double kD;
+
     private double FeedForward;
     private final double MaxMotorSpeed = 4500;
     private double currentError = 0;
@@ -36,7 +38,7 @@ public class Flywheel {
     private TorDerivative pidDerivative;
     private double pidDerivativeResult;
 
-    public static double pidIntegral = 0;
+    public double pidIntegral = 0;
 
     private double targetSpeed;
     private double currentSpeed;
@@ -74,7 +76,7 @@ public class Flywheel {
     }
 
     public void init(){
-
+        setPIDValues(1);
     }
     //-2250 - 154in
     //-1950 - 90in //min distance
@@ -89,6 +91,7 @@ public class Flywheel {
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(speedToSetMotor);
                 flyMotor2.set(-speedToSetMotor);
+                System.out.println("Current speed: " + -currentSpeed);
                 break;
 
             case IDLE:
@@ -103,12 +106,12 @@ public class Flywheel {
                 break;
         }
 
-        //System.out.println("Current speed: " + currentSpeed);
+
         //System.out.println("Target speed: " + targetSpeed);
         SmartDashboard.putNumber("Target Speed", -targetSpeed);
         SmartDashboard.putNumber("Current Speed", -currentSpeed);
         //System.out.println("Current Speed: " + -currentSpeed);
-        SmartDashboard.putNumber("Error: ", currentError);
+        SmartDashboard.putNumber("Error: ", -currentError);
         SmartDashboard.putBoolean("OnTarget", OnTarget);
         //System.out.println("Percentage: " + (currentSpeed/targetSpeed));
         //System.out.println("Time: " + Timer.getFPGATimestamp());
@@ -126,6 +129,7 @@ public class Flywheel {
         // SmartDashboard.putNumber("currentError:", currentError);
         pidDerivativeResult = pidDerivative.estimate(currentError);
         pidIntegral += currentError;
+        System.out.println("P: " + kP);
 
         if(Math.abs(currentError) < 80) {
             OnTarget = true;
@@ -169,6 +173,20 @@ public class Flywheel {
 
         SmartDashboard.putNumber("Current speed", flyEncoder.getVelocity());
         SmartDashboard.putNumber("Sum speed", sumSpeed);
+    }
+
+    public void setPIDValues(int state) {
+        //STATE 1 IS FOR THE RAMPUP, STATE 2 IS FOR THE BALL 1 OFFSET
+        if (state == 1) {
+            kP = kP1;
+            kI = kI1;
+            kD = kD1;
+        }
+        else if (state == 2) {
+            kP = kP2;
+            kI = kI2;
+            kD = kD2;
+        }
     }
 
     public void onDisable(){

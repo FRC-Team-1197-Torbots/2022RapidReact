@@ -45,9 +45,9 @@ public class ArcadeDriveController extends DriveController {
    // PID
    // Stuff------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-   private final double velocitykP = 0.0001;// velocity stuff probably not needed at all and should keep 0
+   private final double velocitykP = 0.0000125;// velocity stuff probably not needed at all and should keep 0
    private final double velocitykI = 0.0;
-   private final double velocitykD = 0.0;
+   private final double velocitykD = 0.0000008;
 
    // ------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -60,6 +60,8 @@ public class ArcadeDriveController extends DriveController {
 
    private double throttle = 0;
    private double steer = 0;
+   
+   private final double MAX_VELOCITY = 28000f;
    //this is for the curve drive
 
    //tunable
@@ -95,23 +97,14 @@ public class ArcadeDriveController extends DriveController {
    }
 
    @Override
-   public void run() {
-       throttle = player1.getRawAxis(1) / 2;
-       steer = player1.getRawAxis(0) / 1.5;
-
-       double sign = 0;
-
-       if(steer > 0) {
-        sign = 1;
-       } else if(steer < 0) {
-        sign = -1;
-       }
-
-       if(Math.abs(steer) < 0.25f) {
-           steer = 0;
-       } else {
-           steer = Math.pow(steer, 2) * sign;
-       }
+   public void run() {       
+       throttle = player1.getRawAxis(1);
+       double sign = Math.signum(throttle);
+       throttle = sign * Math.pow(throttle, 2);
+       
+       steer = player1.getRawAxis(0);
+       sign = Math.signum(steer);
+       steer = sign * Math.pow(steer, 2);       
        
        double rightspeed = 0, leftSpeed = 0;
 
@@ -133,20 +126,26 @@ public class ArcadeDriveController extends DriveController {
            }
        }
 
-       hardware.setMotorSpeeds(-leftSpeed, -rightspeed); 
+       //hardware.setMotorSpeeds(-leftSpeed, -rightspeed); 
+       System.out.println("Left Speed: " + hardware.getLeftVelocity());
+       System.out.println("Right Speed: " + hardware.getRightVelocity());
+       //System.out.println("Left target: " + leftSpeed * MAX_VELOCITY);
+       //System.out.println("Right target: " + rightspeed * MAX_VELOCITY);
+
+       //MAX SPEED 16,000 TICKS PER SECOND
 
        //convert to requested speed in encoder ticks per second
        //convertedspeed = max speed * leftSpeed
 
-       //leftOutput = PID(hardware.getLeftVelocity(), leftSpeed, SIDE.LEFT);
-       //rightOutput = PID(hardware.getRightVelocity(), rightspeed, SIDE.RIGHT);
+       leftOutput = PID(hardware.getLeftVelocity(), leftSpeed * MAX_VELOCITY, SIDE.LEFT);
+       rightOutput = PID(hardware.getRightVelocity(), rightspeed * MAX_VELOCITY, SIDE.RIGHT);
 
 
-       //hardware.setMotorSpeeds(-leftOutput, -rightOutput);
+       hardware.setMotorSpeeds(-leftOutput, -rightOutput);
 
-       //System.out.println("Left output: " +  leftOutput);
-       //System.out.println("Right output: " + rightOutput);
-       //System.out.println("Current error: " +currentError);
+       //System.out.println("Left output: " +  -leftOutput);
+       //System.out.println("Right output: " + -rightOutput);
+       //System.out.println("Current error: " + currentError);
    }
 
    public void testRun(XboxController player1){
@@ -232,13 +231,13 @@ public class ArcadeDriveController extends DriveController {
         }
 
         if(side == SIDE.LEFT) {
-            LeftPIDSum += ((currentError * velocitykP) +
+            LeftPIDSum = ((currentError * velocitykP) +
             (pidIntegral * velocitykI) +
             (pidDerivativeResult * velocitykD)); //+ FeedForward;
     
             return LeftPIDSum;
         } else if(side == SIDE.RIGHT) {
-            RightPIDSum += ((currentError * velocitykP) +
+            RightPIDSum = ((currentError * velocitykP) +
             (pidIntegral * velocitykI) +
             (pidDerivativeResult * velocitykD)); //+ FeedForward;
     
