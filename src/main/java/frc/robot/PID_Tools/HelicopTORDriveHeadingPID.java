@@ -1,6 +1,6 @@
 package frc.robot.PID_Tools;
 
-public class BantorPID {
+public class HelicopTORDriveHeadingPID {
 	//instantiation of all the constants
 	private double kV;
 	private double kA;
@@ -8,7 +8,7 @@ public class BantorPID {
 	private double PositionkP;
 	private double PositionkI;
 	private double PositionkD;
-
+	
 	private double output;
 	
 	private double dt;
@@ -47,7 +47,7 @@ public class BantorPID {
 	private boolean positionOnTarget;
 	private boolean velocityOnTarget;
 	
-	public BantorPID(double kV, double kA, double PositionkP, double PositionkI, double PositionkD,
+	public HelicopTORDriveHeadingPID(double kV, double kA, double PositionkP, double PositionkI, double PositionkD,
 			double VelocitykP, double VelocitykI, double VelocitykD,
 			double dt, double positionTolerance, double velocityTolerance) {
 		this.PositionkP = PositionkP;
@@ -70,6 +70,12 @@ public class BantorPID {
 	public double update() {
 		//figures out the errors first
 		positionError = activePositionTarget - currentPosition;
+		if(positionError > Math.PI) {
+			positionError = positionError - (2 * Math.PI);
+		}
+		if(positionError < -Math.PI) {
+			positionError = positionError + (2 * Math.PI);
+		}
 		velocityError = activeVelocityTarget - currentVelocity;
 		
 		//the position PID
@@ -80,7 +86,6 @@ public class BantorPID {
 				(positionDerivativeResult * PositionkD) +//we subtract the active velocity target since, if it is going perfectly the position Derivative
 				//result will just be the expected velocity, so we would want to make the derivative term be 0
 				(positionIntegralResult * dt * PositionkI);
-		
 		//the final output
 		//adds them all together
 		output = PositionPIDResult + (kV * activeVelocityTarget) + (kA * activeAccelerationTarget);

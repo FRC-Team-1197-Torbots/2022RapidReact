@@ -13,8 +13,8 @@ public class AutoMaster {
     private String m_autoSelected;
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-    private Auto1 auto1;
-    private Auto2 auto2;
+    private AutoBall1 auto1;
+    private AutoBall2 auto2;
 
     private MechMaster mechMaster;
     private TorDrive drive;
@@ -22,8 +22,8 @@ public class AutoMaster {
     public AutoMaster (TorDrive drive, MechMaster mechMaster) {
         this.drive = drive;
         this.mechMaster = mechMaster;
-        auto1 = new Auto1(mechMaster, drive);
-        auto2 = new Auto2(mechMaster, drive);
+        auto1 = new AutoBall1(mechMaster, drive);
+        auto2 = new AutoBall2(mechMaster, drive);
 
     }
     

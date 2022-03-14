@@ -23,7 +23,7 @@ public class ArcadeDriveController extends DriveController {
    private DriveHardware hardware;
 
    private double distance;
-   private BantorPID limeLightPID;
+   private HelicopTORPID limeLightPID;
    private double currentVelocity;
    private TorDerivative findCurrentVelocity;
 
@@ -102,7 +102,7 @@ public class ArcadeDriveController extends DriveController {
        double sign = Math.signum(throttle);
        throttle = sign * Math.pow(throttle, 2);
        
-       steer = player1.getRawAxis(0);
+       steer = player1.getRawAxis(0) * 0.8f;
        sign = Math.signum(steer);
        steer = sign * Math.pow(steer, 2);       
        

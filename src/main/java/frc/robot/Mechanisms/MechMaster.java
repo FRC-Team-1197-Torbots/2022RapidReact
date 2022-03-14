@@ -1,11 +1,8 @@
 package frc.robot.Mechanisms;
 
-import javax.lang.model.util.ElementScanner6;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.Climber.climbState;
-import frc.robot.Mechanisms.Climber.nikitaState;
 import frc.robot.Mechanisms.Elevator.runElevator;
 import frc.robot.Mechanisms.Flywheel.runFlywheel;
 import frc.robot.Mechanisms.Intake.moveIntake;
@@ -117,11 +114,7 @@ public class MechMaster {
         SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
         if (p1.getAButton() && p2.getRightTriggerAxis() == 1) {
             intake.run(moveIntake.DOWN);
-            if(flywheel.OnTarget) {
-                elevator.run(runElevator.SHOOT);
-            } else {
-                elevator.run(runElevator.IDLE);
-            }
+            elevator.run(runElevator.SHOOT);
             flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
 
@@ -142,13 +135,7 @@ public class MechMaster {
         }
 
         else if (p2.getRightTriggerAxis() == 1) {
-            
-            if(flywheel.OnTarget) {
-                elevator.run(runElevator.SHOOT);
-            } else {
-                elevator.run(runElevator.IDLE);
-            }
-
+            elevator.run(runElevator.SHOOT);
             flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
         else {
@@ -160,7 +147,7 @@ public class MechMaster {
         if (p2.getLeftBumperPressed()) {
             elevator.resetBallCount();
             flywheel.setPIDValues(1);
-        } 
+        }
         
 
         //CLIMBER

@@ -41,52 +41,99 @@ public class Elevator {
         IDLE, STORE, SHOOT;
     }
 
+    public static enum autoElevator {
+        IDLE, STORE, SHOOT;
+    }
+
     public void run(runElevator elevatorState) {
         testBreakbeam();
 
         switch(elevatorState) {
-            case IDLE:
-                if(Timer.getFPGATimestamp() < PrevTime + 0.1f) {                    
-                    elMotor.set(-0.6);                    
-                } else {
-                    elMotor.set(0);
-                }                              
-            break;
-            case STORE:
-                if(ballcount < 2) {
-                    //if break beam (digital input) is broken, set motor speed to 0, else set elevator motor speed to x
+            case IDLE:                
+                if(ballcount < 2) {    
+                    elMotor.set(0.15f);
+
                     if (breakbeam.get() && !prev){ 
                         ballcount++;                        
                     }
 
                     prev = breakbeam.get();                    
-                } 
+                } else if(ballcount == 2) {
+                    elMotor.set(0);
+                }
 
-                elMotor.set(0.4);
+                PrevTime = Timer.getFPGATimestamp();                                              
+            break;
+
+            case STORE:
+                if(ballcount < 2) {                    
+                    elMotor.set(0.4);
+                    if (breakbeam.get() && !prev){ 
+                        ballcount++;                        
+                    }
+                    prev = breakbeam.get();                    
+                }
+                else if (ballcount == 2) {
+                    elMotor.set(0);
+                }
+
+                
                 PrevTime = Timer.getFPGATimestamp();                
             break;
-            case SHOOT:
-                elMotor.set(0.6);
-                
-                if(ShooterBeam.get() && !shooterprev) {
-                    ballcount--;
 
-                    // SWITCHES PID VALUES
-                    if (ballcount == 1) {
-                        flywheel.setPIDValues(2);
-                    }
-                    else if(ballcount == 0) {
-                        flywheel.pidIntegral = 0;
-                        flywheel.setPIDValues(1);
-                    }
-                }
-                
-                PrevTime = Timer.getFPGATimestamp();
-                shooterprev = ShooterBeam.get();
+            case SHOOT:                
+                    if(Timer.getFPGATimestamp() < PrevTime + 0.1f && !flywheel.OnTarget) {                    
+                        elMotor.set(-0.6);                    
+                    } else if (flywheel.OnTarget) {
+                        elMotor.set(0.6);
+                    
+                        if(ShooterBeam.get() && !shooterprev) {
+                            ballcount--;
+    
+                            if (ballcount < 0)
+                                ballcount = 0;
+    
+                            // SWITCHES PID VALUES
+                            if (ballcount == 1) {
+                                flywheel.setPIDValues(2);
+                            }
+                            else if(ballcount == 0) {
+                                flywheel.pidIntegral = 0;
+                                flywheel.setPIDValues(1);
+                            }
+    
+                        }                   
+                            
+                        shooterprev = ShooterBeam.get();
+                    } else if(!flywheel.OnTarget) {
+                        elMotor.set(0);
+                    }    
+                           
             break;
             
         }
     }
+    /*
+    public void autoRun(autoElevator autoElState) {
+        switch (autoElState) {
+            case IDLE: 
+                if(ballcount < 2) {    
+                    elMotor.set(0.2f);
+
+                    if (breakbeam.get() && !prev){ 
+                        ballcount++;                        
+                    }
+
+                    prev = breakbeam.get();                    
+                } else if(ballcount == 2) {
+                    elMotor.set(0);
+                }
+
+                PrevTime = Timer.getFPGATimestamp();
+        }
+    }
+    */
+
 
     public void testBreakbeam() {
         SmartDashboard.putBoolean("Breakbeam", breakbeam.get()); 
@@ -100,5 +147,9 @@ public class Elevator {
 
     public void resetBallCount() {
         ballcount = 0;
+    }
+
+    public void setBallCount(int count) {
+        ballcount = count;
     }
 }

@@ -32,7 +32,7 @@ public class Climber {
     public Climber(){
         rightClMotor = new CANSparkMax(9, MotorType.kBrushless);
         leftClMotor = new CANSparkMax(6, MotorType.kBrushless);
-        nikitaClMotor = new CANSparkMax(7, MotorType.kBrushless);
+        //nikitaClMotor = new CANSparkMax(7, MotorType.kBrushless);
         
 
 
@@ -55,7 +55,7 @@ public class Climber {
 
         }
     }
-
+    /*
     public void nikita(nikitaState nikitaPos) {
         switch(nikitaPos) {
             case UP:
@@ -73,6 +73,7 @@ public class Climber {
     public double testNikita() {
         return nikitaClMotor.get();
     }
+    */
 
     
 }

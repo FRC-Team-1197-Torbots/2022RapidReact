@@ -8,7 +8,7 @@ import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.*;
 import frc.robot.Mechanisms.MechMaster.autoMech;
 
-public class Auto2 {
+public class AutoBall2 {
     public static enum autoRun{
         INIT, Linear1, Linear2, Curve1, DONE;
     }
@@ -29,7 +29,7 @@ public class Auto2 {
 
     private final double curve_outer_distance = (2f * Math.PI * 37.375) / 36f;
 
-    public Auto2(MechMaster mechMaster, TorDrive torDrive){
+    public AutoBall2(MechMaster mechMaster, TorDrive torDrive){
         this.torDrive = torDrive;
         this.mechMaster = mechMaster;
         linear1 = new linearTrajectory(torDrive, 3.5, 3);

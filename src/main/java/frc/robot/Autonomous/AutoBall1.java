@@ -4,7 +4,7 @@ import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.*;
 import frc.robot.Mechanisms.MechMaster.autoMech;
 
-public class Auto1 {
+public class AutoBall1 {
     public static enum autoRun{
         INIT, Linear1, Pivot1, SHOOT, DONE;
     }
@@ -17,7 +17,7 @@ public class Auto1 {
     private linearTrajectory linear1;
     public autoMech AutoMechanics;
     
-    public Auto1(MechMaster mechMaster, TorDrive torDrive){
+    public AutoBall1(MechMaster mechMaster, TorDrive torDrive){
         this.torDrive = torDrive;
         this.mechMaster = mechMaster;
         linear1 = new linearTrajectory(torDrive, 3.5, 4);
