@@ -42,9 +42,6 @@ public class AutoMaster {
 
 
     public void run() {
-        
-
-
         switch (m_autoSelected) {
             case Auto_4Ball:
               // Put custom auto code here
@@ -56,6 +53,25 @@ public class AutoMaster {
             case Auto_1Ball:
               auto1.run();
               break;
+        }
+    }
+
+    /***************************************
+    RUN THIS MULTIPLE TIMES W/ 0 FOR NUMTICKS, PUSH IT 1 FOOT EVERY TIME
+    TAKE AVERAGE OF EVERY FINAL ENCODER VALUE IT PRINTS
+    PLUG THAT VALUE BACK INTO NUMTICKS, SEE IF IT GOES 1 FOOT OR NOT
+        IF IT DOES --> PID ISSUE
+        IF IT DOESN'T --> ???
+    **POSSIBLY GO MORE THAN 1 FOOT TO GET CLEARER RESULTS..
+    ***************************************/
+    public void testRun(int numTicks) {
+        int ticks = numTicks;
+        double currentTicks = drive.getAverageEncoderPosition();
+        if (currentTicks < ticks)
+            drive.setMotorSpeeds(0.1, 0.1);
+        else {
+            drive.setMotorSpeeds(0, 0);
+            System.out.println("Current ticks: " + currentTicks);
         }
     }
 }

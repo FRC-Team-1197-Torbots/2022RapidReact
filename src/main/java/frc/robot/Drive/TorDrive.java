@@ -71,6 +71,10 @@ public class TorDrive {//this is the upper layer of the drive
 		return hardware.getHeading();
 	}
 
+	public double getAverageEncoderPosition() {
+		return hardware.getAverageEncoderPosition();
+	}
+
 	public double getPosition() {
 		return hardware.getPosition();
 	}

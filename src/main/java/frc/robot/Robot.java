@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
+
+import org.ejml.simple.AutomaticSimpleMatrixConvert;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.*;
 import frc.robot.Drive.DriveHardware;
@@ -116,7 +119,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    autoMaster.run();
+    //autoMaster.run();
+    autoMaster.testRun(0);
   }
 
   /** This function is called once when teleop is enabled. */
