@@ -7,7 +7,7 @@ import frc.robot.Drive.*;
 
 public class linearTrajectory {
 	private TorDrive drive;
-	private double thisdistance;
+	private double targetDistance;
 	private double currentDistance;
 	private boolean isFinished = false;
 	
@@ -32,6 +32,13 @@ public class linearTrajectory {
 	private final double positionTolerance = 0.001;//units: feet 0.015
 	private final double velocityTolerance = 0.1;//units: feet per second 0.015
 	private final double headingTolerance = 1.5 * (Math.PI / 180.0);//units: radians 2.5 degrees
+	
+	//FOR THE CHEESE RUN
+	//FORMULA: Acos(x) + b
+	private final double minVelocity = 0.05;
+	private final double maxVelocity = 0.55;
+	private double kA = (maxVelocity - minVelocity) / 2;
+	private double kB = minVelocity;
 	
 	private double currentVelocity;
 	
@@ -70,7 +77,7 @@ public class linearTrajectory {
 	
 	public linearTrajectory(TorDrive drive, double distance, double timeOutTime) {
 		this.drive = drive;
-		this.thisdistance = distance;
+		this.targetDistance = distance;
 		this.timeOutTime = timeOutTime;
 		derivative = new TorDerivative(kF);
 		accelDerivative = new TorDerivative(kF);
@@ -80,6 +87,7 @@ public class linearTrajectory {
 	public boolean isDone() {
 		return isFinished;
 	}
+	
 	public void init() {
 		isFinished = false;
 		runIt = run.GO;
@@ -140,7 +148,7 @@ public class linearTrajectory {
 			}
 			
 			//since this distance is always positive, we have to multiply by fob for if it is negative
-			error = thisdistance - currentDistance;//error always positive if approaching
+			error = targetDistance - currentDistance;//error always positive if approaching
 			System.out.println(error);
 			vI += error;
 			
@@ -204,5 +212,29 @@ public class linearTrajectory {
 			break;
 		}
 			
+	}
+
+	//Runs without PID, uses a graph to plot out the velocities
+	//let's cheese it
+	public void cheeseRun() {
+		switch(runIt) {
+			case IDLE:
+				break;
+			case GO:
+				currentDistance = drive.getPosition();
+				velocity = -kA * Math.cos((Math.PI * currentDistance) / (targetDistance / 2)) + kB;
+				drive.setMotorSpeeds(velocity, velocity);
+
+				if((Math.abs(error) <= positionTolerance
+					//&& Math.abs(angleError) <= headingTolerance
+					//&& Math.abs(currentVelocity) < velocityTolerance)
+					|| (currentTime - lastTime > timeOutTime)))
+				{
+					drive.setMotorSpeeds(0, 0);
+					isFinished = true;
+					runIt = run.IDLE;
+				}
+		}
+		
 	}
 }

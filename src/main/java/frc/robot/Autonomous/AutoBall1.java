@@ -32,11 +32,11 @@ public class AutoBall1 {
                 AutoState1 = autoRun.Linear1;
                 break;
             case Linear1:
-                linear1.run();
+                linear1.cheeseRun();
                 //mechMaster.autoRun(autoMech.STORE);
                 if(linear1.isDone()){
                     //pivot1.init();
-                    AutoState1 = autoRun.SHOOT;
+                    AutoState1 = autoRun.DONE;
                 }
                 break;
                 /*
@@ -47,10 +47,11 @@ public class AutoBall1 {
                     AutoState1 = autoRun.SHOOT;
                 }
                 break;
-                */
+                
             case SHOOT:
                 mechMaster.autoRun(autoMech.SHOOT);
                 break;
+                */
             case DONE:
                 
                 break;
