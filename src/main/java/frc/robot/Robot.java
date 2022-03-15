@@ -113,14 +113,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    hardware.resetEncoder();
     autoMaster.init();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    //autoMaster.run();
-    autoMaster.testRun(0);
+    autoMaster.run();
+    //autoMaster.testRun(27395);
   }
 
   /** This function is called once when teleop is enabled. */

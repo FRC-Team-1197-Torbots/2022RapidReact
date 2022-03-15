@@ -1,6 +1,7 @@
 package frc.robot.Autonomous;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.PID_Tools.*;
 import frc.robot.Drive.*;
 
@@ -10,37 +11,39 @@ public class linearTrajectory {
 	private double currentDistance;
 	private boolean isFinished = false;
 	
-	private final double maxSpeed = 0.3;
+	private final double maxSpeed = 0.3;//0
     
     //PID for translation
-	private final double tkP = 0.1;//0.5
-	private final double tkD = 0.0;//0.00002;//.001
-    private final double tkI = 0.0;//0.05;//.0003
+	private final double tkP = 0.03;//0.5
+	private final double tkD = 0;//0.002;//.001
+    private final double tkI = 0.000;//0.05;//.0003
     
     //PID For rotation
+	/*
 	private final double rkP = 0.3;//0.5
 	private final double rkD = 0.0;//0.0
 	private final double rkI = 0.001;//0.01
+	*/
 	private final double kF = 0.005;
 	private final int lor = 1;
 	private final int errorFob = 1;//forwards or backwards
 	
 	//tolerances
-	private final double positionTolerance = 0.05;//units: feet 0.015
+	private final double positionTolerance = 0.001;//units: feet 0.015
 	private final double velocityTolerance = 0.1;//units: feet per second 0.015
 	private final double headingTolerance = 1.5 * (Math.PI / 180.0);//units: radians 2.5 degrees
 	
 	private double currentVelocity;
 	
-	private double omegaP;//turning proportional
-	private double omegaD;//turning derivative
-	private double omegaI = 0;
+	//private double omegaP;//turning proportional
+	//private double omegaD;//turning derivative
+	//private double omegaI = 0;
 	
 	private double vP;//velocity proportional
 	private double vD;//velocity derivative
 	private double vI = 0;
 	
-	private double omega;
+	//private double omega;
 	private double velocity;
 	
 	private double firstAngle;
@@ -51,7 +54,9 @@ public class linearTrajectory {
 	private double lastTime;
 	private double currentTime;
 	private TorDerivative derivative;
+	private TorDerivative accelDerivative;
 	private TorDerivative angleDerivative;
+	private double currentAcceleration = 0;
 	
 	private double timeOutTime;
 	
@@ -68,6 +73,7 @@ public class linearTrajectory {
 		this.thisdistance = distance;
 		this.timeOutTime = timeOutTime;
 		derivative = new TorDerivative(kF);
+		accelDerivative = new TorDerivative(kF);
 		angleDerivative = new TorDerivative(kF);
 	}
 	
@@ -77,7 +83,7 @@ public class linearTrajectory {
 	public void init() {
 		isFinished = false;
 		runIt = run.GO;
-		startDistance = drive.getPosition();
+		startDistance = 0;
 		firstAngle = drive.getHeading();
 		currentAngle = drive.getHeading();
 		angleError = currentAngle - firstAngle;
@@ -90,9 +96,12 @@ public class linearTrajectory {
 				angleError += (2 * Math.PI);
 			}
 		}
-		angleDerivative.resetValue(angleError);
-		derivative.resetValue(drive.getPosition());
+		angleDerivative.resetValue(0);
+		derivative.resetValue(0);
+		accelDerivative.resetValue(0);
 		lastTime = Timer.getFPGATimestamp();
+
+		drive.resetEncoder();
 	}
 		
 	
@@ -100,8 +109,13 @@ public class linearTrajectory {
 
 		//System.out.println("Velocity: " + velocity);
 		//System.out.println("Omega: " + omega);
-		System.out.println("Current distance: " + drive.getPosition());
-		System.out.println("Error: " + error);
+		SmartDashboard.putNumber("Current distance: ", drive.getPosition());
+		SmartDashboard.putNumber("Error: ", error);
+		//System.out.println("Velocity: " + currentVelocity);
+		//System.out.println("Acceleration: " + currentAcceleration);
+
+		// System.out.println("P: " + vP);
+		// System.out.println("D: " + vD);
 		
 
 
@@ -126,27 +140,34 @@ public class linearTrajectory {
 			}
 			
 			//since this distance is always positive, we have to multiply by fob for if it is negative
-			error = (thisdistance) - (currentDistance - startDistance);//error always positive if approaching
-			error *= errorFob;
+			error = thisdistance - currentDistance;//error always positive if approaching
+			System.out.println(error);
 			vI += error;
+			
 			if(Math.abs(error) <= positionTolerance * 0.5) {
 				vI = 0;
 			}
+
 			if(vI > (0.7 / (tkI * kF))) {
 				vI = (0.7 / (tkI * kF));
 			}
 			if(vI < -(0.7 / (tkI * kF))) {
 				vI = -(0.7 / (tkI * kF));
 			}
-			vP = error * tkP;
+
+			vP = error * tkP;//vP gets smaller bc error decreases
+			
 			
 			currentVelocity = derivative.estimate(drive.getPosition());//almost always positive
+			currentAcceleration = -accelDerivative.estimate(currentVelocity);
+			
 			//has to be multiplied by -1 so that if it is approaching the target to fast
 			//it does not act as a positive. Because, if it was approaching fast, the
 			//derivative would be positive
-			vD = (currentVelocity) * tkD * (180 / Math.PI);//degrees per second
-			velocity = vP + vD + (vI * tkI * kF);
+			vD = currentVelocity * tkD;//degrees per second
+			velocity = vP + vD + (vI * tkI);
 			//velocity is good
+			/*
 			omegaP = angleError * rkP;
 			omegaI += angleError;
 			if(Math.abs(angleError) < headingTolerance) {
@@ -162,25 +183,26 @@ public class linearTrajectory {
 			omegaD = (angleDerivative.estimate(angleError)) * rkD;
 			omega = omegaP + omegaD + (omegaI * rkI * kF);
 			omega *= lor;
-
+			*/
 			if(velocity > maxSpeed) {
 				velocity = maxSpeed;
 			} else if(velocity < -maxSpeed) {
 				velocity = -maxSpeed;
 			}
 			
-			drive.setMotorSpeeds(velocity + omega, velocity - omega);//right, left	
-				if((Math.abs(error) <= positionTolerance
-						&& Math.abs(angleError) <= headingTolerance
-						&& Math.abs(currentVelocity) < velocityTolerance)
-						|| (currentTime - lastTime > timeOutTime))
-				{
-					drive.setMotorSpeeds(0, 0);
-					isFinished = true;
-					runIt = run.IDLE;
-				}
-				break;
+			drive.setMotorSpeeds(velocity, velocity);// + omega, velocity - omega);//right, left	
+			if((Math.abs(error) <= positionTolerance
+					&& Math.abs(angleError) <= headingTolerance
+					&& Math.abs(currentVelocity) < velocityTolerance)
+					|| (currentTime - lastTime > timeOutTime))
+			{
+				drive.setMotorSpeeds(0, 0);
+				isFinished = true;
+				runIt = run.IDLE;
 			}
-			
+
+			break;
 		}
+			
 	}
+}

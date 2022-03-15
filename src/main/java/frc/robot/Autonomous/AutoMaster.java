@@ -2,6 +2,7 @@ package frc.robot.Autonomous;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Drive.DriveHardware;
 import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.MechMaster;
 
@@ -68,7 +69,7 @@ public class AutoMaster {
         int ticks = numTicks;
         double currentTicks = drive.getAverageEncoderPosition();
         if (currentTicks < ticks)
-            drive.setMotorSpeeds(0.1, 0.1);
+            drive.setMotorSpeeds(0.05, 0.05);
         else {
             drive.setMotorSpeeds(0, 0);
             System.out.println("Current ticks: " + currentTicks);

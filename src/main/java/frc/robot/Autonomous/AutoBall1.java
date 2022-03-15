@@ -6,7 +6,7 @@ import frc.robot.Mechanisms.MechMaster.autoMech;
 
 public class AutoBall1 {
     public static enum autoRun{
-        INIT, Linear1, Pivot1, SHOOT, DONE;
+        INIT, Linear1, SHOOT, DONE;
     }
 
     private autoRun AutoState1 = autoRun.INIT;
@@ -20,8 +20,8 @@ public class AutoBall1 {
     public AutoBall1(MechMaster mechMaster, TorDrive torDrive){
         this.torDrive = torDrive;
         this.mechMaster = mechMaster;
-        linear1 = new linearTrajectory(torDrive, 3.5, 4);
-        pivot1 = new pivotTrajectory(torDrive, 122.25, 1);
+        linear1 = new linearTrajectory(torDrive, 3.5, 50);
+        //pivot1 = new pivotTrajectory(torDrive, 122.25, 1);
 
     }
 
@@ -33,12 +33,13 @@ public class AutoBall1 {
                 break;
             case Linear1:
                 linear1.run();
-                mechMaster.autoRun(autoMech.STORE);
+                //mechMaster.autoRun(autoMech.STORE);
                 if(linear1.isDone()){
-                    pivot1.init();
-                    AutoState1 = autoRun.Pivot1;
+                    //pivot1.init();
+                    AutoState1 = autoRun.SHOOT;
                 }
                 break;
+                /*
             case Pivot1:
                 pivot1.run();
                 mechMaster.autoRun(autoMech.IDLE);
@@ -46,6 +47,7 @@ public class AutoBall1 {
                     AutoState1 = autoRun.SHOOT;
                 }
                 break;
+                */
             case SHOOT:
                 mechMaster.autoRun(autoMech.SHOOT);
                 break;

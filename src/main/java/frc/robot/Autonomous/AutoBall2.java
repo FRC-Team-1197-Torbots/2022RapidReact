@@ -32,7 +32,7 @@ public class AutoBall2 {
     public AutoBall2(MechMaster mechMaster, TorDrive torDrive){
         this.torDrive = torDrive;
         this.mechMaster = mechMaster;
-        linear1 = new linearTrajectory(torDrive, 3.5, 3);
+        linear1 = new linearTrajectory(torDrive, 3.5, 20);
         linear2 = new linearTrajectory(torDrive, 2.78613941667, 3);
         curve1 = new curveTrajectory(torDrive, curve_outer_distance, 5, Direction.RIGHT);
 

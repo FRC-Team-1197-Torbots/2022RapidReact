@@ -87,6 +87,10 @@ public class TorDrive {//this is the upper layer of the drive
 		return hardware.getRightEncoder();
 	}
 
+	public void resetEncoder() {
+		hardware.resetEncoder();
+	}
+
 	public void init() {
 		ADC.init();
 		TDC.init();
