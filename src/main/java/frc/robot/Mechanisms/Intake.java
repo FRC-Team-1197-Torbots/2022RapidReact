@@ -75,7 +75,7 @@ public class Intake {
         
         switch(intakeState) {
             case UP:
-                roller.set(0);
+                roller.set(rollerin / 3);
                 target = UP_TARGET;
             break;
 

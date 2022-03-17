@@ -9,14 +9,14 @@ import frc.robot.Mechanisms.MechMaster;
 
 public class AutoMaster {
 
-    private static final String Auto_2Ball = "2Ball";
+    private static final String Auto_3Ball = "2Ball";
     private static final String Auto_4Ball = "4Ball";
     private static final String Auto_1Ball = "1Ball";
     private String m_autoSelected;
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
     private AutoBall1 auto1;
-    private AutoBall2 auto2;
+    private AutoBall3 auto3;
     private AutoBall4 auto4;
 
     private MechMaster mechMaster;
@@ -26,14 +26,14 @@ public class AutoMaster {
         this.drive = drive;
         this.mechMaster = mechMaster;
         auto1 = new AutoBall1(mechMaster, drive);
-        auto2 = new AutoBall2(mechMaster, drive);
+        auto3 = new AutoBall3(mechMaster, drive);
         auto4 = new AutoBall4(mechMaster, drive);
 
     }
     
     public void robotInit() {
         m_chooser.setDefaultOption("4 ball", Auto_4Ball);
-        m_chooser.addOption("2 ball", Auto_2Ball);
+        m_chooser.addOption("3 ball", Auto_3Ball);
         m_chooser.addOption("1 ball", Auto_1Ball);
         SmartDashboard.putData("Auto choices", m_chooser);
     }
@@ -55,9 +55,8 @@ public class AutoMaster {
               auto4.run();
               
               break;
-            case Auto_2Ball:
-              auto2.run();
-            
+            case Auto_3Ball:
+              auto3.run();
               break;
             case Auto_1Ball:
               auto1.run();

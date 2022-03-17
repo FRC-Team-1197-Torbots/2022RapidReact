@@ -72,7 +72,7 @@ public class MechMaster {
     public void AutoInit() {
         elevator.init();
         flywheel.init();
-        Elevator.ballcount = 1;
+        Elevator.ballcount = 0;
     }
 
     public void teleRun() {
@@ -167,10 +167,10 @@ public class MechMaster {
         //CLIMBER
         
 
-        if(p2.getPOV() == 0){
+        if(p2.getPOV() == 0 ){
             climber.climb(climbState.UP);  
         }
-        else if(p2.getPOV() == 180){
+        else if(p2.getPOV() == 180 && climber.isAboveZero()){
             climber.climb(climbState.DOWN);
         }
         else

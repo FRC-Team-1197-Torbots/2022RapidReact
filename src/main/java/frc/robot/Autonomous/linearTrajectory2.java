@@ -11,7 +11,7 @@ public class linearTrajectory2 {
 	private double currentDistance;
 	private boolean isFinished = false;
 	
-	private final double maxSpeed = 0.5;//0.6
+	private final double maxSpeed = 0.61;//0.6
 	private final double minMaxSpeed = 0.1;
 	private final double rampTime = 0.75;
 
