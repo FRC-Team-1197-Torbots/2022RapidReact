@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.*;
 import frc.robot.Mechanisms.MechMaster.autoMech;
+import frc.robot.Mechanisms.MechMaster.turretMech;
 
 import javax.lang.model.util.ElementScanner6;
 
@@ -28,7 +29,7 @@ public class AutoBall1 {
         this.torDrive = torDrive;
         this.mechMaster = mechMaster;
         linear1 = new linearTrajectory(torDrive, 3.5f, 5);
-        pivot1 = new pivotTrajectory(torDrive, 172.25, 1); //original angle 122.25
+        pivot1 = new pivotTrajectory(torDrive, 90, 1); //original angle 122.25
 
     }
 
@@ -43,8 +44,8 @@ public class AutoBall1 {
                 break;
             case Linear1:
                 linear1.run();
-                mechMaster.autoRun(autoMech.STORE);
-                if(linear1.isDone()){
+                mechMaster.autoRun(autoMech.STORE, turretMech.SET, 80f);
+                if(linear1.isDone() && Elevator.ballcount > 1){
                     pivot1.init();
                     AutoState1 = autoRun.PIVOT;
                 }
@@ -53,7 +54,7 @@ public class AutoBall1 {
                 
             case PIVOT:
                 pivot1.run();
-                mechMaster.autoRun(autoMech.IDLE);
+                mechMaster.autoRun(autoMech.IDLE, turretMech.AUTOAIM, 80f);
                 if (pivot1.isDone()) {
                     AutoState1 = autoRun.SHOOT;
                 }
@@ -61,7 +62,7 @@ public class AutoBall1 {
                 break;
                 
             case SHOOT:
-                mechMaster.autoRun(autoMech.SHOOT);
+                mechMaster.autoRun(autoMech.SHOOT, turretMech.AUTOAIM, 0);
                 if (mechMaster.getBallCount() == 0) {
                     AutoState1 = autoRun.DONE;
                 }
@@ -71,9 +72,9 @@ public class AutoBall1 {
                                 
             case DONE:
                 if (Timer.getFPGATimestamp() < PrevTime + 0.2)
-                    mechMaster.autoRun(autoMech.SHOOT);
+                    mechMaster.autoRun(autoMech.SHOOT, turretMech.AUTOAIM, 0);
                 else
-                    mechMaster.autoRun(autoMech.IDLE);
+                    mechMaster.autoRun(autoMech.IDLE, turretMech.AUTOAIM, 0);
                 break;
                 
         }

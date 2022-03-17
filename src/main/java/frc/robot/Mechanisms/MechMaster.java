@@ -1,5 +1,7 @@
 package frc.robot.Mechanisms;
 
+import javax.lang.model.util.ElementScanner6;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.Climber.climbState;
@@ -44,6 +46,10 @@ public class MechMaster {
         STORE, SHOOT, IDLE;
     }
 
+    public enum turretMech {
+        SET, AUTOAIM;
+    }
+
 
     public MechMaster() {
         climber = new Climber();
@@ -70,6 +76,8 @@ public class MechMaster {
     }
 
     public void teleRun() {
+
+        
         
         
         /*
@@ -217,16 +225,25 @@ public class MechMaster {
         */    
     }
 
-    public void autoRun(autoMech mechState) {
-        turret.PIDTuning(limelight.getAngle());
+    public void autoRun(autoMech mechState, turretMech turretState, double angle) {
+        switch(turretState) {
+            case SET:
+                turret.PIDTuning(angle);
+                break;
+            case AUTOAIM:
+                turret.PIDTuning(limelight.getAngle());
+                break;
+        }
 
         switch(mechState) {
             case STORE:
                 intake.run(moveIntake.DOWN);
                 elevator.run(runElevator.STORE);
                 flywheel.run(runFlywheel.IDLE, 0);
+
                 break;
             case SHOOT:
+                //if (Math.abs(limelight.getAngle()) < 1)
                 flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
                 elevator.run(runElevator.SHOOT);
                 /*

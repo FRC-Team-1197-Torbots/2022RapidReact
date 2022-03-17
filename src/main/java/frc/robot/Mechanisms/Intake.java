@@ -38,7 +38,7 @@ public class Intake {
     private TorDerivative derivative;
 
     private double target;
-    private final double UP_TARGET = 0, DOWN_TARGET = 433;
+    private final double UP_TARGET = 0, DOWN_TARGET = 486;
 
     public enum moveIntake{
         UP, DOWN;

@@ -17,6 +17,7 @@ public class AutoMaster {
 
     private AutoBall1 auto1;
     private AutoBall2 auto2;
+    private AutoBall4 auto4;
 
     private MechMaster mechMaster;
     private TorDrive drive;
@@ -26,6 +27,7 @@ public class AutoMaster {
         this.mechMaster = mechMaster;
         auto1 = new AutoBall1(mechMaster, drive);
         auto2 = new AutoBall2(mechMaster, drive);
+        auto4 = new AutoBall4(mechMaster, drive);
 
     }
     
@@ -50,7 +52,8 @@ public class AutoMaster {
     public void run() {
         switch (m_autoSelected) {
             case Auto_4Ball:
-              // Put custom auto code here
+              auto4.run();
+              
               break;
             case Auto_2Ball:
               auto2.run();

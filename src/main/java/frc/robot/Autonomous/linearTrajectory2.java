@@ -5,37 +5,38 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.PID_Tools.*;
 import frc.robot.Drive.*;
 
-public class linearTrajectory {
+public class linearTrajectory2 {
 	private TorDrive drive;
 	private double targetDistance;
 	private double currentDistance;
 	private boolean isFinished = false;
 	
-	private final double maxSpeed = 0.5;//0.5;//0
+	private final double maxSpeed = 0.5;//0.6
 	private final double minMaxSpeed = 0.1;
-	private final double maxSpeedAtVeloctiy = 8;
+	private final double rampTime = 0.75;
+
+	private double movingMaxSpeed = minMaxSpeed;
     
     //PID for translation
-	private final double tkP = 0.02;//0.4;//0.6
-	private final double tkD = 0;//0.002;//.001
-    private final double tkI = 0.05;//0.05;//.0001
+	private final double tkP = 0.4;//0.4
+	private final double tkD = 0.0075;//0
+    private final double tkI = 0.00;//0.00
     
     //PID For rotation
 	
-	/*
-	private final double rkP = -0.1;//0.3
+	private final double rkP = 0.3;//0.3
 	private final double rkD = 0.0;//0.0
-	private final double rkI = 0.000;//0.001
-	*/
+	private final double rkI = 0.02;//0.000
 	
 	private final double kF = 0.005;
-	private final int lor = 1;
+	private final int lor = -1;
 	private final int errorFob = 1;//forwards or backwards
 	
 	//tolerances
-	private double positionTolerance = 0.01;//units: feet 0.01
-	private final double velocityTolerance = 0.1;//units: feet per second 0.015
-	private final double headingTolerance = 1.5 * (Math.PI / 180.0);//units: radians 2.5 degrees
+	private double positionTolerance = 0.02;//units: feet 0.04
+	private double absolutePositionTolerance = 0.15;//units: 0.15 ft, or 1.8 inches
+	private final double velocityTolerance = 0.001;//units: feet per second 0.05
+	private final double headingTolerance = 2.5 * (Math.PI / 180.0);//units: radians 2.5 degrees
 	
 	//FOR THE CHEESE RUN
 	//FORMULA: Acos(x) + b
@@ -80,7 +81,7 @@ public class linearTrajectory {
 	
 	public run runIt = run.IDLE;
 	
-	public linearTrajectory(TorDrive drive, double distance, double timeOutTime) {
+	public linearTrajectory2(TorDrive drive, double distance, double timeOutTime) {
 		this.drive = drive;
 		this.targetDistance = distance;
 		this.timeOutTime = timeOutTime;
@@ -88,7 +89,7 @@ public class linearTrajectory {
 		accelDerivative = new TorDerivative(kF);
 		angleDerivative = new TorDerivative(kF);
 
-		positionTolerance = distance * 0.01f;
+		positionTolerance = distance;
 		usePID = true;
 	}
 	
@@ -147,7 +148,7 @@ public class linearTrajectory {
 				}
 			}
 
-			/*
+			
 			omegaP = angleError * rkP;
 			omegaI += angleError;
 			if(Math.abs(angleError) < headingTolerance) {
@@ -163,7 +164,7 @@ public class linearTrajectory {
 			omegaD = (angleDerivative.estimate(angleError)) * rkD;
 			omega = omegaP + omegaD + (omegaI * rkI * kF);
 			omega *= lor;
-			*/
+			
 			
 			//since this distance is always positive, we have to multiply by fob for if it is negative
 			error = targetDistance - currentDistance;//error always positive if approaching
@@ -191,17 +192,23 @@ public class linearTrajectory {
 			vD = currentVelocity * tkD;//degrees per second
 			velocity = vP + vD + (vI * tkI * kF);
 
-			if(velocity > maxSpeed) {
-				velocity = maxSpeed;
-			} else if(velocity < -maxSpeed) {
-				velocity = -maxSpeed;
+			if((currentTime-lastTime) < rampTime) {
+				movingMaxSpeed = minMaxSpeed + (maxSpeed - minMaxSpeed) * (currentTime - lastTime) / rampTime;
 			}
+
+			if(velocity > movingMaxSpeed) {
+				velocity = movingMaxSpeed;
+			} else if(velocity < -movingMaxSpeed) {
+				velocity = -movingMaxSpeed;
+			}
+
 			
-			drive.setMotorSpeeds(velocity, velocity);// + omega, velocity - omega);//right, left	
+			
+			drive.setMotorSpeeds(velocity+omega, velocity-omega);// + omega, velocity - omega);//right, left	
 			
 			//0.099x -0.163
-			if(//Math.abs(error) <= positionTolerance
-				currentDistance >= targetDistance - ((0.099 * targetDistance))//0.163)
+			if((Math.abs(error) <= (positionTolerance + absolutePositionTolerance) && Math.abs(velocity) < velocityTolerance)
+				// currentDistance >= targetDistance - ((0.099 * targetDistance))
 				|| (currentTime - lastTime > timeOutTime))
 			{
 				drive.setMotorSpeeds(0, 0);

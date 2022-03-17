@@ -82,7 +82,7 @@ public class Elevator {
             break;
 
             case SHOOT:                
-                    if(Timer.getFPGATimestamp() < PrevTime + 0.1f && !flywheel.OnTarget) {                    
+                    if(Timer.getFPGATimestamp() < PrevTime + 0.15f && !flywheel.OnTarget) {                    
                         elMotor.set(-0.6);                    
                     } else if (flywheel.OnTarget) {
                         elMotor.set(0.6);

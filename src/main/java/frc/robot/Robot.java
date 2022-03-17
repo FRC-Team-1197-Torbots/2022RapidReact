@@ -86,6 +86,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     autoMaster.robotInit();
+    hardware.SetCoast();
 
     // limelight = new HttpCamera("limelight", "http://limelight.local:5801");
     // CameraServer.startAutomaticCapture(limelight);
