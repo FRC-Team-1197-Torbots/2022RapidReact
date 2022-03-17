@@ -40,7 +40,7 @@ private autoRun AutoState1 = autoRun.INIT;
         linear2 = new linearTrajectory2(torDrive, 12.5, 3.5);
         
         pivot3 = new pivotTrajectory(torDrive, 180, 1);
-        linear3 = new linearTrajectory2(torDrive, 20, 1.75);
+        linear3 = new linearTrajectory2(torDrive, 20, 1.5); //1.75 original
 
     }
 
