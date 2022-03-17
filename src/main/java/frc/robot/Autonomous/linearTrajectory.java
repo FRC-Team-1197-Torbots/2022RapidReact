@@ -14,31 +14,31 @@ public class linearTrajectory {
 	private final double maxSpeed = 0.3;//0
     
     //PID for translation
-	private final double tkP = 0.03;//0.5
+	private final double tkP = 0.1;//0.5
 	private final double tkD = 0;//0.002;//.001
     private final double tkI = 0.000;//0.05;//.0003
     
     //PID For rotation
-	/*
+	
 	private final double rkP = 0.3;//0.5
 	private final double rkD = 0.0;//0.0
 	private final double rkI = 0.001;//0.01
-	*/
+	
 	private final double kF = 0.005;
 	private final int lor = 1;
 	private final int errorFob = 1;//forwards or backwards
 	
 	//tolerances
-	private final double positionTolerance = 0.001;//units: feet 0.015
+	private double positionTolerance = 0.01;//units: feet 0.015
 	private final double velocityTolerance = 0.1;//units: feet per second 0.015
 	private final double headingTolerance = 1.5 * (Math.PI / 180.0);//units: radians 2.5 degrees
 	
 	//FOR THE CHEESE RUN
 	//FORMULA: Acos(x) + b
 	private final double minVelocity = 0.05;
-	private final double maxVelocity = 0.55;
+	private final double maxVelocity = 0.35;
 	private double kA = (maxVelocity - minVelocity) / 2;
-	private double kB = minVelocity;
+	private double kB = minVelocity + kA;
 	
 	private double currentVelocity;
 	
@@ -50,7 +50,7 @@ public class linearTrajectory {
 	private double vD;//velocity derivative
 	private double vI = 0;
 	
-	//private double omega;
+	private double omega;
 	private double velocity;
 	
 	private double firstAngle;
@@ -67,7 +67,8 @@ public class linearTrajectory {
 	
 	private double timeOutTime;
 	
-	
+	private boolean usePID;
+
 	public static enum run {
 		IDLE, GO;
 		private run() {}
@@ -82,6 +83,9 @@ public class linearTrajectory {
 		derivative = new TorDerivative(kF);
 		accelDerivative = new TorDerivative(kF);
 		angleDerivative = new TorDerivative(kF);
+
+		positionTolerance = distance * 0.01f;
+		usePID = true;
 	}
 	
 	public boolean isDone() {
@@ -92,6 +96,7 @@ public class linearTrajectory {
 		isFinished = false;
 		runIt = run.GO;
 		startDistance = 0;
+		currentDistance = 0;
 		firstAngle = drive.getHeading();
 		currentAngle = drive.getHeading();
 		angleError = currentAngle - firstAngle;
@@ -114,19 +119,6 @@ public class linearTrajectory {
 		
 	
 	public void run() {
-
-		//System.out.println("Velocity: " + velocity);
-		//System.out.println("Omega: " + omega);
-		SmartDashboard.putNumber("Current distance: ", drive.getPosition());
-		SmartDashboard.putNumber("Error: ", error);
-		//System.out.println("Velocity: " + currentVelocity);
-		//System.out.println("Acceleration: " + currentAcceleration);
-
-		// System.out.println("P: " + vP);
-		// System.out.println("D: " + vD);
-		
-
-
 		currentAngle = drive.getHeading();
 		//we can't fix current angle right now so that it can't be 359 degrees since we need it in this raw value first for the angleError
 		//since it is never used other than for finding angleError, there is no need to make sure that it reads -1 degrees rather than 359 degrees
@@ -149,8 +141,72 @@ public class linearTrajectory {
 			
 			//since this distance is always positive, we have to multiply by fob for if it is negative
 			error = targetDistance - currentDistance;//error always positive if approaching
-			System.out.println(error);
-			vI += error;
+			
+			if(usePID) {
+				velocity = error * tkP;
+
+				if(velocity > maxSpeed) {
+					usePID = false;
+				}
+			} else {
+				Double Proportion = error/targetDistance;
+
+				velocity = Proportion * maxSpeed;	
+			}
+			
+			drive.setMotorSpeeds(velocity, velocity);// + omega, velocity - omega);//right, left	
+			
+			if(Math.abs(error) <= positionTolerance || (currentTime - lastTime > timeOutTime))
+			{
+				drive.setMotorSpeeds(0, 0);
+				isFinished = true;
+				runIt = run.IDLE;
+			}
+			break;
+		}
+			
+	}
+
+	//Runs without PID, uses a graph to plot out the velocities
+	//let's cheese it
+	public void cheeseRun() {
+		//double FeedForward;
+		switch(runIt) {
+			case IDLE:
+				break;
+			case GO:
+				//System.out.println("Velocity: " + velocity);
+				//System.out.println("Current distance: " + drive.getAverageEncoderPosition());
+
+				error = targetDistance - currentDistance;
+
+				currentDistance = drive.getPosition();
+				velocity = -kA * Math.cos((Math.PI * currentDistance) / (targetDistance / 2)) + kB;
+				if(velocity > maxSpeed) {
+					velocity = maxSpeed;
+				} else if(velocity < -maxSpeed) {
+					velocity = -maxSpeed;
+				}
+				drive.setMotorSpeeds(velocity, velocity);
+
+				if((Math.abs(error) <= positionTolerance
+					&& Math.abs(angleError) <= headingTolerance
+					&& Math.abs(currentVelocity) < velocityTolerance)
+					|| (currentTime - lastTime > timeOutTime))
+				{
+					drive.setMotorSpeeds(0, 0);
+					isFinished = true;
+					System.out.println("Finished");
+					runIt = run.IDLE;
+				}
+		}
+		
+	}
+}
+
+/* OLD PID
+
+vI += error;
 			
 			if(Math.abs(error) <= positionTolerance * 0.5) {
 				vI = 0;
@@ -174,67 +230,4 @@ public class linearTrajectory {
 			//derivative would be positive
 			vD = currentVelocity * tkD;//degrees per second
 			velocity = vP + vD + (vI * tkI);
-			//velocity is good
-			/*
-			omegaP = angleError * rkP;
-			omegaI += angleError;
-			if(Math.abs(angleError) < headingTolerance) {
-				omegaI = 0;
-			}
-			if(omegaI > ((0.25) / (rkI * kF))) {
-				omegaI = ((0.5) / (rkI * kF));
-			}
-			if(omegaI < -((0.25) / (rkI * kF))) {
-				omegaI = -((0.5) / (rkI * kF));
-			}
-			
-			omegaD = (angleDerivative.estimate(angleError)) * rkD;
-			omega = omegaP + omegaD + (omegaI * rkI * kF);
-			omega *= lor;
-			*/
-			if(velocity > maxSpeed) {
-				velocity = maxSpeed;
-			} else if(velocity < -maxSpeed) {
-				velocity = -maxSpeed;
-			}
-			
-			drive.setMotorSpeeds(velocity, velocity);// + omega, velocity - omega);//right, left	
-			if((Math.abs(error) <= positionTolerance
-					&& Math.abs(angleError) <= headingTolerance
-					&& Math.abs(currentVelocity) < velocityTolerance)
-					|| (currentTime - lastTime > timeOutTime))
-			{
-				drive.setMotorSpeeds(0, 0);
-				isFinished = true;
-				runIt = run.IDLE;
-			}
-
-			break;
-		}
-			
-	}
-
-	//Runs without PID, uses a graph to plot out the velocities
-	//let's cheese it
-	public void cheeseRun() {
-		switch(runIt) {
-			case IDLE:
-				break;
-			case GO:
-				currentDistance = drive.getPosition();
-				velocity = -kA * Math.cos((Math.PI * currentDistance) / (targetDistance / 2)) + kB;
-				drive.setMotorSpeeds(velocity, velocity);
-
-				if((Math.abs(error) <= positionTolerance
-					//&& Math.abs(angleError) <= headingTolerance
-					//&& Math.abs(currentVelocity) < velocityTolerance)
-					|| (currentTime - lastTime > timeOutTime)))
-				{
-					drive.setMotorSpeeds(0, 0);
-					isFinished = true;
-					runIt = run.IDLE;
-				}
-		}
-		
-	}
-}
+*/

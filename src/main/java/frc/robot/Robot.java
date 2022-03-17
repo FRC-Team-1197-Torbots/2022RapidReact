@@ -113,7 +113,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    hardware.resetEncoder();
+    //hardware.resetEncoder();
+    hardware.SetBrake();
     autoMaster.init();
   }
 
@@ -121,12 +122,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     autoMaster.run();
-    //autoMaster.testRun(27395);
+    //autoMaster.testRun(50000);
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    hardware.SetBrake();
     mechMaster.TeleInit();
   }
 
@@ -203,6 +205,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     mechMaster.onDisable();
+    hardware.SetCoast();
   }
 
   /** This function is called periodically when disabled. */

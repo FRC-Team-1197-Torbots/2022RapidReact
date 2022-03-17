@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drive.DriveHardware;
 import frc.robot.Drive.TorDrive;
+import frc.robot.Mechanisms.Elevator;
 import frc.robot.Mechanisms.MechMaster;
 
 public class AutoMaster {
@@ -37,8 +38,12 @@ public class AutoMaster {
 
     public void init() {
         m_autoSelected = m_chooser.getSelected();
+        
+
         // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
         System.out.println("Auto selected: " + m_autoSelected);
+
+        mechMaster.AutoInit();
     }
 
 
@@ -69,7 +74,7 @@ public class AutoMaster {
         int ticks = numTicks;
         double currentTicks = drive.getAverageEncoderPosition();
         if (currentTicks < ticks)
-            drive.setMotorSpeeds(0.05, 0.05);
+            drive.setMotorSpeeds(0.15, 0.15);
         else {
             drive.setMotorSpeeds(0, 0);
             System.out.println("Current ticks: " + currentTicks);

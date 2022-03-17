@@ -1,6 +1,7 @@
 package frc.robot.Drive;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotController;
@@ -136,7 +137,8 @@ public class DriveHardware {
 
 	// Getting the position from both encoders in feet
 	public double getPosition() {
-		return ((getRightEncoder() + getLeftEncoder() * 0.5)) / encoderTicksPerFoot; // [feet]
+		return getAverageEncoderPosition() / encoderTicksPerFoot;
+		//return ((getRightEncoder() + getLeftEncoder() * 0.5)) / encoderTicksPerFoot; // [feet]
 	}
 
 	// Getting the angle in radians from the spartan board
@@ -205,5 +207,23 @@ public class DriveHardware {
 	public double getCurrentVoltage() {
 		currentVoltage = RobotController.getInputVoltage();
 		return currentVoltage;
+	}
+
+	public void SetBrake() {
+		Right1.setIdleMode(IdleMode.kBrake);
+		Right2.setIdleMode(IdleMode.kBrake);
+		RightFlipped.setIdleMode(IdleMode.kBrake);
+		Left1.setIdleMode(IdleMode.kBrake);
+		Left2.setIdleMode(IdleMode.kBrake);
+		LeftFlipped.setIdleMode(IdleMode.kBrake);
+	}
+
+	public void SetCoast() {
+		Right1.setIdleMode(IdleMode.kCoast);
+		Right2.setIdleMode(IdleMode.kCoast);
+		RightFlipped.setIdleMode(IdleMode.kCoast);
+		Left1.setIdleMode(IdleMode.kCoast);
+		Left2.setIdleMode(IdleMode.kCoast);
+		LeftFlipped.setIdleMode(IdleMode.kCoast);
 	}
 }

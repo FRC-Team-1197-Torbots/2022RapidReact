@@ -173,6 +173,7 @@ public class Flywheel {
 
         SmartDashboard.putNumber("Current speed", flyEncoder.getVelocity());
         SmartDashboard.putNumber("Sum speed", sumSpeed);
+        System.out.println(flyEncoder.getVelocity());
     }
 
     public void setPIDValues(int state) {

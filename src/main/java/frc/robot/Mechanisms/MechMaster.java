@@ -63,6 +63,12 @@ public class MechMaster {
         flywheel.init();
     }
 
+    public void AutoInit() {
+        elevator.init();
+        flywheel.init();
+        Elevator.ballcount = 1;
+    }
+
     public void teleRun() {
         
         
@@ -151,7 +157,7 @@ public class MechMaster {
         
 
         //CLIMBER
-        /*
+        
 
         if(p2.getPOV() == 0){
             climber.climb(climbState.UP);  
@@ -163,6 +169,7 @@ public class MechMaster {
             climber.climb(climbState.IDLE);
 
         //NIKITA
+        /*
         if (p2.getPOV() == 90) {
             climber.nikita(nikitaState.UP);
         }
@@ -211,18 +218,27 @@ public class MechMaster {
     }
 
     public void autoRun(autoMech mechState) {
+        turret.PIDTuning(limelight.getAngle());
+
         switch(mechState) {
             case STORE:
                 intake.run(moveIntake.DOWN);
                 elevator.run(runElevator.STORE);
+                flywheel.run(runFlywheel.IDLE, 0);
                 break;
             case SHOOT:
+                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+                elevator.run(runElevator.SHOOT);
+                /*
                 if(flywheel.OnTarget) {
                     elevator.run(runElevator.SHOOT);
+                    System.out.println("Shooting");
                 } else {
                     elevator.run(runElevator.IDLE);
+                    System.out.println("Idle");
                 }
-                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+                */
+                
                 break;
             
             case IDLE:
@@ -232,6 +248,10 @@ public class MechMaster {
                 break;
         }
 
+    }
+    
+    public int getBallCount() {
+        return elevator.ballcount;
     }
 
     public void onDisable(){

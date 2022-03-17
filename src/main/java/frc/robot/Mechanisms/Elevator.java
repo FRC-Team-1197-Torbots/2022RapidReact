@@ -16,7 +16,7 @@ public class Elevator {
     private CANSparkMax elMotor;
 
     private boolean ballInElevator = false;
-    public int ballcount;
+    public static int ballcount;
     private boolean prev, shooterprev;
     private double PrevTime;
 
