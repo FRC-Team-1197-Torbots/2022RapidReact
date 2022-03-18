@@ -228,7 +228,7 @@ public class MechMaster {
     public void autoRun(autoMech mechState, turretMech turretState, double angle) {
         switch(turretState) {
             case SET:
-                turret.PIDTuning(angle);
+                turret.PIDAutoTuning(angle);
                 break;
             case AUTOAIM:
                 turret.PIDTuning(limelight.getAngle());
