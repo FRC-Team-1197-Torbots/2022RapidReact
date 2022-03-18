@@ -165,6 +165,26 @@ public class Turret {
             return false;
     }
 
+    public void PIDAutoTuning(double angle) {      
+
+        if(m_initstate != INIT_STATES.IDLE) {
+            init();
+        } else {
+            
+           TargetAngle = angle;
+
+            if (TargetAngle > 120)
+                TargetAngle = 120;
+            else if (TargetAngle <-120)
+                TargetAngle = -120;
+
+            //start writing state machine to turn for tuning
+            double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
+            // System.out.println("target " + TargetAngle);
+            
+            TurretMotor.set(ControlMode.PercentOutput, pidout);        
+        }
+    }
     
     public void PIDTuning(double tx) {      
 
