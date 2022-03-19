@@ -91,7 +91,7 @@ public class Flywheel {
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(speedToSetMotor);
                 flyMotor2.set(-speedToSetMotor);
-                System.out.println("Current speed: " + -currentSpeed);
+                //System.out.println("Current speed: " + -currentSpeed);
                 break;
 
             case IDLE:
@@ -173,7 +173,7 @@ public class Flywheel {
 
         SmartDashboard.putNumber("Current speed", flyEncoder.getVelocity());
         SmartDashboard.putNumber("Sum speed", sumSpeed);
-        System.out.println(flyEncoder.getVelocity());
+        //System.out.println(flyEncoder.getVelocity());
     }
 
     public void setPIDValues(int state) {

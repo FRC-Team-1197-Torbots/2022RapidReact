@@ -43,9 +43,14 @@ public class AutoMaster {
         
 
         // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-        System.out.println("Auto selected: " + m_autoSelected);
+        //System.out.println("Auto selected: " + m_autoSelected);
 
         mechMaster.AutoInit();
+        drive.resetGyro();
+        drive.resetEncoder();
+
+        
+        
     }
 
 
@@ -79,7 +84,7 @@ public class AutoMaster {
             drive.setMotorSpeeds(0.15, 0.15);
         else {
             drive.setMotorSpeeds(0, 0);
-            System.out.println("Current ticks: " + currentTicks);
+            //System.out.println("Current ticks: " + currentTicks);
         }
     }
 }

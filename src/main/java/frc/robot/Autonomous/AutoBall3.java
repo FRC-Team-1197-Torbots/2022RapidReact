@@ -36,7 +36,7 @@ private autoRun AutoState1 = autoRun.INIT;
         this.mechMaster = mechMaster;
         linear1 = new linearTrajectory2(torDrive, 4.0, 2);
         pivot1 = new pivotTrajectory(torDrive, 50, 1.3);
-        pivot2 = new pivotTrajectory(torDrive, -43, 1.00);
+        pivot2 = new pivotTrajectory(torDrive, -41, 1.00);
         linear2 = new linearTrajectory2(torDrive, 12.5, 3.5);
         
         pivot3 = new pivotTrajectory(torDrive, 180, 1);
@@ -46,6 +46,8 @@ private autoRun AutoState1 = autoRun.INIT;
 
     public void run(){
         SmartDashboard.putString("Auto State", AutoState1.toString());
+        SmartDashboard.putNumber("Gyro value: ", torDrive.getHeading());
+        SmartDashboard.putNumber("Position", torDrive.getPosition());
         switch(AutoState1){
             case INIT:
                 linear1.init();
@@ -97,7 +99,7 @@ private autoRun AutoState1 = autoRun.INIT;
                 break;
             case LINEAR2:
                 linear2.run();
-                mechMaster.autoRun(autoMech.STORE, turretMech.SET, 120f);
+                mechMaster.autoRun(autoMech.STORE, turretMech.SET, 0);
 
                 if(Timer.getFPGATimestamp() > PrevTime + 3.0){
                     pivot3.init();

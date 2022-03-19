@@ -173,6 +173,9 @@ public class MechMaster {
         else if(p2.getPOV() == 180 && climber.isAboveZero()){
             climber.climb(climbState.DOWN);
         }
+        else if(p1.getPOV() == 180){
+            climber.climb(climbState.RESET_DOWN);
+        }
         else
             climber.climb(climbState.IDLE);
 

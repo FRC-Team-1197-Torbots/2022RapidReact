@@ -23,15 +23,16 @@ public class Climber {
     private RelativeEncoder rightClEncoder;
     private RelativeEncoder leftClEncoder;
 
-    private double speed = 0.8;
+    private double speed = 0.95f;
+    private double slowSpeed = 0.4;
     private double nikitaSpeed = 0.3;
 
     public enum climbState{
-        UP, DOWN, IDLE;
+        UP, DOWN, IDLE, RESET_DOWN;
     }
 
     public enum nikitaState {
-        UP, DOWN, IDLE;
+        UP, DOWN, RESET_DOWN, IDLE;
     }
     
     //public climbState climberPos;
@@ -63,6 +64,10 @@ public class Climber {
             case DOWN:
                 rightClMotor.set(speed);
                 leftClMotor.set(-speed);
+                break;
+            case RESET_DOWN:
+                rightClMotor.set(slowSpeed);
+                leftClMotor.set(-slowSpeed);
                 break;
             case IDLE:
                 rightClMotor.set(0);

@@ -102,7 +102,7 @@ public class ArcadeDriveController extends DriveController {
        double sign = Math.signum(throttle);
        throttle = sign * Math.pow(throttle, 2);
        
-       steer = player1.getRawAxis(0) * 0.8f;
+       steer = player1.getRawAxis(0);
        sign = Math.signum(steer);
        steer = sign * Math.pow(steer, 2);       
        
@@ -127,8 +127,8 @@ public class ArcadeDriveController extends DriveController {
        }
 
        //hardware.setMotorSpeeds(-leftSpeed, -rightspeed); 
-       System.out.println("Left Speed: " + hardware.getLeftVelocity());
-       System.out.println("Right Speed: " + hardware.getRightVelocity());
+       //System.out.println("Left Speed: " + hardware.getLeftVelocity());
+       //System.out.println("Right Speed: " + hardware.getRightVelocity());
        //System.out.println("Left target: " + leftSpeed * MAX_VELOCITY);
        //System.out.println("Right target: " + rightspeed * MAX_VELOCITY);
 

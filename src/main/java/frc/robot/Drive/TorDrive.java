@@ -96,6 +96,10 @@ public class TorDrive {//this is the upper layer of the drive
 		TDC.init();
 		hardware.init();
 	}
+
+	public void resetGyro() {
+		hardware.resetGyro();
+	}
 	
 	//we are only running trajectories in MP so that is why it only takes from the MPDC
 	// public boolean MPTrajectoryIsComplete() {
