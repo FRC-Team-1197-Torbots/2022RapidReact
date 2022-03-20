@@ -129,7 +129,7 @@ public class Flywheel {
         // SmartDashboard.putNumber("currentError:", currentError);
         pidDerivativeResult = pidDerivative.estimate(currentError);
         pidIntegral += currentError;
-        System.out.println("P: " + kP);
+        //System.out.println("P: " + kP);
 
         if(Math.abs(currentError) < 80) {
             OnTarget = true;

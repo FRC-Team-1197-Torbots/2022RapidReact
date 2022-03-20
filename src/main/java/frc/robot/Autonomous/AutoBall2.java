@@ -10,7 +10,7 @@ import javax.lang.model.util.ElementScanner6;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class AutoBall1 {
+public class AutoBall2 {
     public static enum autoRun{
         INIT, Linear1, PIVOT, SHOOT, DONE;
     }
@@ -25,10 +25,10 @@ public class AutoBall1 {
     
     private double PrevTime = Timer.getFPGATimestamp() + 0.2;
     
-    public AutoBall1(MechMaster mechMaster, TorDrive torDrive){
+    public AutoBall2(MechMaster mechMaster, TorDrive torDrive){
         this.torDrive = torDrive;
         this.mechMaster = mechMaster;
-        linear1 = new linearTrajectory(torDrive, 3.5f, 5);
+        linear1 = new linearTrajectory(torDrive, 4f, 5);
         pivot1 = new pivotTrajectory(torDrive, 90, 1); //original angle 122.25
 
     }
@@ -44,8 +44,8 @@ public class AutoBall1 {
                 break;
             case Linear1:
                 linear1.run();
-                mechMaster.autoRun(autoMech.STORE, turretMech.SET, 80f);
-                if(linear1.isDone() && Elevator.ballcount > 1){
+                mechMaster.autoRun(autoMech.STORE, turretMech.SET, 100f);
+                if(linear1.isDone()){
                     pivot1.init();
                     AutoState1 = autoRun.PIVOT;
                 }
@@ -54,19 +54,18 @@ public class AutoBall1 {
                 
             case PIVOT:
                 pivot1.run();
-                mechMaster.autoRun(autoMech.IDLE, turretMech.AUTOAIM, 80f);
+                mechMaster.autoRun(autoMech.IDLE, turretMech.SET, 100f);
                 if (pivot1.isDone()) {
+                    PrevTime = Timer.getFPGATimestamp();
                     AutoState1 = autoRun.SHOOT;
                 }
-                PrevTime = Timer.getFPGATimestamp();
                 break;
                 
             case SHOOT:
                 mechMaster.autoRun(autoMech.SHOOT, turretMech.AUTOAIM, 0);
-                if (mechMaster.getBallCount() == 0) {
+                if (Timer.getFPGATimestamp() > PrevTime + 5) {
                     AutoState1 = autoRun.DONE;
                 }
-                PrevTime = Timer.getFPGATimestamp();
                 
                 break;
                                 

@@ -61,7 +61,8 @@ public class ArcadeDriveController extends DriveController {
    private double throttle = 0;
    private double steer = 0;
    
-   private final double MAX_VELOCITY = 28000f;
+   private final double MAX_VELOCITY = 39000f; //28000
+   private final double STEER_SCALAR = 1.2;
    //this is for the curve drive
 
    //tunable
@@ -104,7 +105,7 @@ public class ArcadeDriveController extends DriveController {
        
        steer = player1.getRawAxis(0);
        sign = Math.signum(steer);
-       steer = sign * Math.pow(steer, 2);       
+       steer = sign * Math.pow(steer, 2) * STEER_SCALAR;           
        
        double rightspeed = 0, leftSpeed = 0;
 

@@ -126,6 +126,7 @@ public class MechMaster {
         
         
         SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
+        //maybe override the intake w the A button
         if (p1.getAButton() && p2.getRightTriggerAxis() == 1) {
             intake.run(moveIntake.DOWN);
             elevator.run(runElevator.SHOOT);
