@@ -127,11 +127,23 @@ public class MechMaster {
         
         SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
         //maybe override the intake w the A button
+        SmartDashboard.putBoolean("LeftBumper Pressed: ", p1.getLeftBumper());
+
+        if (p1.getRightTriggerAxis() >= 0.95){//p1.getLeftTriggerAxis() == 1){
+            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+            if (p1.getLeftBumper() == true && flywheel.OnTarget) {
+                elevator.run(runElevator.SHOOT);
+            }
+            else
+                elevator.run(runElevator.REVUP);
+        }
+        /*
         if (p1.getAButton() && p2.getRightTriggerAxis() == 1) {
             intake.run(moveIntake.DOWN);
             elevator.run(runElevator.SHOOT);
             flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
+        */
 
         else if (p1.getAButton()) {
             if(elevator.ballcount < 2) {
@@ -161,6 +173,10 @@ public class MechMaster {
 
         if (p2.getLeftBumperPressed()) {
             elevator.resetBallCount();
+            flywheel.setPIDValues(1);
+        }
+
+        if (p1.getRightTriggerAxis() <= 0.05) {
             flywheel.setPIDValues(1);
         }
         

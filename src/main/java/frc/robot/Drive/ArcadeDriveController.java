@@ -61,9 +61,18 @@ public class ArcadeDriveController extends DriveController {
    private double throttle = 0;
    private double steer = 0;
    
-   private final double MAX_VELOCITY = 39000f; //28000
-   private final double STEER_SCALAR = 1.2;
+   private final double MAX_VELOCITY = 45000f; //28000 //39000 // 34,000 // 39,000
+   private final double STEER_SCALAR = 1.15; //1.2
    //this is for the curve drive
+
+   private final double POSRANGE_MAX_ACCEL = 0.08;
+   private final double NEGRANGE_MAX_ACCEL = 0.03;
+   private final double MAX_DECEL = 0.06;
+
+   
+//    private double previousLeftSpeed = 0;
+//    private double previousRightSpeed = 0;
+    private double previousThrottle = 0;
 
    //tunable
    private final double matrixLength = 2;
@@ -99,7 +108,7 @@ public class ArcadeDriveController extends DriveController {
 
    @Override
    public void run() {       
-       throttle = player1.getRawAxis(1);
+       throttle = -player1.getRawAxis(1);
        double sign = Math.signum(throttle);
        throttle = sign * Math.pow(throttle, 2);
        
@@ -108,6 +117,30 @@ public class ArcadeDriveController extends DriveController {
        steer = sign * Math.pow(steer, 2) * STEER_SCALAR;           
        
        double rightspeed = 0, leftSpeed = 0;
+
+
+       if (throttle > previousThrottle) {
+           if (previousThrottle> 0)
+                throttle = previousThrottle + POSRANGE_MAX_ACCEL;
+            else
+                throttle = previousThrottle + NEGRANGE_MAX_ACCEL;
+        }
+        if (throttle < previousThrottle) {
+            throttle = previousThrottle - MAX_DECEL;
+        }
+
+        if(throttle > 1) {
+            throttle = 1;
+        }
+
+        if(throttle < -1) {
+            throttle = -1;
+        }
+
+
+        previousThrottle = throttle;
+        
+        throttle = -throttle;
 
        if(throttle > 0) {
            if(steer > 0) {
@@ -138,8 +171,39 @@ public class ArcadeDriveController extends DriveController {
        //convert to requested speed in encoder ticks per second
        //convertedspeed = max speed * leftSpeed
 
-       leftOutput = PID(hardware.getLeftVelocity(), leftSpeed * MAX_VELOCITY, SIDE.LEFT);
-       rightOutput = PID(hardware.getRightVelocity(), rightspeed * MAX_VELOCITY, SIDE.RIGHT);
+        // if(leftSpeed > previousLeftSpeed) {
+        //    leftSpeed = previousLeftSpeed + MAX_ACCEL;
+        // }
+        // if(leftSpeed < previousLeftSpeed) {
+        //     leftSpeed = previousLeftSpeed - MAX_DECEL;
+        // }
+
+        // if(rightspeed > previousRightSpeed) {
+        //     rightspeed = previousRightSpeed + MAX_ACCEL;
+        // }
+        // if(rightspeed < previousRightSpeed) {
+        //     rightspeed = previousRightSpeed - MAX_DECEL;
+        // }
+
+        
+
+        // previousLeftSpeed = leftSpeed;
+        // previousRightSpeed = rightspeed;
+
+        
+
+        double settingLeftSpeed = leftSpeed, settingRightSpeed = rightspeed;
+
+        if(Math.abs(settingLeftSpeed) < 0.05) {
+            settingLeftSpeed = 0;
+        }
+
+        if(Math.abs(settingRightSpeed) < 0.05) {
+            settingRightSpeed = 0;
+        }
+
+       leftOutput = PID(hardware.getLeftVelocity(), settingLeftSpeed * MAX_VELOCITY, SIDE.LEFT);
+       rightOutput = PID(hardware.getRightVelocity(), settingRightSpeed * MAX_VELOCITY, SIDE.RIGHT);
 
 
        hardware.setMotorSpeeds(-leftOutput, -rightOutput);
