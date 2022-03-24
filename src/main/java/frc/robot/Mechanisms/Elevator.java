@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator {
 
-    private DigitalInput breakbeam;
+    private DigitalInput lowBeam;
     private DigitalInput ShooterBeam;
     private CANSparkMax elMotor;
 
@@ -24,10 +24,10 @@ public class Elevator {
 
     public Elevator(Flywheel flywheel) {
         this.flywheel = flywheel;
-        breakbeam = new DigitalInput(0);
+        lowBeam = new DigitalInput(0);
         ShooterBeam = new DigitalInput(2);
         elMotor = new CANSparkMax(10, MotorType.kBrushless);
-        prev = breakbeam.get();
+        prev = lowBeam.get();
         shooterprev = ShooterBeam.get();
         ballcount = 0;
     }
@@ -38,7 +38,7 @@ public class Elevator {
 
 
     public static enum runElevator {
-        IDLE, STORE, SHOOT;
+        IDLE, STORE, SHOOT, REVUP;
     }
 
     public static enum autoElevator {
@@ -46,32 +46,56 @@ public class Elevator {
     }
 
     public void run(runElevator elevatorState) {
-        testBreakbeam();
+        testBreakBeam();
 
         switch(elevatorState) {
             case IDLE:                
                 if(ballcount < 2) {    
-                    elMotor.set(0.15f);
+                    elMotor.set(0.4f); //0.15
 
-                    if (breakbeam.get() && !prev){ 
+                    if (lowBeam.get() && !prev){ 
                         ballcount++;                        
                     }
 
-                    prev = breakbeam.get();                    
+                    prev = lowBeam.get();                    
                 } else if(ballcount == 2) {
                     elMotor.set(0);
                 }
 
-                PrevTime = Timer.getFPGATimestamp();                                              
+                PrevTime = Timer.getFPGATimestamp();
+                
+                /*
+                if (ballcount == 0) {
+                    elMotorTop.set(0.8);
+                    elMotorBottom.set(0.8);
+                    if (topBeam.get() && !prevTopBeam) {
+                        ballcount++
+                    }
+                }
+                else if (ballcount == 1) {
+                    elMotorTop.set(0);
+                    elMotorBottom.set(0.8);
+                    if (bottomBeam.get() && !prevBottomBeam) {
+                        ballcount++;
+                    }
+                }
+                else if (ballcount == 2) {
+                    elMotorTop.set(0);
+                    elMotorBottom.set(0);
+                }
+
+                prevTopBeam = topBeam;
+                prevBottomBeam = bottomBeam;
+                */
             break;
 
             case STORE:
                 if(ballcount < 2) {                    
                     elMotor.set(0.4);
-                    if (breakbeam.get() && !prev){ 
+                    if (lowBeam.get() && !prev){ 
                         ballcount++;                        
                     }
-                    prev = breakbeam.get();                    
+                    prev = lowBeam.get();                    
                 }
                 else if (ballcount == 2) {
                     elMotor.set(0);
@@ -107,9 +131,41 @@ public class Elevator {
                         shooterprev = ShooterBeam.get();
                     } else if(!flywheel.OnTarget) {
                         elMotor.set(0);
-                    }    
+                    }
+
+                    /*
+                    if (flywheel.OnTarget) {
+                        elMotor.set(0.6);
+                        if (ballcount == 2) {
+                            if (!topBeam.get() && prevTopBeam.get())
+                                ballcount--;
+                        }
+                        else if (ballcount == 1) {
+                            if (!topBeam.get() && prevTopBeam.get())
+                                ballcount--;
+                        }
+                        else if (ballcount == 0) {
+                            nuffin...
+                        }
+                        
+                    }
+                    else
+                        elMotor.set(0);
+
+                    prevBottomBeam = bottomBeam;
+                    prevTopBeam = topBeam;
+
+                    */
                            
             break;
+
+            case REVUP:
+                if(Timer.getFPGATimestamp() < PrevTime + 0.15f && !flywheel.OnTarget) {                    
+                    elMotor.set(-0.6);                    
+                } else {
+                    elMotor.set(0);
+                }
+            break; 
             
         }
     }
@@ -120,11 +176,11 @@ public class Elevator {
                 if(ballcount < 2) {    
                     elMotor.set(0.2f);
 
-                    if (breakbeam.get() && !prev){ 
+                    if (lowBeam.get() && !prev){ 
                         ballcount++;                        
                     }
 
-                    prev = breakbeam.get();                    
+                    prev = lowBeam.get();                    
                 } else if(ballcount == 2) {
                     elMotor.set(0);
                 }
@@ -135,8 +191,8 @@ public class Elevator {
     */
 
 
-    public void testBreakbeam() {
-        SmartDashboard.putBoolean("Breakbeam", breakbeam.get()); 
+    public void testBreakBeam() {
+        SmartDashboard.putBoolean("lowBeam", lowBeam.get()); 
         SmartDashboard.putBoolean("Shooter Beam", ShooterBeam.get());
         SmartDashboard.putNumber("Balls in robot", ballcount);       
     }
