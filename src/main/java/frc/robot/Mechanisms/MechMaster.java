@@ -43,7 +43,7 @@ public class MechMaster {
     private boolean turretIsAuto = true;
 
     public enum autoMech {
-        STORE, SHOOT, IDLE;
+        STORE, REVUP, SHOOT, IDLE;
     }
 
     public enum turretMech {
@@ -77,38 +77,11 @@ public class MechMaster {
 
     public void teleRun() {
 
-        
-        
-        
-        /*
-        if(p1.getXButtonPressed() && intake.ONTARGET){
-            intake.run(true);        
-            System.out.println("Button pressed: "+ p1.getXButtonPressed());
-        } else {
-            intake.run(false);
-            System.out.println("Button pressed: "+ p1.getXButtonPressed());
-        }
-        */
-        
 
-        //testing if intake sensor is working
-        /*
-        if (p1.getAButton()) {
-            intake.testrun(1);
-        }
-        else if (p1.getYButton()) {
-            intake.testrun(2);
-        }
-        SmartDashboard.getNumber("intake encoder", intake.getEncoderPos());
-        */
-        
-        //AFTER INTAKE IS TUNED, RUN IT WITH THE ELEVATOR LOGIC (COMMENT OUT THE FLYWHEEL CLASS)
-        SmartDashboard.putBoolean("turretIsAuto?", turretIsAuto);
-        
+        //TURRET CONTROL
         if (p2.getYButtonPressed()) {
             turretIsAuto = !turretIsAuto;
         }
-        
         if (turretIsAuto) {
             turret.PIDTuning(limelight.getAngle());
         }
@@ -129,22 +102,18 @@ public class MechMaster {
         //maybe override the intake w the A button
         SmartDashboard.putBoolean("LeftBumper Pressed: ", p1.getLeftBumper());
 
-        if (p1.getRightTriggerAxis() >= 0.95){//p1.getLeftTriggerAxis() == 1){
+
+        //SHOOTING
+        if (p1.getRightTriggerAxis() >= 0.95){
             flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
             if (p1.getLeftBumper() == true && flywheel.OnTarget) {
                 elevator.run(runElevator.SHOOT);
             }
             else
-                elevator.run(runElevator.REVUP);
+                elevator.run(runElevator.STORE);
         }
-        /*
-        if (p1.getAButton() && p2.getRightTriggerAxis() == 1) {
-            intake.run(moveIntake.DOWN);
-            elevator.run(runElevator.SHOOT);
-            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
-        }
-        */
 
+        //INTAKING
         else if (p1.getAButton()) {
             if(elevator.ballcount < 2) {
                 intake.run(moveIntake.DOWN);
@@ -153,17 +122,6 @@ public class MechMaster {
                 intake.run(moveIntake.UP);
                 elevator.run(runElevator.IDLE);
             }
-                
-           // if (!elevator.isBallInElevator())
-             //   elevator.run(runElevator.STORE);
-            //else
-            
-            //flywheel.run(runFlywheel.IDLE, 0);
-        }
-
-        else if (p2.getRightTriggerAxis() == 1) {
-            elevator.run(runElevator.SHOOT);
-            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
         }
         else {
             intake.run(moveIntake.UP);
@@ -171,11 +129,14 @@ public class MechMaster {
             flywheel.run(runFlywheel.IDLE, 0);
         }
 
+
+        //RESETS THE BALL COUNT
         if (p2.getLeftBumperPressed()) {
             elevator.resetBallCount();
             flywheel.setPIDValues(1);
         }
 
+        //RESETS PID VALUES OF THE FLYWHEEL WHEN TRIGGER LET GO
         if (p1.getRightTriggerAxis() <= 0.05) {
             flywheel.setPIDValues(1);
         }
@@ -262,6 +223,9 @@ public class MechMaster {
                 flywheel.run(runFlywheel.IDLE, 0);
 
                 break;
+            case REVUP:
+                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+                elevator.run(runElevator.STORE);
             case SHOOT:
                 //if (Math.abs(limelight.getAngle()) < 1)
                 flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
