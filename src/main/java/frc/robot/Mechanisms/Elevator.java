@@ -3,6 +3,10 @@ package frc.robot.Mechanisms;
 CONTROLS THE ELEVATOR SPEEDS
 ----------------------*/
 
+import java.util.ArrayList;
+
+import javax.swing.text.AbstractDocument.BranchElement;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -22,21 +26,26 @@ public class Elevator {
 
     private boolean ballInElevator = false;
     public static int ballcount;
+    //public static int trueBallCount;
     
     private double PrevTime;
 
     private Flywheel flywheel;
 
+    private ArrayList<Boolean> topBreakBeamList = new ArrayList<Boolean>();
+    private ArrayList<Boolean> bottomBreakBeamList = new ArrayList<Boolean>();
+    private ArrayList<Boolean> shooterBreakBeamList = new ArrayList<Boolean>();
+
     public Elevator(Flywheel flywheel) {
         this.flywheel = flywheel;
         bottomBeam = new DigitalInput(0);
-        prevBottomBeam = bottomBeam.get();
+        prevBottomBeam = !bottomBeam.get();
 
         topBeam = new DigitalInput(3);
         prevTopBeam = topBeam.get();
 
         shooterBeam = new DigitalInput(2);
-        prevShooterBeam = shooterBeam.get();
+        prevShooterBeam = !shooterBeam.get();
 
         elMotorTop = new CANSparkMax(10, MotorType.kBrushless);
         elMotorBottom = new CANSparkMax(5, MotorType.kBrushless);
@@ -66,14 +75,14 @@ public class Elevator {
                 if (ballcount == 0) {
                     elMotorTop.set(0.5);
                     elMotorBottom.set(0.5);
-                    if (topBeam.get() && !prevTopBeam) {
+                    if (getMode(topBreakBeamList) && !prevTopBeam) {
                         ballcount++;
                     }
                 }
                 else if (ballcount == 1) {
                     elMotorTop.set(0);
                     elMotorBottom.set(0.5);
-                    if (bottomBeam.get() && !prevBottomBeam) {
+                    if (!getMode(bottomBreakBeamList) && prevBottomBeam) {
                         ballcount++;
                     }
                 }
@@ -82,23 +91,21 @@ public class Elevator {
                     elMotorBottom.set(0);
                 }
 
-                prevTopBeam = topBeam.get();
-                prevBottomBeam = bottomBeam.get();
-                
+                incrementBeamList(); 
             break;
 
             case STORE:
                 if (ballcount == 0) {
                     elMotorTop.set(0.5);
                     elMotorBottom.set(0.5);
-                    if (topBeam.get() && !prevTopBeam) {
+                    if (getMode(topBreakBeamList) && !prevTopBeam) {
                         ballcount++;
                     }
                 }
                 else if (ballcount == 1) {
                     elMotorTop.set(0);
                     elMotorBottom.set(0.5);
-                    if (bottomBeam.get() && !prevBottomBeam) {
+                    if (!getMode(bottomBreakBeamList) && prevBottomBeam) {
                         ballcount++;
                     }
                 }
@@ -107,8 +114,7 @@ public class Elevator {
                     elMotorBottom.set(0);
                 }
 
-                prevTopBeam = topBeam.get();
-                prevBottomBeam = bottomBeam.get();
+                incrementBeamList();
             break;
 
             case SHOOT:
@@ -116,34 +122,30 @@ public class Elevator {
                     if (flywheel.OnTarget) {
                         elMotorTop.set(0.6);
                         elMotorBottom.set(0.6);
-                        if (ballcount > 0) {
-                            if (!topBeam.get() && prevTopBeam) {
-                                ballcount--;
-                                flywheel.setPIDValues(2);
-                            }
-                        }
-                        else if (ballcount == 0) {
-                            //nuffin...
-                            flywheel.setPIDValues(1);
-                        }
                         
                     }
                     else {
                         elMotorTop.set(0);
                         elMotorBottom.set(0);
                     }
-
-                    if (bottomBeam.get() && !prevBottomBeam) {
+                    if (ballcount > 0) {
+                        if (!shooterBeam.get() && prevShooterBeam){//(getMode(topBreakBeamList) && prevTopBeam) {
+                            ballcount--;
+                            flywheel.setPIDValues(2);
+                        }
+                    }
+                    else if (ballcount == 0) {
+                        //nuffin...
+                        flywheel.setPIDValues(1);
+                    }
+                    /*
+                    if (getMode(bottomBreakBeamList) && !prevBottomBeam) {
                         ballcount++;
                     }
-
-                    prevBottomBeam = bottomBeam.get();
-                    prevTopBeam = topBeam.get();
-
+                    */
                     
-                           
-            break;
-            
+                    incrementBeamList();
+            break;            
         }
     }
     /*
@@ -167,6 +169,46 @@ public class Elevator {
     }
     */
 
+    private void incrementBeamList(){
+
+        prevTopBeam = getMode(topBreakBeamList);
+        prevBottomBeam = !getMode(bottomBreakBeamList);
+        System.out.println("BottomBeam: " + prevBottomBeam);
+        //prevShooterBeam = getMode(shooterBreakBeamList);
+        prevShooterBeam = shooterBeam.get();
+
+        topBreakBeamList.add(topBeam.get());
+        bottomBreakBeamList.add(bottomBeam.get());
+        shooterBreakBeamList.add(shooterBeam.get());
+
+        if(topBreakBeamList.size() >= 6){ //10
+            topBreakBeamList.remove(0);
+        }
+        if(bottomBreakBeamList.size() >= 10){ //10
+           bottomBreakBeamList.remove(0);
+        }
+
+        if(shooterBreakBeamList.size() >= 10){ //10
+            shooterBreakBeamList.remove(0);
+        }
+    }
+
+    private boolean getMode(ArrayList<Boolean> list){
+        int false_count = 0;
+        boolean mode;
+        for(boolean b: list){
+            if(!b){
+                false_count++;
+            }
+        }
+        if(false_count >= list.size()/2){ //5
+            mode = true;
+        }
+        else{
+            mode = false;
+        }
+        return mode;
+    }
 
     public void testBreakBeam() {
         SmartDashboard.putBoolean("bottomBeam", bottomBeam.get()); 

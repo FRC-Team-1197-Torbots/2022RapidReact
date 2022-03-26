@@ -87,14 +87,15 @@ public class MechMaster {
         }
         else {
             if (p2.getBButton())
-                turret.manualControl(-0.2f);
+                turret.PIDTuning(90);
             else if (p2.getXButton())
-                turret.manualControl(0.2f);
+                turret.PIDTuning(-90);
             else if (p2.getAButton())
-                turret.manualZero();
+                turret.PIDTuning(0);
             else
                 turret.manualControl(0f);
         }
+
         
         
         
@@ -131,7 +132,7 @@ public class MechMaster {
 
 
         //RESETS THE BALL COUNT
-        if (p2.getLeftBumperPressed()) {
+        if (p2.getLeftTriggerAxis() >= 0.95) {
             elevator.resetBallCount();
             flywheel.setPIDValues(1);
         }
@@ -257,6 +258,7 @@ public class MechMaster {
 
     public void onDisable(){
         flywheel.onDisable();
+        turret.onDisable();
     }
 
 

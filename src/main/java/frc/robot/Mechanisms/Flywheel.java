@@ -97,12 +97,16 @@ public class Flywheel {
             case IDLE:
                 // targetSpeed = 0;
                 // speedToSetMotor = pidRun(currentSpeed, targetSpeed);
-                flyMotor.set(0);
-                flyMotor2.set(0);
+                targetSpeed = -1500;
+                currentSpeed = flyEncoder.getVelocity();
+                speedToSetMotor = pidRun(currentSpeed, targetSpeed);
+                flyMotor.set(speedToSetMotor);
+                flyMotor2.set(-speedToSetMotor);
+                //flyMotor.set(speedToSetMotor);
                 OnTarget = false;
 
-                pidIntegral = 0;
-                sumSpeed = 0;
+                //pidIntegral = 0;
+                //sumSpeed = 0;
                 break;
         }
 

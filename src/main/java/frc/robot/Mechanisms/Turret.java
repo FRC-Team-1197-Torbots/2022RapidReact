@@ -3,6 +3,7 @@ package frc.robot.Mechanisms;
 import java.lang.annotation.Target;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -95,6 +96,7 @@ public class Turret {
      * turret
      */
     public void init(){
+        TurretMotor.setNeutralMode(NeutralMode.Brake);
         
         switch(m_initstate) {
             case INIT:
@@ -295,6 +297,10 @@ public class Turret {
         }
 
         
+    }
+
+    public void onDisable(){
+        TurretMotor.setNeutralMode(NeutralMode.Coast);
     }
 
 }
