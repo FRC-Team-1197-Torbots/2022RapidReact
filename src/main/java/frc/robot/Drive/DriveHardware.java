@@ -114,7 +114,7 @@ public class DriveHardware {
 
 	// Getting raw position value from the right encoder
 	public double getRightEncoder() {
-		return Math.abs(rightEncoder.getRaw());
+		return rightEncoder.getRaw();
 	}
 
 	public double getRightVelocity() {
@@ -127,7 +127,7 @@ public class DriveHardware {
 
 	// Getting raw position value from the left encoder
 	public double getLeftEncoder() {
-		return Math.abs(leftEncoder.getRaw());
+		return -leftEncoder.getRaw();
 	}
 
 	// Getting the average encoder position from both encoders

@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.PID_Tools.*;
 import frc.robot.Drive.*;
 
-public class linearTrajectory2 {
+public class linearTrajectoryBack {
 	private TorDrive drive;
 	private double targetDistance;
 	private double currentDistance;
@@ -18,8 +18,8 @@ public class linearTrajectory2 {
 	private double movingMaxSpeed = minMaxSpeed;
     
     //PID for translation
-	private final double tkP = 0.4;//0.4
-	private final double tkD = 0.0075;//0
+	private final double tkP = 0.25;//0.4
+	private final double tkD = 0.009;//0.0075
     private final double tkI = 0.00;//0.00
     
     //PID For rotation
@@ -81,7 +81,7 @@ public class linearTrajectory2 {
 	
 	public run runIt = run.IDLE;
 	
-	public linearTrajectory2(TorDrive drive, double distance, double timeOutTime) {
+	public linearTrajectoryBack(TorDrive drive, double distance, double timeOutTime) {
 		this.drive = drive;
 		this.targetDistance = distance;
 		this.timeOutTime = timeOutTime;

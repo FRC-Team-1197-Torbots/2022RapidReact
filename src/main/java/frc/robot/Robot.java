@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
     // elevator = new Elevator();
     hardware = new DriveHardware();
     drive = new TorDrive(hardware, player1);
-    mechMaster = new MechMaster();
+    mechMaster = new MechMaster(drive);
     autoMaster = new AutoMaster(drive, mechMaster); 
 
     CameraServer.startAutomaticCapture();

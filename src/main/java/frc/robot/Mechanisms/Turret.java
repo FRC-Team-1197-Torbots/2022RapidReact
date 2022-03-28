@@ -110,7 +110,7 @@ public class Turret {
                     TurretMotor.set(ControlMode.PercentOutput, 0.0f);
                     m_initstate = INIT_STATES.RETURN;
                 } else {
-                    TurretMotor.set(ControlMode.PercentOutput, -0.2f);
+                    TurretMotor.set(ControlMode.PercentOutput, -0.5f);
                 }
             break;
 
@@ -121,7 +121,7 @@ public class Turret {
                     m_initstate = INIT_STATES.ZERO;
                     TurretMotor.set(ControlMode.PercentOutput, 0.0f);
                 } else {
-                    TurretMotor.set(ControlMode.PercentOutput, 0.2f);
+                    TurretMotor.set(ControlMode.PercentOutput, 0.4f);
                 }
             break;
 
@@ -175,10 +175,10 @@ public class Turret {
             
            TargetAngle = angle;
 
-            if (TargetAngle > 120)
-                TargetAngle = 120;
-            else if (TargetAngle <-120)
-                TargetAngle = -120;
+            if (TargetAngle > 180)
+                TargetAngle = 180;
+            else if (TargetAngle <-155)
+                TargetAngle = -155;
 
             //start writing state machine to turn for tuning
             double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
@@ -198,10 +198,10 @@ public class Turret {
             else
                 TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
 
-            if (TargetAngle > 120)
-                TargetAngle = 120;
-            else if (TargetAngle <-120)
-                TargetAngle = -120;
+            if (TargetAngle > 180)
+                TargetAngle = 180;
+            else if (TargetAngle <-155)
+                TargetAngle = -155;
 
             //start writing state machine to turn for tuning
             double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);

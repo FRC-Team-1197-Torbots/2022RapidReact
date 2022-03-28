@@ -4,6 +4,7 @@ import javax.lang.model.util.ElementScanner6;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.Climber.climbState;
 import frc.robot.Mechanisms.Elevator.runElevator;
 import frc.robot.Mechanisms.Flywheel.runFlywheel;
@@ -33,6 +34,8 @@ public class MechMaster {
     private LimeLightLineup limelight;
     private Turret turret;
     private Climber climber;
+    private TorDrive drive;
+
 
     private XboxController p1;
     private XboxController p2;
@@ -51,7 +54,7 @@ public class MechMaster {
     }
 
 
-    public MechMaster() {
+    public MechMaster(TorDrive drive) {
         climber = new Climber();
         flywheel = new Flywheel();
         elevator = new Elevator(flywheel);
@@ -60,6 +63,7 @@ public class MechMaster {
         turret = new Turret();
         p1 = new XboxController(0);
         p2 = new XboxController(1);
+        this.drive = drive;
         // intake = new Intake(p1);
         // changeIntake = moveIntake.UP;
     }
@@ -105,14 +109,52 @@ public class MechMaster {
 
 
         //SHOOTING
-        if (p1.getRightTriggerAxis() >= 0.95){
+        
+        if (p1.getRightTriggerAxis() >= 0.95) {
+            //System.out.println("Limelight distance: " + limelight.calculate_distance());
+
             flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
-            if (p1.getLeftBumper() == true && flywheel.OnTarget) {
+            /*
+            if (p1.getLeftBumper() == true 
+                && flywheel.OnTarget
+                && Math.abs(drive.getRightVelocity()) < 1000 
+                && Math.abs(drive.getLeftVelocity()) < 1000) 
+            {
+                elevator.run(runElevator.SHOOT);
+            }
+            else
+                elevator.run(runElevator.STORE);
+            */
+            if ( flywheel.OnTarget
+                && Math.abs(drive.getRightVelocity()) < 1000 
+                && Math.abs(drive.getLeftVelocity()) < 1000) 
+            {
+                elevator.run(runElevator.SHOOT);
+            }
+            else {
+                elevator.run(runElevator.STORE);
+            }
+        }
+
+        //TEST SHOOTING
+
+        /*
+        if (p1.getRightTriggerAxis() >= 0.95) {
+            flywheel.testRun(-2200);
+            //System.out.println("Limelight distance: " + limelight.calculate_distance());
+            //SmartDashboard.putNumber("Limerlight Distance", limelight.calculate_distance());
+
+            if (p1.getLeftBumper() == true 
+                && flywheel.OnTarget
+                && Math.abs(drive.getRightVelocity()) < 1000 
+                && Math.abs(drive.getLeftVelocity()) < 1000) 
+            {
                 elevator.run(runElevator.SHOOT);
             }
             else
                 elevator.run(runElevator.STORE);
         }
+        */
 
         //INTAKING
         else if (p1.getAButton()) {
@@ -145,7 +187,7 @@ public class MechMaster {
 
         //CLIMBER
         
-
+        /*
         if(p2.getPOV() == 0 ){
             climber.climb(climbState.UP);  
         }
@@ -227,8 +269,10 @@ public class MechMaster {
             case REVUP:
                 flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
                 elevator.run(runElevator.STORE);
+                break;
             case SHOOT:
                 //if (Math.abs(limelight.getAngle()) < 1)
+                intake.run(moveIntake.UP);
                 flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
                 elevator.run(runElevator.SHOOT);
                 /*

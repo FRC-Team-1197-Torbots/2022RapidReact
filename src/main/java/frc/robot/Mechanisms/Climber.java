@@ -38,21 +38,21 @@ public class Climber {
     //public climbState climberPos;
 
     public Climber(){
-        rightClMotor = new CANSparkMax(9, MotorType.kBrushless);
-        leftClMotor = new CANSparkMax(6, MotorType.kBrushless);
+        //rightClMotor = new CANSparkMax(9, MotorType.kBrushless);
+        //leftClMotor = new CANSparkMax(6, MotorType.kBrushless);
         //nikitaClMotor = new CANSparkMax(7, MotorType.kBrushless);
-
+/*
         rightClEncoder = rightClMotor.getEncoder();
         leftClEncoder = leftClMotor.getEncoder();
 
         rightClEncoder.setPosition(0);
         leftClEncoder.setPosition(0);
         
-
+*/
 
     }
 
-    public void climb(climbState climberPos){
+    public void climb(climbState climberPos){/*
         SmartDashboard.putNumber("Right Climber", getRightClimberPos());
         SmartDashboard.putNumber("Left Climber", getLeftClimberPos());
 
@@ -107,6 +107,6 @@ public class Climber {
         return nikitaClMotor.get();
     }
     */
-
     
+    }
 }

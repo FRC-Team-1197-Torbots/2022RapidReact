@@ -19,17 +19,40 @@ public class Flywheel {
     //private final double highSpeedConstant = 0.0;//0.9
     //private final double lowSpeedConstant = 0.0;
     // RPM below 2000 p = 0.045 i = 0.4 d = 0
-    private final double kP1 = 0.000006;//.00035//0.05
-    private final double kI1 = 0.000000;//0.00000006;//.000005
-    private final double kD1 = 0.00000004; //original 0.5 0 0
 
-    private final double kP2 = 0.0000008;//.00035//0.05
-    private final double kI2 = 0.000000;//0.00000006;//.000005
-    private final double kD2 = 0.00000001; //original 0.5 0 0
+    /*
+    private final double kP1 = 0.000006; //0.000006
+    private final double kI1 = 0.000000; //0.000000
+    private final double kD1 = 0.00000004; //0.00000004
+
+    private final double kP2 = 0.0000008; //0.0000008
+    private final double kI2 = 0.000000; //0.000000
+    private final double kD2 = 0.00000001; //0.00000001
+    */
+    
+    
+    private final double kP1 = 0.00012;
+    private final double kI1 = 0.000015; //0.00001
+    private final double kD1 = 0.0000002;
+    
+
+
+    /********************
+     New Distances:
+     
+     232.67 inches - 2770 rpm
+     166.72 inches - 2450 rpm
+     132.52 inches - 2200 rpm
+     98.60 inches - 2100 rpm
+     64.12 inches - X
+
+
+     ********************/
 
     private double kP;
     private double kI;
     private double kD;
+    
 
     private double FeedForward;
     private final double MaxMotorSpeed = 4500;
@@ -38,7 +61,7 @@ public class Flywheel {
     private TorDerivative pidDerivative;
     private double pidDerivativeResult;
 
-    public double pidIntegral = 0;
+    private double pidIntegral = 0;
 
     private double targetSpeed;
     private double currentSpeed;
@@ -86,8 +109,20 @@ public class Flywheel {
     public void run(runFlywheel flyState, double distance) {
         switch(flyState) {
             case RUN:
-                targetSpeed = (-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
+                /***
+                 * FORMULAS TRIED:
+                 * (-4.63f*distance) + -1534f
+                 * (-5.18382f * distance) + -1562.89f --> first formula w/ new limelight angle
+                 * (-6 * distance) - 1450f;
+                 * 
+                 * 
+                 */
+                System.out.println("Current Speed: " + currentSpeed);
+                System.out.println("Target Speed: " + targetSpeed);
+
+                targetSpeed = (-6 * distance) + -1450f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 currentSpeed = flyEncoder.getVelocity();//rpm
+                
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
                 flyMotor.set(speedToSetMotor);
                 flyMotor2.set(-speedToSetMotor);
@@ -113,7 +148,7 @@ public class Flywheel {
 
         //System.out.println("Target speed: " + targetSpeed);
         SmartDashboard.putNumber("Target Speed", -targetSpeed);
-        SmartDashboard.putNumber("Current Speed", -currentSpeed);
+        //SmartDashboard.putNumber("Current Speed", -currentSpeed);
         //System.out.println("Current Speed: " + -currentSpeed);
         SmartDashboard.putNumber("Error: ", -currentError);
         SmartDashboard.putBoolean("OnTarget", OnTarget);
@@ -135,28 +170,37 @@ public class Flywheel {
         pidIntegral += currentError;
         //System.out.println("P: " + kP);
 
-        if(Math.abs(currentError) < 80) {
+        if(Math.abs(currentError) < 80) {//80
             OnTarget = true;
         } else {
             OnTarget = false;
-        }
-            
 
-        if(currentError < 20) {
+        }
+        
+        //System.out.println("PID Integral: " + pidIntegral);
+        /*
+        if(Math.abs(currentError) < 20) {
             pidIntegral = 0;
         }
+        */
 
+        /*
         if(pidIntegral * kI > 0.5) {
             pidIntegral = 0.5 / kI;
         } else if(pidIntegral * kI < -0.5) {
             pidIntegral = -0.5 / kI;
         }
+        */
+        
+        // sumSpeed += ((currentError * kP) +
+        // (pidIntegral * kI) +
+        // (pidDerivativeResult * kD)); //+ FeedForward;
 
-        sumSpeed += ((currentError * kP) +
-        (pidIntegral * kI) +
-        (pidDerivativeResult * kD)); //+ FeedForward;
+        
 
-        return sumSpeed;
+        return ((currentError * kP) +
+         (pidIntegral * kI) +
+         (pidDerivativeResult * kD));
     }
 
     public void stop() {
@@ -166,18 +210,18 @@ public class Flywheel {
     //TESTING TO TUNE PID, INPUTS HARD TARGET
     public void testRun(double rpm) {
         targetHighSpeed = rpm; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
-        targetSpeed = targetHighSpeed;
-        FeedForward = targetSpeed/MaxMotorSpeed;
         
         // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
         // currentPosition = (adjustingConstant * 1) / (gearRatio);
-        currentSpeed = flyEncoder.getVelocity() / MaxMotorSpeed;//rpm
-        speedToSetMotor = pidRun(currentSpeed, FeedForward);
+        currentSpeed = flyEncoder.getVelocity();//rpm
+        speedToSetMotor = pidRun(currentSpeed, targetHighSpeed);
         flyMotor.set(speedToSetMotor);
+        flyMotor2.set(-speedToSetMotor);
 
-        SmartDashboard.putNumber("Current speed", flyEncoder.getVelocity());
-        SmartDashboard.putNumber("Sum speed", sumSpeed);
-        //System.out.println(flyEncoder.getVelocity());
+        //SmartDashboard.putNumber("Current speed", flyEncoder.getVelocity());
+        //SmartDashboard.putNumber("Sum speed", sumSpeed);
+        SmartDashboard.putNumber("Target RPM", targetHighSpeed);
+        System.out.println("RPM: " + flyEncoder.getVelocity());
     }
 
     public void setPIDValues(int state) {
@@ -188,9 +232,9 @@ public class Flywheel {
             kD = kD1;
         }
         else if (state == 2) {
-            kP = kP2;
-            kI = kI2;
-            kD = kD2;
+            // kP = kP2;
+            // kI = kI2;
+            // kD = kD2;
         }
     }
 

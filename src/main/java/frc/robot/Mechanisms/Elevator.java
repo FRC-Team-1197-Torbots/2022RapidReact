@@ -59,7 +59,7 @@ public class Elevator {
 
 
     public static enum runElevator {
-        IDLE, STORE, SHOOT;
+        IDLE, STORE, SHOOT, SHOOT_WAIT;
     }
 
     public static enum autoElevator {
@@ -70,6 +70,7 @@ public class Elevator {
         testBreakBeam();
 
         switch(elevatorState) {
+            /*
             case IDLE:
                 
                 if (ballcount == 0) {
@@ -142,10 +143,62 @@ public class Elevator {
                     if (getMode(bottomBreakBeamList) && !prevBottomBeam) {
                         ballcount++;
                     }
-                    */
+                    
                     
                     incrementBeamList();
-            break;            
+            break;
+            
+            case SHOOT_WAIT:
+                    elMotorTop.set(0);
+                    elMotorBottom.set(0);
+            break;
+            */
+                
+            case IDLE:
+                ballcount = getBallCount();
+                elevatorIndexControl(ballcount);
+                /*
+                if ((!topBeam.get() && prevTopBeam)){
+                    if (!bottomBeam.get()) {
+                        elMotorTop.set(0);
+                        elMotorBottom.set(0);
+                    }
+                    else {
+                        elMotorTop.set(0);
+                        elMotorBottom.set(0.5);
+                    }
+                }
+                else {
+                    elMotorTop.set(0.5);
+                    elMotorBottom.set(0.5);
+                }
+                */
+            break;
+
+            case STORE:
+                ballcount = getBallCount();
+                elevatorIndexControl(ballcount);
+                //probably the same thing as idle
+            break;
+            case SHOOT:
+                elMotorTop.set(0.6);
+                elMotorBottom.set(0.6);
+                ballcount = getBallCount();
+                /*
+                if(ballcount % 2 == 0){
+                    flywheel.setPIDValues(1);
+                }
+                else{
+                    flywheel.setPIDValues(2);
+                }
+                */
+                /*
+                if (!topBeam && prevTopBeam) {
+                    flywheel.setPIDValues(2);
+                }
+                */
+            break;
+                    
         }
     }
     /*
@@ -173,7 +226,7 @@ public class Elevator {
 
         prevTopBeam = getMode(topBreakBeamList);
         prevBottomBeam = !getMode(bottomBreakBeamList);
-        System.out.println("BottomBeam: " + prevBottomBeam);
+        //System.out.println("ShooterBeam " + prevShooterBeam);
         //prevShooterBeam = getMode(shooterBreakBeamList);
         prevShooterBeam = shooterBeam.get();
 
@@ -181,14 +234,14 @@ public class Elevator {
         bottomBreakBeamList.add(bottomBeam.get());
         shooterBreakBeamList.add(shooterBeam.get());
 
-        if(topBreakBeamList.size() >= 6){ //10
+        if(topBreakBeamList.size() >= 10){ //10
             topBreakBeamList.remove(0);
         }
-        if(bottomBreakBeamList.size() >= 10){ //10
+        if(bottomBreakBeamList.size() >= 14){ //10
            bottomBreakBeamList.remove(0);
         }
 
-        if(shooterBreakBeamList.size() >= 10){ //10
+        if(shooterBreakBeamList.size() >= 8){ //10
             shooterBreakBeamList.remove(0);
         }
     }
@@ -214,7 +267,8 @@ public class Elevator {
         SmartDashboard.putBoolean("bottomBeam", bottomBeam.get()); 
         SmartDashboard.putBoolean("topBeam", topBeam.get());
         SmartDashboard.putBoolean("Shooter Beam", shooterBeam.get());
-        SmartDashboard.putNumber("Balls in robot", ballcount);       
+        SmartDashboard.putNumber("Balls in robot", ballcount);   
+        SmartDashboard.putNumber("ShooterListIndex", shooterBreakBeamList.size());    
     }
     
     public boolean isBallInElevator() {
@@ -227,5 +281,34 @@ public class Elevator {
 
     public void setBallCount(int count) {
         ballcount = count;
+    }
+
+    public int getBallCount(){
+        int balls = 0;
+        if(!topBeam.get() && bottomBeam.get()){
+            balls = 2;
+        }
+        else if(!bottomBeam.get() && !topBeam.get()){
+            balls = 1;
+        }
+        else if(!bottomBeam.get() && topBeam.get()){
+            balls = 0;
+        }
+        return balls;
+    }
+
+    public void elevatorIndexControl(int ballCount){
+        if (ballCount == 0) {
+            elMotorTop.set(0.5);
+            elMotorBottom.set(0.5);
+        }
+        else if (ballCount == 1) {
+            elMotorTop.set(0);
+            elMotorBottom.set(0.5);
+        }
+        else if (ballCount == 2) {
+            elMotorTop.set(0);
+            elMotorBottom.set(0);
+        }
     }
 }

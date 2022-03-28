@@ -87,6 +87,14 @@ public class TorDrive {//this is the upper layer of the drive
 		return hardware.getRightEncoder();
 	}
 
+	public double getLeftVelocity() {
+		return hardware.getLeftVelocity();
+	}
+
+	public double getRightVelocity() {
+		return hardware.getRightVelocity();
+	}
+
 	public void resetEncoder() {
 		hardware.resetEncoder();
 	}
