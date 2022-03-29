@@ -184,6 +184,10 @@ public class Elevator {
                 elMotorTop.set(0.6);
                 elMotorBottom.set(0.6);
                 ballcount = getBallCount();
+
+                if (topBeam.get()) {
+                    flywheel.setPIDValues(2);
+                }
                 /*
                 if(ballcount % 2 == 0){
                     flywheel.setPIDValues(1);
