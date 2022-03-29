@@ -31,9 +31,14 @@ public class Flywheel {
     */
     
     
-    private final double kP1 = 0.00012;
-    private final double kI1 = 0.000015; //0.00001
-    private final double kD1 = 0.0000002;
+    private final double kP1 = 0.00015; //0.00012
+    private final double kI1 = 0.00001; //0.00001
+    private final double kD1 = 0;//0.000003 //0.0000002
+
+    private final double kP2 = 0.00002; //0.00015
+    private final double kI2 = 0.000009; //0.00001
+    private final double kD2 = 0.00000;//0.000001;//0.0000015
+
     
 
 
@@ -170,7 +175,7 @@ public class Flywheel {
         pidIntegral += currentError;
         //System.out.println("P: " + kP);
 
-        if(Math.abs(currentError) < 80) {//80
+        if(Math.abs(currentError) < 50) {//80
             OnTarget = true;
         } else {
             OnTarget = false;
@@ -232,9 +237,9 @@ public class Flywheel {
             kD = kD1;
         }
         else if (state == 2) {
-            // kP = kP2;
-            // kI = kI2;
-            // kD = kD2;
+            kP = kP2;
+            kI = kI2;
+            kD = kD2;
         }
     }
 
