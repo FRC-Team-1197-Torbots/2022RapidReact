@@ -64,11 +64,13 @@ public class LimeLightLineup {
                 //System.out.println("Y: " + y);
                 //System.out.println("Area: " + area);
                 
+                /*
                 SmartDashboard.putNumber("LimelightX", tx.getDouble(0.0));
                 SmartDashboard.putNumber("LimelightY", ty.getDouble(0.0));
                 SmartDashboard.putNumber("LimelightArea", ta.getDouble(0.0));
                 SmartDashboard.putNumber("V_Number", tv.getDouble(0.0));
                 SmartDashboard.putNumber("S_number", ts.getDouble(0.0));
+                */
                 
         }
 

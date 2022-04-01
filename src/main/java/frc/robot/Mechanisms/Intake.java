@@ -41,7 +41,7 @@ public class Intake {
     private final double UP_TARGET = 0, DOWN_TARGET = 500;
 
     public enum moveIntake{
-        UP, DOWN;
+        UP, DOWN, OFF;
     }
 
     public moveIntake intakeState = moveIntake.UP;
@@ -67,7 +67,7 @@ public class Intake {
         this.intakeState = intakeState;
         double speed = PID();
         intake.set(speed);
-        SmartDashboard.putNumber("Intake position", intakeEncoder.get());
+        //SmartDashboard.putNumber("Intake position", intakeEncoder.get());
         //System.out.println(intakeState);
         //SmartDashboard.putNumber("Target value", target);
         //SmartDashboard.putNumber("Speed", speed);
@@ -84,6 +84,10 @@ public class Intake {
                 if (ONTARGET)
                     roller.set(rollerin);
             break;
+
+            case OFF:
+                roller.set(0);
+                target = UP_TARGET;
 
         }
 

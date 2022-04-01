@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Elevator {
 
     private DigitalInput bottomBeam;
-    private DigitalInput shooterBeam;
+    public static DigitalInput shooterBeam;
     private DigitalInput topBeam;
 
     private boolean prevTopBeam, prevShooterBeam, prevBottomBeam;
@@ -45,7 +45,7 @@ public class Elevator {
         prevTopBeam = topBeam.get();
 
         shooterBeam = new DigitalInput(2);
-        prevShooterBeam = !shooterBeam.get();
+        prevShooterBeam = shooterBeam.get();
 
         elMotorTop = new CANSparkMax(10, MotorType.kBrushless);
         elMotorBottom = new CANSparkMax(5, MotorType.kBrushless);
@@ -59,7 +59,7 @@ public class Elevator {
 
 
     public static enum runElevator {
-        IDLE, STORE, SHOOT, SHOOT_WAIT;
+        IDLE, STORE, SHOOT, SHOOT_WAIT, OFF;
     }
 
     public static enum autoElevator {
@@ -67,7 +67,7 @@ public class Elevator {
     }
 
     public void run(runElevator elevatorState) {
-        testBreakBeam();
+        //testBreakBeam();
 
         switch(elevatorState) {
             /*
@@ -179,15 +179,24 @@ public class Elevator {
                 ballcount = getBallCount();
                 elevatorIndexControl(ballcount);
                 //probably the same thing as idle
+                
+                if (shooterBeam.get() && !prevShooterBeam) {
+                    flywheel.setPIDValues(2);
+                    System.out.println("CHANGED PID VALUES");
+                }
+
             break;
             case SHOOT:
                 elMotorTop.set(0.6);
                 elMotorBottom.set(0.6);
                 ballcount = getBallCount();
 
-                if (topBeam.get()) {
+                if (shooterBeam.get() && !prevShooterBeam) {
                     flywheel.setPIDValues(2);
+                    System.out.println("CHANGED PID VALUES");
                 }
+
+                
                 /*
                 if(ballcount % 2 == 0){
                     flywheel.setPIDValues(1);
@@ -201,7 +210,16 @@ public class Elevator {
                     flywheel.setPIDValues(2);
                 }
                 */
+
+                prevShooterBeam = shooterBeam.get();
+
+                
             break;
+
+            case OFF:
+                elMotorBottom.set(0);
+                elMotorTop.set(0);
+            
                     
         }
     }

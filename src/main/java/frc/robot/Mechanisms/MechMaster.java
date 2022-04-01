@@ -2,10 +2,12 @@ package frc.robot.Mechanisms;
 
 import javax.lang.model.util.ElementScanner6;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drive.TorDrive;
 import frc.robot.Mechanisms.Climber.climbState;
+import frc.robot.Mechanisms.Climber.nikitaState;
 import frc.robot.Mechanisms.Elevator.runElevator;
 import frc.robot.Mechanisms.Flywheel.runFlywheel;
 import frc.robot.Mechanisms.Intake.moveIntake;
@@ -45,6 +47,10 @@ public class MechMaster {
 
     private boolean turretIsAuto = true;
 
+    private boolean climbMode = false;
+
+    private double prevTime;
+
     public enum autoMech {
         STORE, REVUP, SHOOT, IDLE;
     }
@@ -66,6 +72,8 @@ public class MechMaster {
         this.drive = drive;
         // intake = new Intake(p1);
         // changeIntake = moveIntake.UP;
+
+        climbMode = false;
     }
 
     public void TeleInit() {
@@ -81,172 +89,190 @@ public class MechMaster {
 
     public void teleRun() {
 
+        SmartDashboard.putBoolean("Climb mode", climbMode);
+        SmartDashboard.putBoolean("Turret mode", turretIsAuto);
 
-        //TURRET CONTROL
-        if (p2.getYButtonPressed()) {
-            turretIsAuto = !turretIsAuto;
+        //TOGGLE CLIMB MODE
+        if (p2.getAButtonPressed()) {
+            climbMode = !climbMode;
         }
-        if (turretIsAuto) {
-            turret.PIDTuning(limelight.getAngle());
-        }
-        else {
-            if (p2.getBButton())
-                turret.PIDTuning(90);
-            else if (p2.getXButton())
-                turret.PIDTuning(-90);
-            else if (p2.getAButton())
-                turret.PIDTuning(0);
+
+        if (climbMode) {
+            //CLIMBER
+            elevator.run(runElevator.OFF);
+            flywheel.run(runFlywheel.OFF, 0);
+            turret.PIDTuning(0);
+            intake.run(moveIntake.OFF);
+            
+
+            if(p2.getPOV() == 0 ){
+                climber.climb(climbState.UP);  
+            }
+            else if(p2.getPOV() == 180){ //&& climber.isAboveZero()){
+                climber.climb(climbState.DOWN);
+            }/*
+            else if(p1.getPOV() == 180){
+                climber.climb(climbState.RESET_DOWN);
+            }*/
             else
-                turret.manualControl(0f);
-        }
+                climber.climb(climbState.IDLE);
 
-        
-        
-        
-        SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
-        //maybe override the intake w the A button
-        SmartDashboard.putBoolean("LeftBumper Pressed: ", p1.getLeftBumper());
-
-
-        //SHOOTING
-        
-        if (p1.getRightTriggerAxis() >= 0.95) {
-            //System.out.println("Limelight distance: " + limelight.calculate_distance());
-
-            flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
-            /*
-            if (p1.getLeftBumper() == true 
-                && flywheel.OnTarget
-                && Math.abs(drive.getRightVelocity()) < 1000 
-                && Math.abs(drive.getLeftVelocity()) < 1000) 
-            {
-                elevator.run(runElevator.SHOOT);
+            
+            if (p2.getPOV() == 90) {
+                climber.nikita(nikitaState.UP);
+            }
+            else if (p2.getPOV() == 270) {
+                climber.nikita(nikitaState.DOWN);
             }
             else
-                elevator.run(runElevator.STORE);
-            */
-            if ( flywheel.OnTarget
-                && Math.abs(drive.getRightVelocity()) < 1000 
-                && Math.abs(drive.getLeftVelocity()) < 1000) 
-            {
-                elevator.run(runElevator.SHOOT);
+                climber.nikita(nikitaState.IDLE);
+            }
+        else {
+
+        
+            //TURRET CONTROL
+            if (p2.getYButtonPressed()) {
+                turretIsAuto = !turretIsAuto;
+            }
+            if (turretIsAuto) {
+                turret.PIDTuning(limelight.getAngle());
             }
             else {
-                elevator.run(runElevator.STORE);
+                if (p2.getBButton())
+                    turret.PIDTuning(90);
+                else if (p2.getXButton())
+                    turret.PIDTuning(-90);
+                else if (p2.getAButton())
+                    turret.PIDTuning(0);
+                else
+                    turret.manualControl(0f);
             }
-        }
 
-        //TEST SHOOTING
+            //SmartDashboard.putBoolean("Ball in elevator: ", elevator.isBallInElevator());
+            //maybe override the intake w the A button
+            //SmartDashboard.putBoolean("LeftBumper Pressed: ", p1.getLeftBumper());
 
-        /*
-        if (p1.getRightTriggerAxis() >= 0.95) {
-            flywheel.testRun(-2200);
-            //System.out.println("Limelight distance: " + limelight.calculate_distance());
-            //SmartDashboard.putNumber("Limerlight Distance", limelight.calculate_distance());
+            //SHOOTING
+            
+            if (p1.getRightTriggerAxis() >= 0.95) {
+                //System.out.println("Limelight distance: " + limelight.calculate_distance());
 
-            if (p1.getLeftBumper() == true 
-                && flywheel.OnTarget
-                && Math.abs(drive.getRightVelocity()) < 1000 
-                && Math.abs(drive.getLeftVelocity()) < 1000) 
-            {
-                elevator.run(runElevator.SHOOT);
+                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+                
+                
+                if (p1.getLeftBumper() == true 
+                    && flywheel.OnTarget
+                    && Math.abs(drive.getRightVelocity()) < 1000 
+                    && Math.abs(drive.getLeftVelocity()) < 1000) 
+                {
+                    elevator.run(runElevator.SHOOT);
+                }
+                else
+                    elevator.run(runElevator.STORE);
+                
+
+                /*
+                if ( flywheel.OnTarget
+                    && Math.abs(drive.getRightVelocity()) < 1000 
+                    && Math.abs(drive.getLeftVelocity()) < 1000) 
+                {
+                    elevator.run(runElevator.SHOOT);
+                }
+                else {
+                    elevator.run(runElevator.STORE);
+                    prevTime = Timer.getFPGATimestamp();
+                    
+                }
+                */
+                
             }
-            else
-                elevator.run(runElevator.STORE);
-        }
-        */
 
-        //INTAKING
-        else if (p1.getAButton()) {
-            if(elevator.ballcount < 2) {
-                intake.run(moveIntake.DOWN);
-                elevator.run(runElevator.STORE);
-            } else {
+            //TEST SHOOTING
+            /*
+            if (p1.getRightTriggerAxis() >= 0.95) {
+                flywheel.testRun(-2200);
+                //System.out.println("Limelight distance: " + limelight.calculate_distance());
+                //SmartDashboard.putNumber("Limerlight Distance", limelight.calculate_distance());
+
+                if (p1.getLeftBumper() == true 
+                    && flywheel.OnTarget
+                    && Math.abs(drive.getRightVelocity()) < 1000 
+                    && Math.abs(drive.getLeftVelocity()) < 1000) 
+                {
+                    elevator.run(runElevator.SHOOT);
+                }
+                else
+                    elevator.run(runElevator.STORE);
+            }
+            */
+
+            //INTAKING
+            else if (p1.getAButton()) {
+                if(elevator.ballcount < 2) {
+                    intake.run(moveIntake.DOWN);
+                    elevator.run(runElevator.STORE);
+                } else {
+                    intake.run(moveIntake.UP);
+                    elevator.run(runElevator.IDLE);
+                }
+            }
+            else {
                 intake.run(moveIntake.UP);
                 elevator.run(runElevator.IDLE);
+                flywheel.run(runFlywheel.IDLE, 0);
+            }
+
+
+            //RESETS THE BALL COUNT
+            if (p2.getLeftTriggerAxis() >= 0.95) {
+                elevator.resetBallCount();
+                flywheel.setPIDValues(1);
+            }
+
+            //RESETS PID VALUES OF THE FLYWHEEL WHEN TRIGGER LET GO
+            if (p1.getRightTriggerAxis() <= 0.05) {
+                flywheel.setPIDValues(1);
             }
         }
-        else {
-            intake.run(moveIntake.UP);
-            elevator.run(runElevator.IDLE);
-            flywheel.run(runFlywheel.IDLE, 0);
-        }
 
+            
+            
+            
 
-        //RESETS THE BALL COUNT
-        if (p2.getLeftTriggerAxis() >= 0.95) {
-            elevator.resetBallCount();
-            flywheel.setPIDValues(1);
-        }
+            //TEST NIKITA
+            //System.out.println("Nikita power: " + climber.testNikita());
+            
+            
+            
+            
+            //TESTING DIFFERENT DISTANCES FOR FLYWHEEL
+            //(10 feet, 2200 rpm)
+            //
+            /*
+            elevator.run(runElevator.SHOOT);
+            flywheel.testRun(-1800f);
+            limelight.test();
+            SmartDashboard.putNumber("Limelight distance", limelight.calculate_distance());
+            //System.out.println("Distance: " + limelight.calculate_distance());
+            //turret.PIDTuning(limelight.getAngle());
+            
+            /*
+            //TUNING THE PID FOR FLYWHEEL
+            //elevator.run(runElevator.SHOOT);
+            flywheel.testRun(-2000);
 
-        //RESETS PID VALUES OF THE FLYWHEEL WHEN TRIGGER LET GO
-        if (p1.getRightTriggerAxis() <= 0.05) {
-            flywheel.setPIDValues(1);
-        }
-        
-
-        //CLIMBER
-        
-        /*
-        if(p2.getPOV() == 0 ){
-            climber.climb(climbState.UP);  
-        }
-        else if(p2.getPOV() == 180 && climber.isAboveZero()){
-            climber.climb(climbState.DOWN);
-        }
-        else if(p1.getPOV() == 180){
-            climber.climb(climbState.RESET_DOWN);
-        }
-        else
-            climber.climb(climbState.IDLE);
-
-        //NIKITA
-        /*
-        if (p2.getPOV() == 90) {
-            climber.nikita(nikitaState.UP);
-        }
-        else if (p2.getPOV() == 270) {
-            climber.nikita(nikitaState.DOWN);
-        }
-        else
-            climber.nikita(nikitaState.IDLE);
-        
-        */
-
-        //TEST NIKITA
-        //System.out.println("Nikita power: " + climber.testNikita());
-        
-        
-        
-        
-        //TESTING DIFFERENT DISTANCES FOR FLYWHEEL
-        //(10 feet, 2200 rpm)
-        //
-        /*
-        elevator.run(runElevator.SHOOT);
-        flywheel.testRun(-1800f);
-        limelight.test();
-        SmartDashboard.putNumber("Limelight distance", limelight.calculate_distance());
-        //System.out.println("Distance: " + limelight.calculate_distance());
-        //turret.PIDTuning(limelight.getAngle());
-        
-        /*
-        //TUNING THE PID FOR FLYWHEEL
-        //elevator.run(runElevator.SHOOT);
-        flywheel.testRun(-2000);
-
-        
-        /*
-        if (p2.getPOV(90) == 90){
-            turret.manualControl("right");
-        }
-        else if (p2.getPOV(270) == 270){
-            turret.manualControl("left");
-        }
-        else{
-            //turret.PIDTuning(tx);
-        }
-        */    
+            
+            /*
+            if (p2.getPOV(90) == 90){
+                turret.manualControl("right");
+            }
+            else if (p2.getPOV(270) == 270){
+                turret.manualControl("left");
+            }
+            else{
+                //turret.PIDTuning(tx);
+            }
+            */    
     }
 
     public void autoRun(autoMech mechState, turretMech turretState, double angle) {
@@ -274,7 +300,10 @@ public class MechMaster {
                 //if (Math.abs(limelight.getAngle()) < 1)
                 intake.run(moveIntake.UP);
                 flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
-                elevator.run(runElevator.SHOOT);
+                if(flywheel.OnTarget)
+                    elevator.run(runElevator.SHOOT);
+                else
+                    elevator.run(runElevator.STORE);
                 /*
                 if(flywheel.OnTarget) {
                     elevator.run(runElevator.SHOOT);

@@ -48,7 +48,7 @@ public class DriveHardware {
 	//need to be in the same gear
 	//also need to tune the values in TorTrajectory, to use linear and pivot trajectories
 	//also need to tune global motion limits in TorTrajectoryLib (don't need to tune TorTrajectory in TorTrajectoryLib since it is not building any linear or pivots)
-	private final double encoderTicksPerFoot = 7827;//7230;//7057//5460.0; //push the robot forward one foot and take the average of the two encoder distances
+	private final double encoderTicksPerFoot = 7416;//7827;//7230;//7057//5460.0; //push the robot forward one foot and take the average of the two encoder distances
 	private final double absoluteMaxVelocity = 0.0; //use encoder ticks per foot, and using the robot, set it to the max speed on both wheels and see how many encoder ticks it goes forward
 	//then using the encoder ticks per foot calculation, calculate its absolute Max Velocity [Units: Feet/Second]
 	private final double absoluteMaxAcceleration = 0.0;//[Units:(delta feet/seconds)/seconds

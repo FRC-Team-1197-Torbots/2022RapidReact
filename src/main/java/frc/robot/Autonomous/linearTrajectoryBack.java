@@ -136,7 +136,7 @@ public class linearTrajectoryBack {
 			break;
 		case GO:
 
-			SmartDashboard.putNumber("Distance: ", currentDistance);
+			//SmartDashboard.putNumber("Distance: ", currentDistance);
 			angleError = currentAngle - firstAngle;
 			//is in radians so we have to make sure that it goes from -pi to pi and does not have 
 			//an absolute value greater than pi in order to be an efficient control system
@@ -185,7 +185,7 @@ public class linearTrajectoryBack {
 			vP = error * tkP;//vP gets smaller bc error decreases
 
 			currentVelocity = derivative.estimate(drive.getPosition());//almost always positive
-			SmartDashboard.putNumber("current velocity", currentVelocity);
+			//SmartDashboard.putNumber("current velocity", currentVelocity);
 
 			//has to be multiplied by -1 so that if it is approaching the target to fast
 			//it does not act as a positive. Because, if it was approaching fast, the

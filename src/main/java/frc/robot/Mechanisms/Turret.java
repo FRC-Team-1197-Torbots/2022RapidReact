@@ -110,7 +110,7 @@ public class Turret {
                     TurretMotor.set(ControlMode.PercentOutput, 0.0f);
                     m_initstate = INIT_STATES.RETURN;
                 } else {
-                    TurretMotor.set(ControlMode.PercentOutput, -0.5f);
+                    TurretMotor.set(ControlMode.PercentOutput, -0.7f);
                 }
             break;
 

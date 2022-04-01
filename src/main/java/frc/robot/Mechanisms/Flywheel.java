@@ -5,6 +5,8 @@ CONTROLS THE FLYWHEEL SPEEDS
 
 import frc.robot.PID_Tools.*;
 
+import java.util.ArrayList;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -31,13 +33,13 @@ public class Flywheel {
     */
     
     
-    private final double kP1 = 0.00015; //0.00012
-    private final double kI1 = 0.00001; //0.00001
-    private final double kD1 = 0;//0.000003 //0.0000002
+    private final double kP1 = 0.0001; //0.00012 //0.0002
+    private final double kI1 = 0.000012;//0.00001; //0.00001
+    private final double kD1 = 0.000000;//0.000003; //0.0000002
 
-    private final double kP2 = 0.00002; //0.00015
-    private final double kI2 = 0.000009; //0.00001
-    private final double kD2 = 0.00000;//0.000001;//0.0000015
+    private final double kP2 = 0.0001; //0.00015
+    private final double kI2 = 0.00001; //0.00001
+    private final double kD2 = 0.000000;//0.000001;//0.0000015
 
     
 
@@ -66,7 +68,7 @@ public class Flywheel {
     private TorDerivative pidDerivative;
     private double pidDerivativeResult;
 
-    private double pidIntegral = 0;
+    public double pidIntegral = 0;
 
     private double targetSpeed;
     private double currentSpeed;
@@ -88,8 +90,10 @@ public class Flywheel {
     private double dt = timeInterval;
     public boolean OnTarget = false;
 
+    private ArrayList<Boolean> targetList = new ArrayList<Boolean>();
+
     public static enum runFlywheel {
-        RUN, IDLE;
+        RUN, IDLE, OFF;
     }
 
     public Flywheel() {
@@ -105,6 +109,7 @@ public class Flywheel {
 
     public void init(){
         setPIDValues(1);
+        pidIntegral = 0;
     }
     //-2250 - 154in
     //-1950 - 90in //min distance
@@ -119,13 +124,17 @@ public class Flywheel {
                  * (-4.63f*distance) + -1534f
                  * (-5.18382f * distance) + -1562.89f --> first formula w/ new limelight angle
                  * (-6 * distance) - 1450f;
-                 * 
+                 * (-5.3f + -1562.89f)
                  * 
                  */
-                System.out.println("Current Speed: " + currentSpeed);
-                System.out.println("Target Speed: " + targetSpeed);
+                //System.out.println("Current Speed: " + currentSpeed);
+                //System.out.println("Target Speed: " + targetSpeed);
 
-                targetSpeed = (-6 * distance) + -1450f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
+                System.out.printf("Current: %.2f Target: %.2f Ball? %s P: %.3f I: %.3f D: %.3f%n", currentSpeed, targetSpeed, Elevator.shooterBeam.get(), currentError * kP, pidIntegral * kI, pidDerivativeResult * kD);
+                System.out.println("I: " + kI);
+
+
+                targetSpeed = (-5.7f * distance) + -1562.89f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 currentSpeed = flyEncoder.getVelocity();//rpm
                 
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
@@ -148,15 +157,19 @@ public class Flywheel {
                 //pidIntegral = 0;
                 //sumSpeed = 0;
                 break;
+            case OFF:
+                flyMotor.set(0);
+                flyMotor2.set(0);
+            break;
         }
 
 
         //System.out.println("Target speed: " + targetSpeed);
-        SmartDashboard.putNumber("Target Speed", -targetSpeed);
+        //SmartDashboard.putNumber("Target Speed", -targetSpeed);
         //SmartDashboard.putNumber("Current Speed", -currentSpeed);
         //System.out.println("Current Speed: " + -currentSpeed);
-        SmartDashboard.putNumber("Error: ", -currentError);
-        SmartDashboard.putBoolean("OnTarget", OnTarget);
+        //SmartDashboard.putNumber("Error: ", -currentError);
+        //SmartDashboard.putBoolean("OnTarget", OnTarget);
         //System.out.println("Percentage: " + (currentSpeed/targetSpeed));
         //System.out.println("Time: " + Timer.getFPGATimestamp());
     }
@@ -200,7 +213,10 @@ public class Flywheel {
         // sumSpeed += ((currentError * kP) +
         // (pidIntegral * kI) +
         // (pidDerivativeResult * kD)); //+ FeedForward;
-
+        incrementList(targetList);
+        if(targetList.size() > 14 && targetSpeed < -1600){
+            //System.out.println(targetReached());
+        }
         
 
         return ((currentError * kP) +
@@ -241,6 +257,21 @@ public class Flywheel {
             kI = kI2;
             kD = kD2;
         }
+    }
+
+    private void incrementList(ArrayList<Boolean> list){
+        list.add(OnTarget);
+        if(list.size() > 15){
+            list.remove(0);
+        }
+    }
+    public boolean targetReached(){
+        for(Boolean b: targetList){
+            if(!b){
+                return false;
+            }
+        }
+        return true;
     }
 
     public void onDisable(){

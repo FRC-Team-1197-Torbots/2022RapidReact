@@ -123,7 +123,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     autoMaster.run();
-    //autoMaster.testRun(50000);
+    //autoMaster.testRun(0);
   }
 
   /** This function is called once when teleop is enabled. */
@@ -137,8 +137,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    SmartDashboard.putNumber("Right encoder", drive.getRightEncoder());
-    SmartDashboard.putNumber("Left encoder", drive.getLeftEncoder());
+    //SmartDashboard.putNumber("Right encoder", drive.getRightEncoder());
+    //SmartDashboard.putNumber("Left encoder", drive.getLeftEncoder());
     drive.Run();
 
     /* **************** INTAKE TEST CODE **************************** */

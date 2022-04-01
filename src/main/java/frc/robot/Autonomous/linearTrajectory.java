@@ -135,7 +135,7 @@ public class linearTrajectory {
 			break;
 		case GO:
 
-			SmartDashboard.putNumber("Distance: ", currentDistance);
+			//SmartDashboard.putNumber("Lineartraj Distance: ", currentDistance);
 			angleError = currentAngle - firstAngle;
 			//is in radians so we have to make sure that it goes from -pi to pi and does not have 
 			//an absolute value greater than pi in order to be an efficient control system

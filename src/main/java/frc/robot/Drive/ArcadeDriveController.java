@@ -65,9 +65,9 @@ public class ArcadeDriveController extends DriveController {
    private final double STEER_SCALAR = 1.15; //1.2
    //this is for the curve drive
 
-   private final double POSRANGE_MAX_ACCEL = 0.08;
-   private final double NEGRANGE_MAX_ACCEL = 0.03;
-   private final double MAX_DECEL = 0.06;
+   private final double POSRANGE_MAX_ACCEL = 0.03;//0.08;
+   private final double NEGRANGE_MAX_ACCEL = 0.02;//0.03;
+   private final double MAX_DECEL = 0.04;//0.06;
 
    
 //    private double previousLeftSpeed = 0;
@@ -205,8 +205,10 @@ public class ArcadeDriveController extends DriveController {
        leftOutput = PID(hardware.getLeftVelocity(), settingLeftSpeed * MAX_VELOCITY, SIDE.LEFT);
        rightOutput = PID(hardware.getRightVelocity(), settingRightSpeed * MAX_VELOCITY, SIDE.RIGHT);
 
-
-       hardware.setMotorSpeeds(-leftOutput, -rightOutput);
+       if (Math.abs(leftOutput) < 0.01 && Math.abs(rightOutput) < 0.01) 
+            hardware.setMotorSpeeds(0, 0);
+       else 
+            hardware.setMotorSpeeds(-leftOutput, -rightOutput);
 
        //System.out.println("Left output: " +  -leftOutput);
        //System.out.println("Right output: " + -rightOutput);
@@ -225,8 +227,8 @@ public class ArcadeDriveController extends DriveController {
        else if(player1.getAButton()){
             leftSpeed = -0.4;
             rightSpeed = -0.4;
-            // leftOutput = PID(hardware.getLeftEncoder(), leftSpeed);
-            // rightOutput = PID(hardware.getRightEncoder(), rightSpeed);
+            //leftOutput = PID(hardware.getLeftEncoder(), leftSpeed);
+            //rightOutput = PID(hardware.getRightEncoder(), rightSpeed);
             hardware.setMotorSpeeds(-leftOutput, -rightOutput);
        }
        else{

@@ -16,97 +16,85 @@ CONTROLS 4 CLIMBER ARMS
 
 public class Climber {
 
-    private CANSparkMax rightClMotor;
-    private CANSparkMax leftClMotor;
-    private CANSparkMax nikitaClMotor;
+    private CANSparkMax climb;
+    private CANSparkMax nikita;
 
-    private RelativeEncoder rightClEncoder;
-    private RelativeEncoder leftClEncoder;
+    private RelativeEncoder climbEncoder;
+    private RelativeEncoder nikitaEncoder;
 
-    private double speed = 0.95f;
-    private double slowSpeed = 0.4;
-    private double nikitaSpeed = 0.3;
-
+    private double speed = 0.9f;
+    private double slowSpeed = 0.1;
+    private double nikitaSpeed = 0.2;
     public enum climbState{
         UP, DOWN, IDLE, RESET_DOWN;
     }
 
-    public enum nikitaState {
-        UP, DOWN, RESET_DOWN, IDLE;
+    public static enum nikitaState {
+        UP, DOWN, IDLE;
     }
     
     //public climbState climberPos;
 
     public Climber(){
-        //rightClMotor = new CANSparkMax(9, MotorType.kBrushless);
-        //leftClMotor = new CANSparkMax(6, MotorType.kBrushless);
-        //nikitaClMotor = new CANSparkMax(7, MotorType.kBrushless);
-/*
-        rightClEncoder = rightClMotor.getEncoder();
-        leftClEncoder = leftClMotor.getEncoder();
+        climb = new CANSparkMax(6, MotorType.kBrushless);
+        nikita = new CANSparkMax(9, MotorType.kBrushless);
 
-        rightClEncoder.setPosition(0);
-        leftClEncoder.setPosition(0);
-        
-*/
+        climbEncoder = climb.getEncoder();
+        nikitaEncoder = nikita.getEncoder();
 
+        climbEncoder.setPosition(0);
+        nikitaEncoder.setPosition(0);
     }
 
-    public void climb(climbState climberPos){/*
-        SmartDashboard.putNumber("Right Climber", getRightClimberPos());
-        SmartDashboard.putNumber("Left Climber", getLeftClimberPos());
+    public void climb(climbState climberPos){
+        //SmartDashboard.putNumber("Right Climber", getRightClimberPos());
+        //SmartDashboard.putNumber("Left Climber", getLeftClimberPos());
 
         switch(climberPos) {
             case UP:
-                rightClMotor.set(-speed);
-                leftClMotor.set(speed);
+                climb.set(speed);
                 break;
             case DOWN:
-                rightClMotor.set(speed);
-                leftClMotor.set(-speed);
+                if (climbEncoder.getPosition() >= 0)
+                    climb.set(-speed);
+                else
+                    climb.set(0);
                 break;
             case RESET_DOWN:
-                rightClMotor.set(slowSpeed);
-                leftClMotor.set(-slowSpeed);
+                climb.set(-slowSpeed);
                 break;
             case IDLE:
-                rightClMotor.set(0);
-                leftClMotor.set(0);
+                climb.set(0);
                 break;
 
         }
     }
 
-    public double getLeftClimberPos() {
-        return leftClEncoder.getPosition();
-    }
-
-    public double getRightClimberPos() {
-        return rightClEncoder.getPosition();
+   /* public double getClimberPos() {
+        return climbEncoder.getPosition();
     }
 
     public boolean isAboveZero() {
-        return getLeftClimberPos() > 0 && getRightClimberPos() < 0;
+        return getClimberPos() > 0;
     }
-    /*
+    */
     public void nikita(nikitaState nikitaPos) {
         switch(nikitaPos) {
             case UP:
-                nikitaClMotor.set(nikitaSpeed);
+                nikita.set(nikitaSpeed);
                 break;
             case DOWN:
-                nikitaClMotor.set(-nikitaSpeed);
+                nikita.set(-nikitaSpeed);
                 break;
             case IDLE:
-                nikitaClMotor.set(0);
+                nikita.set(0);
                 break;
         }
     }
 
     public double testNikita() {
-        return nikitaClMotor.get();
+        return nikitaEncoder.getPosition();
     }
-    */
     
     }
-}
+

@@ -56,10 +56,6 @@ public class AutoMaster {
 
     public void run() {
         switch (m_autoSelected) {
-            // case Auto_4Ball:
-            //   auto4.run();
-              
-            //   break;
             case Auto_4Ball:
               auto4.run();
               break;
@@ -78,13 +74,15 @@ public class AutoMaster {
     **POSSIBLY GO MORE THAN 1 FOOT TO GET CLEARER RESULTS..
     ***************************************/
     public void testRun(int numTicks) {
+        
         int ticks = numTicks;
         double currentTicks = drive.getAverageEncoderPosition();
         if (currentTicks < ticks)
             drive.setMotorSpeeds(0.15, 0.15);
         else {
             drive.setMotorSpeeds(0, 0);
-            //System.out.println("Current ticks: " + currentTicks);
+            System.out.println("Current ticks: " + currentTicks);
+            //SmartDashboard.putNumber("Current ticks", currentTicks);
         }
     }
 }
