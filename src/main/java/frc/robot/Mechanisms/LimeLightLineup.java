@@ -87,8 +87,8 @@ public class LimeLightLineup {
         public double calculate_distance() {
                 y = ty.getDouble(0.0);
                 //y *= -1;
-                double distance = (102.619 - 43.125) / (Math.tan(degrees_to_radians(33.3f + y))) //original: 28, now adding 6.7
-                ; //29
+                double distance = (102.619 - 43.125) / (Math.tan(degrees_to_radians(33.3f + y))); //original: 28, now adding 6.7
+                 //29
                 return distance;
                 //IF isAligned = true
                 //use the function d = (h2-h1) / tan(a1+a2) to calculate

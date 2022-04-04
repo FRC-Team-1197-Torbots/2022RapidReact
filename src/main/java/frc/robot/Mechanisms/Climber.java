@@ -25,6 +25,7 @@ public class Climber {
     private double speed = 0.9f;
     private double slowSpeed = 0.1;
     private double nikitaSpeed = 0.2;
+
     public enum climbState{
         UP, DOWN, IDLE, RESET_DOWN;
     }
@@ -52,11 +53,11 @@ public class Climber {
 
         switch(climberPos) {
             case UP:
-                climb.set(speed);
+                climb.set(-speed);
                 break;
             case DOWN:
-                if (climbEncoder.getPosition() >= 0)
-                    climb.set(-speed);
+                if(climbEncoder.getPosition() <= 0)
+                    climb.set(speed);
                 else
                     climb.set(0);
                 break;

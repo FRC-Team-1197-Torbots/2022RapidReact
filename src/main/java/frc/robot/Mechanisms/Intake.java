@@ -3,8 +3,6 @@ package frc.robot.Mechanisms;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxRelativeEncoder.Type;
-
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,7 +23,7 @@ public class Intake {
     
     private XboxController controller;
 
-    private double rollerin = -0.5f, rollerout = 0.5f;
+    private double rollerin = -0.8f, rollerout = 0.5f;
 
 
     //PID Variables

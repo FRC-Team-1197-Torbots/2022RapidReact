@@ -52,7 +52,7 @@ public class MechMaster {
     private double prevTime;
 
     public enum autoMech {
-        STORE, REVUP, SHOOT, IDLE;
+        STORE, REVUP, SHOOT, IDLE, SCUFF_SHOOT;
     }
 
     public enum turretMech {
@@ -79,6 +79,7 @@ public class MechMaster {
     public void TeleInit() {
         elevator.init();
         flywheel.init();
+        climbMode = false;
     }
 
     public void AutoInit() {
@@ -91,6 +92,8 @@ public class MechMaster {
 
         SmartDashboard.putBoolean("Climb mode", climbMode);
         SmartDashboard.putBoolean("Turret mode", turretIsAuto);
+        //System.out.println("Climb mode: " + climbMode);
+        //System.out.println("A button: " + p2.getAButtonPressed());
 
         //TOGGLE CLIMB MODE
         if (p2.getAButtonPressed()) {
@@ -110,12 +113,12 @@ public class MechMaster {
             }
             else if(p2.getPOV() == 180){ //&& climber.isAboveZero()){
                 climber.climb(climbState.DOWN);
-            }/*
-            else if(p1.getPOV() == 180){
-                climber.climb(climbState.RESET_DOWN);
-            }*/
-            else
+            }
+            else {
                 climber.climb(climbState.IDLE);
+            }
+        
+                
 
             
             if (p2.getPOV() == 90) {
@@ -142,8 +145,8 @@ public class MechMaster {
                     turret.PIDTuning(90);
                 else if (p2.getXButton())
                     turret.PIDTuning(-90);
-                else if (p2.getAButton())
-                    turret.PIDTuning(0);
+                //else if (p2.getAButton())
+                   // turret.PIDTuning(0);
                 else
                     turret.manualControl(0f);
             }
@@ -276,6 +279,8 @@ public class MechMaster {
     }
 
     public void autoRun(autoMech mechState, turretMech turretState, double angle) {
+        climbMode = false;
+
         switch(turretState) {
             case SET:
                 turret.PIDAutoTuning(angle);
@@ -289,19 +294,24 @@ public class MechMaster {
             case STORE:
                 intake.run(moveIntake.DOWN);
                 elevator.run(runElevator.STORE);
-                flywheel.run(runFlywheel.IDLE, 0);
+                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
 
                 break;
             case REVUP:
-                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
+                intake.run(moveIntake.UP);
+                flywheel.testRun(-2640); //-2590
                 elevator.run(runElevator.STORE);
                 break;
             case SHOOT:
                 //if (Math.abs(limelight.getAngle()) < 1)
                 intake.run(moveIntake.UP);
                 flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
-                if(flywheel.OnTarget)
+                if(flywheel.OnTarget
+                    && Math.abs(drive.getRightVelocity()) < 1000 
+                    && Math.abs(drive.getLeftVelocity()) < 1000)
+                {
                     elevator.run(runElevator.SHOOT);
+                }
                 else
                     elevator.run(runElevator.STORE);
                 /*
@@ -316,10 +326,22 @@ public class MechMaster {
                 
                 break;
             
+            case SCUFF_SHOOT:
+                intake.run(moveIntake.UP);
+                flywheel.testRun(-2640); //-2590
+                if(flywheel.OnTarget)
+                {
+                    elevator.run(runElevator.SHOOT);
+                }
+                else
+                    elevator.run(runElevator.STORE);
+                break;
+
+            
             case IDLE:
                 intake.run(moveIntake.UP);
                 elevator.run(runElevator.IDLE);
-                flywheel.run(runFlywheel.IDLE, 0);
+                flywheel.run(runFlywheel.RUN, limelight.calculate_distance());
                 break;
         }
 

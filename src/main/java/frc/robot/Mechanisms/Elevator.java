@@ -103,7 +103,7 @@ public class Elevator {
                         ballcount++;
                     }
                 }
-                else if (ballcount == 1) {
+                else if (baSllcount == 1) {
                     elMotorTop.set(0);
                     elMotorBottom.set(0.5);
                     if (!getMode(bottomBreakBeamList) && prevBottomBeam) {
@@ -182,18 +182,19 @@ public class Elevator {
                 
                 if (shooterBeam.get() && !prevShooterBeam) {
                     flywheel.setPIDValues(2);
-                    System.out.println("CHANGED PID VALUES");
+                    //System.out.println("CHANGED PID VALUES");
                 }
 
             break;
             case SHOOT:
+                //System.out.println(shooterBeam);
                 elMotorTop.set(0.6);
                 elMotorBottom.set(0.6);
                 ballcount = getBallCount();
 
                 if (shooterBeam.get() && !prevShooterBeam) {
                     flywheel.setPIDValues(2);
-                    System.out.println("CHANGED PID VALUES");
+                    //System.out.println("CHANGED PID VALUES");
                 }
 
                 

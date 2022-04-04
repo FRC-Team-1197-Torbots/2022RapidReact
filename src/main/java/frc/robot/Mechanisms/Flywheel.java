@@ -117,7 +117,11 @@ public class Flywheel {
     //-2800 - 220in
 
     public void run(runFlywheel flyState, double distance) {
+        //System.out.printf("Current: %.2f Target: %.2f Ball? %s P: %.3f I: %.3f D: %.3f%n", currentSpeed, targetSpeed, Elevator.shooterBeam.get(), currentError * kP, pidIntegral * kI, pidDerivativeResult * kD);
+
+
         switch(flyState) {
+
             case RUN:
                 /***
                  * FORMULAS TRIED:
@@ -129,11 +133,6 @@ public class Flywheel {
                  */
                 //System.out.println("Current Speed: " + currentSpeed);
                 //System.out.println("Target Speed: " + targetSpeed);
-
-                System.out.printf("Current: %.2f Target: %.2f Ball? %s P: %.3f I: %.3f D: %.3f%n", currentSpeed, targetSpeed, Elevator.shooterBeam.get(), currentError * kP, pidIntegral * kI, pidDerivativeResult * kD);
-                System.out.println("I: " + kI);
-
-
                 targetSpeed = (-5.7f * distance) + -1562.89f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 currentSpeed = flyEncoder.getVelocity();//rpm
                 
@@ -231,7 +230,8 @@ public class Flywheel {
     //TESTING TO TUNE PID, INPUTS HARD TARGET
     public void testRun(double rpm) {
         targetHighSpeed = rpm; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
-        
+        System.out.printf("Current: %.2f Target: %.2f Ball? %s P: %.3f I: %.3f D: %.3f%n", currentSpeed, targetHighSpeed, Elevator.shooterBeam.get(), currentError * kP, pidIntegral * kI, pidDerivativeResult * kD);
+
         // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
         // currentPosition = (adjustingConstant * 1) / (gearRatio);
         currentSpeed = flyEncoder.getVelocity();//rpm
@@ -239,24 +239,32 @@ public class Flywheel {
         flyMotor.set(speedToSetMotor);
         flyMotor2.set(-speedToSetMotor);
 
+        if(Math.abs(currentError) < 50) {//80
+            OnTarget = true;
+        } else {
+            OnTarget = false;
+        }
+
         //SmartDashboard.putNumber("Current speed", flyEncoder.getVelocity());
         //SmartDashboard.putNumber("Sum speed", sumSpeed);
         SmartDashboard.putNumber("Target RPM", targetHighSpeed);
-        System.out.println("RPM: " + flyEncoder.getVelocity());
+        //System.out.println("RPM: " + flyEncoder.getVelocity());
     }
 
     public void setPIDValues(int state) {
         //STATE 1 IS FOR THE RAMPUP, STATE 2 IS FOR THE BALL 1 OFFSET
-        if (state == 1) {
-            kP = kP1;
-            kI = kI1;
-            kD = kD1;
+        kP = kP1;
+        kI = kI1;
+        kD = kD1;
+        
+        /*if (state == 1) {
+            
         }
         else if (state == 2) {
             kP = kP2;
             kI = kI2;
             kD = kD2;
-        }
+        }*/
     }
 
     private void incrementList(ArrayList<Boolean> list){

@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class AutoBall2 {
     public static enum autoRun{
-        INIT, Linear1, PIVOT, SHOOT, DONE;
+        INIT, Linear1, PIVOT, SHOOT, Linear2, HangerTurret, HangerFire, DONE;
     }
 
     private autoRun AutoState1 = autoRun.INIT;
@@ -34,7 +34,7 @@ public class AutoBall2 {
     }
 
     public void run(){
-        SmartDashboard.putString("Auto State", AutoState1.toString());
+        // SmartDashboard.putString("Auto State", AutoState1.toString());
         switch(AutoState1){
             case INIT:
                 linear1.init();

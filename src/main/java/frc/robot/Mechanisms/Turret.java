@@ -97,8 +97,9 @@ public class Turret {
      */
     public void init(){
         TurretMotor.setNeutralMode(NeutralMode.Brake);
+        TurretMotor.setSelectedSensorPosition(0);
         
-        switch(m_initstate) {
+        /*switch(m_initstate) {
             case INIT:
                 TurretMotor.setSelectedSensorPosition(0);
                 m_initstate = INIT_STATES.TURN;
@@ -135,7 +136,7 @@ public class Turret {
             case IDLE:
 
             break;            
-        }
+        }*/
 
     }
 
@@ -167,48 +168,45 @@ public class Turret {
             return false;
     }
 
-    public void PIDAutoTuning(double angle) {      
+    public void PIDAutoTuning(double angle) {    
+        
+        TargetAngle = angle;
 
-        if(m_initstate != INIT_STATES.IDLE) {
+        if (TargetAngle > 180)
+            TargetAngle = 180;
+        else if (TargetAngle <-155)
+            TargetAngle = -155;
+
+            //start writing state machine to turn for tuning
+        double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
+            // System.out.println("target " + TargetAngle);
+            
+        TurretMotor.set(ControlMode.PercentOutput, pidout);   
+
+        /*if(m_initstate != INIT_STATES.IDLE) {
             init();
         } else {
             
-           TargetAngle = angle;
-
-            if (TargetAngle > 180)
-                TargetAngle = 180;
-            else if (TargetAngle <-155)
-                TargetAngle = -155;
-
-            //start writing state machine to turn for tuning
-            double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
-            // System.out.println("target " + TargetAngle);
-            
-            TurretMotor.set(ControlMode.PercentOutput, pidout);        
-        }
+                
+        }*/
     }
     
     public void PIDTuning(double tx) {      
+        if (offTargetForALongTime(tx))
+               TargetAngle = 0;
+        else
+            TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
 
-        if(m_initstate != INIT_STATES.IDLE) {
-            init();
-        } else {
-            if (offTargetForALongTime(tx))
-                TargetAngle = 0;
-            else
-                TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
-
-            if (TargetAngle > 180)
-                TargetAngle = 180;
-            else if (TargetAngle <-155)
-                TargetAngle = -155;
+        if (TargetAngle > 180)
+            TargetAngle = 180;
+        else if (TargetAngle <-155)
+            TargetAngle = -155;
 
             //start writing state machine to turn for tuning
-            double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
+        double pidout = TurretPID(units_to_degrees(TurretMotor.getSelectedSensorPosition()), TargetAngle);
             // System.out.println("target " + TargetAngle);
             
-            TurretMotor.set(ControlMode.PercentOutput, pidout);        
-        }
+        TurretMotor.set(ControlMode.PercentOutput, pidout);            
     }
 
     private double TurretPID(double currentangle, double targetangle) {
