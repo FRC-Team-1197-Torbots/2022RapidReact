@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 
 public class DriveHardware {
@@ -92,8 +92,8 @@ public class DriveHardware {
 	}
 
 	public void setMotorSpeeds(double leftSpeed, double rightSpeed) {
-		// SmartDashboard.putNumber("left raw", getLeftEncoder());
-		// SmartDashboard.putNumber("right raw", getRightEncoder());
+		SmartDashboard.putNumber("left raw", getLeftEncoder());
+		SmartDashboard.putNumber("right raw", getRightEncoder());
 		SetLeft(-leftSpeed); //- for auto
 		SetRight(-rightSpeed); //+ for teleop
 	}

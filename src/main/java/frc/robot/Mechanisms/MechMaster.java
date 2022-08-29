@@ -96,7 +96,7 @@ public class MechMaster {
         //System.out.println("A button: " + p2.getAButtonPressed());
 
         //TOGGLE CLIMB MODE
-        if (p2.getAButtonPressed()) {
+        if (p2.getRightBumperPressed()) {
             climbMode = !climbMode;
         }
 
@@ -108,10 +108,10 @@ public class MechMaster {
             intake.run(moveIntake.OFF);
             
 
-            if(p2.getPOV() == 0 ){
+            if(p2.getYButton()){
                 climber.climb(climbState.UP);  
             }
-            else if(p2.getPOV() == 180){ //&& climber.isAboveZero()){
+            else if(p2.getAButton()){ //&& climber.isAboveZero()){
                 climber.climb(climbState.DOWN);
             }
             else {
@@ -121,10 +121,10 @@ public class MechMaster {
                 
 
             
-            if (p2.getPOV() == 90) {
+            if (p2.getBButton()){//(p2.getPOV() == 90) {
                 climber.nikita(nikitaState.UP);
             }
-            else if (p2.getPOV() == 270) {
+            else if (p2.getXButton()){//(p2.getPOV() == 270) {
                 climber.nikita(nikitaState.DOWN);
             }
             else
@@ -134,17 +134,20 @@ public class MechMaster {
 
         
             //TURRET CONTROL
-            if (p2.getYButtonPressed()) {
+            if (p2.getLeftBumperPressed()) {
                 turretIsAuto = !turretIsAuto;
             }
             if (turretIsAuto) {
                 turret.PIDTuning(limelight.getAngle());
             }
             else {
-                if (p2.getBButton())
-                    turret.PIDTuning(90);
-                else if (p2.getXButton())
-                    turret.PIDTuning(-90);
+                /**************************************
+                 * REMEMBER TO PUSH THE CODE JUSTIN!!!!
+                 ***************************************/
+                if (p2.getPOV() == 90)
+                    turret.PIDTuning(20);
+                else if (p2.getPOV() == 270)
+                    turret.PIDTuning(-20);
                 //else if (p2.getAButton())
                    // turret.PIDTuning(0);
                 else

@@ -133,7 +133,7 @@ public class Flywheel {
                  */
                 //System.out.println("Current Speed: " + currentSpeed);
                 //System.out.println("Target Speed: " + targetSpeed);
-                targetSpeed = (-5.7f * distance) + -1562.89f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
+                targetSpeed = -2000f;//(-5.7f * distance) + -1562.89f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 currentSpeed = flyEncoder.getVelocity();//rpm
                 
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);

@@ -35,7 +35,7 @@ private autoRun AutoState1 = autoRun.INIT;
         this.mechMaster = mechMaster;
         linear1 = new linearTrajectory2(torDrive, 4, 1); //4.0 2.5
         pivot1 = new pivotTrajectory(torDrive, 13, 0.75); //10, 0.75
-        linear2 = new linearTrajectory2(torDrive, 13.5, 3.0); //13.67, 3.0 //12.67 4.0 //4.0 //3.5
+        linear2 = new linearTrajectory2(torDrive, 13.75, 3.0); //13.67, 3.0 //12.67 4.0 //4.0 //3.5
 
         linear3 = new linearTrajectoryBack(torDrive, -5, 1.5); //-6 1.5 //-4, 1.0 //1.75 original
 

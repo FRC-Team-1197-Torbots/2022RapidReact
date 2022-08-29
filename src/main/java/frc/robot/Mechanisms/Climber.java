@@ -56,10 +56,10 @@ public class Climber {
                 climb.set(-speed);
                 break;
             case DOWN:
-                if(climbEncoder.getPosition() <= 0)
+                //if(climbEncoder.getPosition() <= 0)
                     climb.set(speed);
-                else
-                    climb.set(0);
+                //else
+                    //climb.set(0);
                 break;
             case RESET_DOWN:
                 climb.set(-slowSpeed);

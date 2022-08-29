@@ -61,13 +61,13 @@ public class ArcadeDriveController extends DriveController {
    private double throttle = 0;
    private double steer = 0;
    
-   private final double MAX_VELOCITY = 45000f; //28000 //39000 // 34,000 // 39,000
+   private final double MAX_VELOCITY = 50000f;//45000f; //28000 //39000 // 34,000 // 39,000
    private final double STEER_SCALAR = 1.15; //1.2
    //this is for the curve drive
 
-   private final double POSRANGE_MAX_ACCEL = 0.03;//0.08;
-   private final double NEGRANGE_MAX_ACCEL = 0.02;//0.03;
-   private final double MAX_DECEL = 0.04;//0.06;
+   private final double POSRANGE_MAX_ACCEL = 0.02;//0.03;//0.08;
+   private final double NEGRANGE_MAX_ACCEL = 0.03;//0.02;//0.03;
+   private final double MAX_DECEL = 0.03;//0.04;//0.06;
 
    
 //    private double previousLeftSpeed = 0;
@@ -108,24 +108,37 @@ public class ArcadeDriveController extends DriveController {
 
    @Override
    public void run() {       
+        //System.out.println("Stickx: " + player1.getRawAxis(1) + "   sticky: " + player1.getRawAxis(0));
+
        throttle = -player1.getRawAxis(1);
        double sign = Math.signum(throttle);
        throttle = sign * Math.pow(throttle, 2);
-       
+
        steer = player1.getRawAxis(0);
        sign = Math.signum(steer);
-       steer = sign * Math.pow(steer, 2) * STEER_SCALAR;           
-       
-       double rightspeed = 0, leftSpeed = 0;
+       steer = sign * Math.pow(steer, 2) * STEER_SCALAR;  
 
+       if(Math.abs(throttle) < 0.025f) {
+            throttle = 0;
+       }
+
+       if(Math.abs(steer) < 0.025f) {
+           steer = 0;
+       }
+
+       double rightspeed = 0, leftSpeed = 0;
 
        if (throttle > previousThrottle) {
            if (previousThrottle> 0)
                 throttle = previousThrottle + POSRANGE_MAX_ACCEL;
-            else
+            else{                
                 throttle = previousThrottle + NEGRANGE_MAX_ACCEL;
+                //System.out.println("Throttle " + throttle);
+            }
+                
         }
-        if (throttle < previousThrottle) {
+
+        if (throttle < previousThrottle && Math.abs(throttle - previousThrottle) > MAX_DECEL) {
             throttle = previousThrottle - MAX_DECEL;
         }
 
