@@ -49,7 +49,7 @@ public class Turret {
     private INIT_STATES m_initstate;
     
     private runTurret turretState = runTurret.IDLE;
-    private TalonSRX TurretMotor;
+    public TalonSRX TurretMotor;
     private DigitalInput zeroSensor;
     //private XboxController player2;
     private LimeLightLineup limelight;
@@ -196,6 +196,8 @@ public class Turret {
                TargetAngle = 0;
         else
             TargetAngle = units_to_degrees(TurretMotor.getSelectedSensorPosition()) + tx;
+            //System.out.println(TargetAngle);
+
 
         if (TargetAngle > 180)
             TargetAngle = 180;

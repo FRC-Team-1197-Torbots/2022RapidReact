@@ -117,7 +117,7 @@ public class Flywheel {
     //-2800 - 220in
 
     public void run(runFlywheel flyState, double distance) {
-        //System.out.printf("Current: %.2f Target: %.2f Ball? %s P: %.3f I: %.3f D: %.3f%n", currentSpeed, targetSpeed, Elevator.shooterBeam.get(), currentError * kP, pidIntegral * kI, pidDerivativeResult * kD);
+        
 
 
         switch(flyState) {
@@ -133,7 +133,7 @@ public class Flywheel {
                  */
                 //System.out.println("Current Speed: " + currentSpeed);
                 //System.out.println("Target Speed: " + targetSpeed);
-                targetSpeed = -2000f;//(-5.7f * distance) + -1562.89f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
+                targetSpeed = (-5.7f * distance) + -1562.89f;//-2000f;    //(-4.63f*distance) + -1534f; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
                 currentSpeed = flyEncoder.getVelocity();//rpm
                 
                 speedToSetMotor = pidRun(currentSpeed, targetSpeed);
@@ -230,7 +230,7 @@ public class Flywheel {
     //TESTING TO TUNE PID, INPUTS HARD TARGET
     public void testRun(double rpm) {
         targetHighSpeed = rpm; //FORMULA FOR THE DISTANCE, MIGHT NEED TO CHANGE
-        System.out.printf("Current: %.2f Target: %.2f Ball? %s P: %.3f I: %.3f D: %.3f%n", currentSpeed, targetHighSpeed, Elevator.shooterBeam.get(), currentError * kP, pidIntegral * kI, pidDerivativeResult * kD);
+        //System.out.printf("Current: %.2f Target: %.2f Ball? %s P: %.3f I: %.3f D: %.3f%n", currentSpeed, targetHighSpeed, Elevator.shooterBeam.get(), currentError * kP, pidIntegral * kI, pidDerivativeResult * kD);
 
         // currentPosition = (adjustingConstant * flyEncoder1.getPosition()) / (gearRatio);
         // currentPosition = (adjustingConstant * 1) / (gearRatio);

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import com.ctre.phoenix.motorcontrol.*;
 //import com.ctre.phoenix.motorcontrol.can.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 
 import org.ejml.simple.AutomaticSimpleMatrixConvert;
 
@@ -22,6 +23,8 @@ import frc.robot.Mechanisms.*;
 import frc.robot.Mechanisms.Elevator.runElevator;
 import frc.robot.Autonomous.*;
 
+//import frc.robot.Mechanisms.MechMaster.autoMech;
+//import frc.robot.Mechanisms.MechMaster.turretMech;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -53,6 +56,9 @@ public class Robot extends TimedRobot {
   private TorDrive drive;
   private MechMaster mechMaster;
   private AutoMaster autoMaster;
+  private AnalogPotentiometer potentiometer;
+  //public autoMech AutoMechanics;
+
 
   private boolean isAligned;
   private double horizAngleOffset; //instance variable to test the accuracy of the turret, get rid of this later
@@ -64,13 +70,14 @@ public class Robot extends TimedRobot {
     //talon = new TalonSRX(10);
 
     //intake = new Intake(player1);
-    // turret = new Turret();
+    //turret = new Turret();
     // limeLight = new LimeLightLineup();
     // elevator = new Elevator();
     hardware = new DriveHardware();
     drive = new TorDrive(hardware, player1);
     mechMaster = new MechMaster(drive);
     autoMaster = new AutoMaster(drive, mechMaster); 
+    potentiometer = new AnalogPotentiometer(1);
 
     CameraServer.startAutomaticCapture();
   }
@@ -137,14 +144,21 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    //System.out.println(mechMaster.turret.units_to_degrees(mechMaster.turret.TurretMotor.getSelectedSensorPosition()));
+    //pivot1.run();
+    //mechMaster.autoRun(autoMech.IDLE, turretMech.AUTOAIM, 45);
 
+    mechMaster.teleRun();
+    drive.Run();
+    //turret.PIDTuning(limeLight.getAngle());
+    
     //SmartDashboard.putNumber("Right encoder", drive.getRightEncoder());
     //SmartDashboard.putNumber("Left encoder", drive.getLeftEncoder());
-    drive.Run();
+   
 
     /* **************** INTAKE TEST CODE **************************** */
     //intake.run();
-    mechMaster.teleRun();
+   
 
 
     /* **************** TURRET TEST CODE ****************************

@@ -131,7 +131,7 @@ public class linearTrajectory2 {
 		//since it is never used other than for finding angleError, there is no need to make sure that it reads -1 degrees rather than 359 degrees
 		currentDistance = drive.getPosition();
 		currentTime = Timer.getFPGATimestamp();
-		System.out.println("Current angle: " + currentAngle);
+		//System.out.println("Current angle: " + currentAngle);
 
 		switch(runIt) {
 		case IDLE:

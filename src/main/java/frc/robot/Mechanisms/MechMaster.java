@@ -2,6 +2,7 @@ package frc.robot.Mechanisms;
 
 import javax.lang.model.util.ElementScanner6;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,7 +38,7 @@ public class MechMaster {
     private Turret turret;
     private Climber climber;
     private TorDrive drive;
-
+    private DigitalInput limitSwitch;
 
     private XboxController p1;
     private XboxController p2;
@@ -70,6 +71,7 @@ public class MechMaster {
         p1 = new XboxController(0);
         p2 = new XboxController(1);
         this.drive = drive;
+        limitSwitch = new DigitalInput(4);
         // intake = new Intake(p1);
         // changeIntake = moveIntake.UP;
 
@@ -108,8 +110,13 @@ public class MechMaster {
             intake.run(moveIntake.OFF);
             
 
-            if(p2.getYButton()){
-                climber.climb(climbState.UP);  
+            if(p2.getYButton()){  
+                if(!limitSwitch.get()){
+                   climber.climb(climbState.SWITCH_PRESSED);
+               }
+                else{
+                    climber.climb(climbState.UP);
+                }
             }
             else if(p2.getAButton()){ //&& climber.isAboveZero()){
                 climber.climb(climbState.DOWN);

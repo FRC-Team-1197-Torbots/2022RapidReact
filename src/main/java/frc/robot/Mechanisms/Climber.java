@@ -2,10 +2,13 @@ package frc.robot.Mechanisms;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.CAN;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /*-------------------------
 CONTROLS 4 CLIMBER ARMS
@@ -19,6 +22,8 @@ public class Climber {
     private CANSparkMax climb;
     private CANSparkMax nikita;
 
+    private DigitalInput limitSwitch;
+
     private RelativeEncoder climbEncoder;
     private RelativeEncoder nikitaEncoder;
 
@@ -27,18 +32,21 @@ public class Climber {
     private double nikitaSpeed = 0.2;
 
     public enum climbState{
-        UP, DOWN, IDLE, RESET_DOWN;
+        UP, DOWN, IDLE, RESET_DOWN, SWITCH_PRESSED;
     }
 
     public static enum nikitaState {
         UP, DOWN, IDLE;
     }
     
-    //public climbState climberPos;
+    public climbState climberPos;
 
     public Climber(){
         climb = new CANSparkMax(6, MotorType.kBrushless);
         nikita = new CANSparkMax(9, MotorType.kBrushless);
+        climb.setIdleMode(IdleMode.kBrake);
+        nikita.setIdleMode(IdleMode.kBrake);
+        //limitSwitch = new DigitalInput(0);
 
         climbEncoder = climb.getEncoder();
         nikitaEncoder = nikita.getEncoder();
@@ -54,6 +62,10 @@ public class Climber {
         switch(climberPos) {
             case UP:
                 climb.set(-speed);
+                break;
+            case SWITCH_PRESSED:
+                //System.out.println("Switch working");
+                climb.set(0);
                 break;
             case DOWN:
                 //if(climbEncoder.getPosition() <= 0)
@@ -71,20 +83,22 @@ public class Climber {
         }
     }
 
-   /* public double getClimberPos() {
+   public double getClimberPos() {
         return climbEncoder.getPosition();
     }
 
     public boolean isAboveZero() {
         return getClimberPos() > 0;
     }
-    */
+    
     public void nikita(nikitaState nikitaPos) {
         switch(nikitaPos) {
             case UP:
+                //nikita.set(-nikitaSpeed);
                 nikita.set(nikitaSpeed);
                 break;
             case DOWN:
+                //nikita.set(nikitaSpeed);
                 nikita.set(-nikitaSpeed);
                 break;
             case IDLE:
