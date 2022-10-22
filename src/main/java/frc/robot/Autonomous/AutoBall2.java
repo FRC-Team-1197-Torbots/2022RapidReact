@@ -34,7 +34,7 @@ public class AutoBall2 {
     }
 
     public void run(){
-        // SmartDashboard.putString("Auto State", AutoState1.toString());
+        //SmartDashboard.putString("Auto State", AutoState1.toString());
         switch(AutoState1){
             case INIT:
                 linear1.init();
